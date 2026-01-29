@@ -1,0 +1,13 @@
+# Virtual environment
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# SQLite database
+finance.db
+
+# OS junk
+.DS_Store
+Thumbs.db
