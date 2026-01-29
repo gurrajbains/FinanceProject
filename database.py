@@ -11,11 +11,24 @@ def get_connection():
 
 
 def init_db():
-    """
-    Initialize database and tables.
-    TODO: Create transactions table
-    """
-    pass
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS transactions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            date TEXT NOT NULL,
+            amount REAL NOT NULL,
+            type TEXT NOT NULL,
+            category TEXT NOT NULL,
+            description TEXT
+        )
+    """)
+    conn.commit()
+    print("Database initialized successfully.")
+    conn.close
+
+
+  
 
 
 def add_transaction(date, amount, ttype, category, description=""):

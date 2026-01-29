@@ -7,7 +7,7 @@ def main():
     Application entry point.
     """
     init_db()
-    print("Finance Tracker base structure loaded")
+    print("DB has been initialized.")
 
 
 if __name__ == "__main__":
