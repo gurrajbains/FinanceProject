@@ -1,6 +1,7 @@
 # database.py
 import sqlite3
 
+
 DB_NAME = "finance.db"
 
 
@@ -15,33 +16,34 @@ def init_db():
     cursor = conn.cursor()
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS transactions (
+            name TEXT,
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             date TEXT NOT NULL,
             amount REAL NOT NULL,
-            type TEXT NOT NULL,
+            ttype TEXT NOT NULL,
             category TEXT NOT NULL,
             description TEXT
         )
     """)
     conn.commit()
     print("Database initialized successfully.")
-    conn.close
+    conn.close()
 
 
   
 
 
-def add_transaction(date, amount, type, category, description=""):
+def add_transaction(name, date, amount, ttype, category, description=""):
     """
     Add a transaction to the database.
     TODO: Insert row into transactions table
     """
-    conn =get_connection()
+    conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("""
-        INSERT INTO transactions (date, amount, type, category, description)
-        VALUES (?, ?, ?, ?, ?)
-    """, (date, amount, type, category, description))
+        INSERT INTO transactions (name, date, amount, ttype, category, description)
+        VALUES (?,?, ?, ?, ?, ?)
+    """, (name, date, amount, ttype, category, description))
     conn.commit()
     conn.close()
 
@@ -49,5 +51,21 @@ def get_all_transactions():
     """
     Return all transactions.
     TODO: Query transactions table
+    """
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT name, date, amount, ttype, category, description FROM transactions;")
+    rows = cursor.fetchall()
+    conn.close()
+    return rows
+
+def delete_Database():
+    """
+    Clear the database files
+    """ 
+    pass
+def cleanPrint(rows):
+    """
+    Print the rows in a clean format
     """
     pass
