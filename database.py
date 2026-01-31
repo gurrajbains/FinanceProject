@@ -31,13 +31,19 @@ def init_db():
   
 
 
-def add_transaction(date, amount, ttype, category, description=""):
+def add_transaction(date, amount, type, category, description=""):
     """
     Add a transaction to the database.
     TODO: Insert row into transactions table
     """
-    pass
-
+    conn =get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        INSERT INTO transactions (date, amount, type, category, description)
+        VALUES (?, ?, ?, ?, ?)
+    """, (date, amount, type, category, description))
+    conn.commit()
+    conn.close()
 
 def get_all_transactions():
     """

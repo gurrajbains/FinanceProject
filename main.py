@@ -1,14 +1,13 @@
-# main.py
-from database import init_db
+from database import init_db, add_transaction
 
+init_db()
 
-def main():
-    """
-    Application entry point.
-    """
-    init_db()
-    print("DB has been initialized.")
+add_transaction(
+    "2026-02-01",
+    20.00,
+    "expense",
+    "Food",
+    "Lunch"
+)
 
-
-if __name__ == "__main__":
-    main()
+print("Inserted one transaction")
