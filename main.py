@@ -13,25 +13,29 @@ add_transaction(
 while True:
     print("What do you want to do?")
     print("Type 'add' to add a transaction or 'exit' to quit or 'view' to search for a specfic transaction." )
-    x = input("Enter your choice: ")
+    x = input("Enter your choice: ").strip().lower()
     if x.lower() == 'exit':
         break
     elif x.lower() == 'add':
       print("Adding a new transaction:")
       print("Please provide the following details.")
-      name = input("Enter name: ")
-      date = input("Enter date (YYYY-MM-DD): ")
+      name = input("Enter name: ").strip().lower()
+      date = input("Enter date (YYYY-MM-DD): ").strip().lower()
       amount = float(input("Enter amount: "))
-      ttype = input("Enter type (income/expense): ") 
-      if(ttype != "income"): category = input("Enter source: ")   
-      else: category = input("Enter category: ")
-      description = input("Enter description (optional): ")
+      ttype = input("Enter type (income/expense): ") .strip().lower()
+      if(ttype == "income"): category = input("Enter source: ").strip().lower()   
+      elif(ttype == "expense"): category = input("Enter category: ").strip().lower()
+      else:
+          print("Invalid type. Please enter 'income' or 'expense'.")
+          continue
+      description = input("Enter description (optional): ").strip().lower()
       add_transaction(name, date, amount, ttype, category, description)
       print("Transaction added.")
-
-
+    elif x.lower() == 'view':
+      print("Listing all transactions:")
+      rows = get_all_transactions()
+      for row in rows:
+          print(row) 
 print("Inserted one transaction")
-print("All transactions:")
 
-rows = get_all_transactions()
-print(rows)
+
