@@ -69,3 +69,15 @@ def cleanPrint(rows):
     Print the rows in a clean format
     """
     pass
+
+def delete_transaction(transaction_id):
+    conn= get_connection()
+    cursor = conn.cursor()
+    cursor.execute(" DELETE FROM transactions WHERE id = ?", (transaction_id,))
+    conn.commit()
+   
+    cursor.rowcount
+
+    rowcount = cursor.rowcount
+    conn.close()
+    return rowcount
