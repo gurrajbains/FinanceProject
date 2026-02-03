@@ -1,4 +1,4 @@
-from database import init_db, add_transaction, get_all_transactions, delete_transaction
+from database import get_summary, init_db, add_transaction, get_all_transactions, delete_transaction
 
 init_db()
 
@@ -12,10 +12,15 @@ add_transaction(
 )
 while True:
     print("What do you want to do?")
-    print("Type 'add' to add a transaction or 'exit' to quit or 'view' to search for a specfic transaction or 'delete' to delete a transaction." )
+    print("Type 'add' to add a transaction or 'exit' to quit or 'view' to see all transactions or 'delete' to delete a transaction or 'summary' to see a summary of transactions." )
     x = input("Enter your choice: ").strip().lower()
     if x.lower() == 'exit':
         break
+    elif x.lower() == 'summary':
+        print("Displaying summary of transactions below:")
+        summary = get_summary()
+        for item in summary:
+            print(item)
     elif x.lower() == 'add':
       print("Adding a new transaction:")
       print("Please provide the following details.")
@@ -44,7 +49,5 @@ while True:
            print("Transaction deleted.")
     else:
            print("Transaction not found.")
-       
-
-
+   
 

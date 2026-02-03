@@ -81,3 +81,11 @@ def delete_transaction(transaction_id):
     rowcount = cursor.rowcount
     conn.close()
     return rowcount
+
+def get_summary(): 
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT ttype, SUM (amount) FROM transactions GROUP BY ttype;")
+    summary = cursor.fetchall() 
+    conn.close()
+    return summary  
