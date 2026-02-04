@@ -1,26 +1,38 @@
-from database import get_summary, init_db, add_transaction, get_all_transactions, delete_transaction
+from database import get_summary, init_db, add_transaction, get_all_transactions, delete_transaction 
+import csv
 
 init_db()
-
-add_transaction(
-    "Gurraj Bains",
-    "2026-02-01",
-    20.00,
-    "expense",
-    "Food",
-    "Lunch"
-)
+def export_to_csv(rows):
+    """
+    Export all transactions to a CSV file.
+    """
+    with open('transactions.csv', 'w', newline='') as csvfile:  #open file in write mode 
+        columns = ['Name', 'Date', 'Amount', 'Type', 'Category', 'Description'] # define ccollumns  fo rthe csv files
+        writer = csv.writer(csvfile)#writer will be write into csv file
+        writer.writerow(columns) # write the header rows 
+        for row in rows: #go through every single row in rows and put the values intoo the corresponding header 
+            writer.writerow(row)
+    
 while True:
     print("What do you want to do?")
-    print("Type 'add' to add a transaction or 'exit' to quit or 'view' to see all transactions or 'delete' to delete a transaction or 'summary' to see a summary of transactions." )
+    print("Type 'add' to add a transaction or 'exit' to quit or 'view' to see all transactions or 'delete' to delete a transaction or 'summary' to see a summary of transactions or 'export' to export transactions to a CSV file." )
     x = input("Enter your choice: ").strip().lower()
+    
+    #logic to exit loop
     if x.lower() == 'exit':
         break
+    #logic to view all the tranctions in terminal
     elif x.lower() == 'summary':
         print("Displaying summary of transactions below:")
         summary = get_summary()
         for item in summary:
             print(item)
+    #logic to export to csv  << can implment a feature to only print out a specfic data range  / data type later and return percentages etc
+    elif x.lower() == 'export':
+        rows = get_all_transactions()
+        export_to_csv(rows) 
+        print("Exported transactions to CSV.")
+    #logic for adding a transaction
     elif x.lower() == 'add':
       print("Adding a new transaction:")
       print("Please provide the following details.")
@@ -36,11 +48,14 @@ while True:
       description = input("Enter description (optional): ").strip().lower()
       add_transaction(name, date, amount, ttype, category, description)
       print("Inserted one transaction")
+    #logic to view transactions 
     elif x.lower() == 'view':
       print("Listing all transactions:")
       rows = get_all_transactions()
       for row in rows:
           print(row) 
+    
+    #logic to delete a transaction // add abilitiy to delete all tranctions by typing all? << do later
     elif x.lower() == 'delete':
       id = input("Enter the ID of the transaction to delete: ").strip().lower()
       print(f"Looking for transaction with ID: {id}")
