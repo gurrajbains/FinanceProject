@@ -43,11 +43,11 @@ while True:
           print(row) 
     elif x.lower() == 'delete':
       id = input("Enter the ID of the transaction to delete: ").strip().lower()
-    print("Looking for transaction with ID:{id}")
-    row = delete_transaction(int(id))
-    if row == 1:
-           print("Transaction deleted.")
-    else:
-           print("Transaction not found.")
+      print(f"Looking for transaction with ID: {id}")
+      row = delete_transaction((id))
+      if row == 1:
+            print("Transaction deleted.")
+      else:
+            print("Transaction not found.")
    
 
