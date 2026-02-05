@@ -1,4 +1,4 @@
-from database import get_summary, init_db, add_transaction, get_all_transactions, delete_transaction 
+from database import get_summary, init_db, add_transaction, get_all_transactions, delete_transaction, delete_all_transactions
 import csv
 
 init_db()
@@ -15,7 +15,7 @@ def export_to_csv(rows):
     
 while True:
     print("What do you want to do?")
-    print("Type 'add' to add a transaction or 'exit' to quit or 'view' to see all transactions or 'delete' to delete a transaction or 'summary' to see a summary of transactions or 'export' to export transactions to a CSV file." )
+    print("Type 'add' to add a transaction or 'exit' to quit or 'list' to see all transactions \n or 'delete' to delete a transaction or 'summary' to see a summary of \n transactions or 'export' to export transactions to a CSV file." )
     x = input("Enter your choice: ").strip().lower()
     
     #logic to exit loop
@@ -37,7 +37,7 @@ while True:
       print("Adding a new transaction:")
       print("Please provide the following details.")
       name = input("Enter name: ").strip().lower()
-      date = input("Enter date (YYYY-MM-DD): ").strip().lower()
+      date = input("Enter date (MM-DD-YYYY): ").strip().lower()
       amount = float(input("Enter amount: "))
       ttype = input("Enter type (income/expense): ") .strip().lower()
       if(ttype == "income"): category = input("Enter source: ").strip().lower()   
@@ -57,12 +57,17 @@ while True:
     
     #logic to delete a transaction // add abilitiy to delete all tranctions by typing all? << do later
     elif x.lower() == 'delete':
-      id = input("Enter the ID of the transaction to delete: ").strip().lower()
-      print(f"Looking for transaction with ID: {id}")
-      row = delete_transaction((id))
-      if row == 1:
-            print("Transaction deleted.")
+      id = input("Enter the ID of the transaction to delete or 'all' to delete all transactions: ").strip().lower()
+      if id == "all":
+        print("Deleting all transactions.")
+        delete_all_transactions()
+        print("All transactions have been deleted. ")
       else:
+        print(f"Looking for transaction with ID: {id}")
+        row = delete_transaction((id))
+        if row == 1:
+              print("Transaction deleted.")
+        else:
             print("Transaction not found.")
    
 

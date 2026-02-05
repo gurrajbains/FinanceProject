@@ -81,6 +81,18 @@ def delete_transaction(transaction_id):
     rowcount = cursor.rowcount
     conn.close()
     return rowcount
+def delete_all_transactions():
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM transactions;")
+   
+    conn.commit()
+   
+    deleted = cursor.rowcount
+    conn.close()
+    return deleted
+
+
 
 def get_summary(): 
     conn = get_connection()
