@@ -1,4 +1,4 @@
-from database import get_summary, init_db, add_transaction, get_all_transactions, delete_transaction, delete_all_transactions
+from database import get_summary, init_db, add_transaction, get_all_transactions, delete_transaction, delete_all_transactions, get_transactions_by_type
 import csv
 
 init_db()

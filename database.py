@@ -101,3 +101,10 @@ def get_summary():
     summary = cursor.fetchall() 
     conn.close()
     return summary  
+def get_transactions_by_type(ttype):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT name, date, amount, ttype, category, description FROM transactions WHERE ttype=? ORDER by date DESC, id DESC", (ttype,))
+    rows = cursor.fetchall()
+    conn.close()
+    return rows
