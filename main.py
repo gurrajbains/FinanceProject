@@ -3,6 +3,7 @@ import csv
 
 init_db()
 def export_to_csv(rows):
+    #Need to clean up data , need to clean up ui, need to clean up how data is being dsipalted on the CLI, add abiility to give percentages based on income etc; tax rates ; etc ; total percentage of money used; revenue across a few months etc;
     """
     Export all transactions to a CSV file.
     """
@@ -15,9 +16,20 @@ def export_to_csv(rows):
     
 while True:
     print("What do you want to do?")
-    print("Type 'add' to add a transaction or 'exit' to quit or 'list' to see all transactions \n or 'delete' to delete a transaction or 'summary' to see a summary of \n transactions or 'export' to export transactions to a CSV file." )
+    print("Type 'add' to add a transaction or 'exit' to quit or 'list' to see all transactions \n or 'delete' to delete a transaction or 'options' to see all options." )
     x = input("Enter your choice: ").strip().lower()
-    
+    if(x == "options"):
+        print("Available options:")
+        print("1. 'add' - Add a new transaction")
+        print("2. 'view' - View all transactions")
+        print("3. 'delete' - Delete a transaction by ID or delete all transactions")
+        print("4. 'summary' - View a summary of transactions")
+        print("5. 'export' - Export transactions to a CSV file")
+        print("6. 'exit' - Exit the application")
+        x= input("Enter your choice: ").strip().lower()
+    while x not in ['add', 'view', 'delete', 'summary', 'export', 'exit', 'options']:
+        print("Invalid choice. Please try again.")
+        x = input("Enter your choice: ").strip().lower()
     #logic to exit loop
     if x.lower() == 'exit':
         break
