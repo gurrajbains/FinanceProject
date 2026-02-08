@@ -1,5 +1,6 @@
 # database.py
 import sqlite3
+from flask import g
 
 
 DB_NAME = "finance.db"
