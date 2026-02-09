@@ -1,6 +1,6 @@
 # database.py
 import sqlite3
-from flask import g
+from flask import g, render_template
 
 
 DB_NAME = "finance.db"
@@ -31,7 +31,11 @@ def init_db():
     conn.close()
 
 
-  
+def return_HTML_table(rows):
+    """
+    Return DATA to html   """
+    rows = get_all_transactions()
+    return render_template("index.html", rows=rows)
 
 
 def add_transaction(name, date, amount, ttype, category, description=""):
