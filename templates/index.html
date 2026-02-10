@@ -25,16 +25,19 @@ table,th,td{
         <th> Type </th>
         <th> Data </th>
     </tr>
-    <tr style="border-bottom: 1px solid #ff0000;">
+    <tbody>
+        <tr style="border-bottom: 1px solid #ff0000;">
         //A basic table row, which will be generated based on actual data
         {% for row in rows %}
         <td> {{row[1]}} </td>
-        <td> {{row[0]}} </td>
-        <td> {{row[2]}} </td>
+        <td> {{row[6]}} </td>
         <td> {{row[3]}} </td>
+        <td> {{row[2]}} </td>
         <td> {{row[5]}} </td>
         <td> {{row[4]}} </td>
-         {% endfor %} 
+        <td>{{row[0]}}</td>
+     </tr>    {% endfor %} 
+    </tbody>
 </table>
 <body>
 <html>
