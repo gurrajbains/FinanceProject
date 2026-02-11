@@ -16,7 +16,7 @@ def init_db():
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS transactions (
+        CREATE TABLE IF NOT EXISTS finance (
             name TEXT,
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             date TEXT NOT NULL,
@@ -41,12 +41,12 @@ def return_HTML_table(rows):
 def add_transaction(name, date, amount, ttype, category, description=""):
     """
     Add a transaction to the database.
-    TODO: Insert row into transactions table
+    TODO: Insert row into finance table
     """
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("""
-        INSERT INTO transactions (name, date, amount, ttype, category, description)
+        INSERT INTO finance (name, date, amount, ttype, category, description)
         VALUES (?,?, ?, ?, ?, ?)
     """, (name, date, amount, ttype, category, description))
     conn.commit()
@@ -55,30 +55,19 @@ def add_transaction(name, date, amount, ttype, category, description=""):
 def get_all_transactions():
     """
     Return all transactions.
-    TODO: Query transactions table
+    TODO: Query finance table
     """
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT name, date, amount, ttype, category, description FROM transactions;")
+    cursor.execute("SELECT name, date, amount, ttype, category, description FROM finance;")
     rows = cursor.fetchall()
     conn.close()
     return rows
 
-def delete_Database():
-    """
-    Clear the database files
-    """ 
-    pass
-def cleanPrint(rows):
-    """
-    Print the rows in a clean format
-    """
-    pass
-
 def delete_transaction(transaction_id):
     conn= get_connection()
     cursor = conn.cursor()
-    cursor.execute(" DELETE FROM transactions WHERE id = ?", (transaction_id,))
+    cursor.execute(" DELETE FROM finance WHERE id = ?", (transaction_id,))
     conn.commit()
    
     cursor.rowcount
@@ -89,7 +78,7 @@ def delete_transaction(transaction_id):
 def delete_all_transactions():
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("DELETE FROM transactions;")
+    cursor.execute("DELETE FROM finance;")
    
     conn.commit()
    
@@ -102,14 +91,14 @@ def delete_all_transactions():
 def get_summary(): 
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT ttype, SUM (amount) FROM transactions GROUP BY ttype;")
+    cursor.execute("SELECT ttype, SUM (amount) FROM finance GROUP BY ttype;")
     summary = cursor.fetchall() 
     conn.close()
     return summary  
 def get_transactions_by_type(ttype):
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT name, date, amount, ttype, category, description FROM transactions WHERE ttype=? ORDER by date DESC, id DESC", (ttype,))
+    cursor.execute("SELECT name, date, amount, ttype, category, description FROM finance WHERE ttype=? ORDER by date DESC, id DESC", (ttype,))
     rows = cursor.fetchall()
     conn.close()
     return rows

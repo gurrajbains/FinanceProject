@@ -7,7 +7,7 @@ appp = Flask(__name__)
 @appp.route('/')
 def house():
     rows = get_all_transactions()
-    return render_template('index.html', rows=rows)
+    return render_template('index.html', rows = rows)
 if(__name__ == '__main__'):
     init_db()
     appp.run(debug=True)

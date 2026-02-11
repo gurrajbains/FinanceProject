@@ -1,21 +1,25 @@
 <!DOCTYPE html>
-<html> render_template("index.html", rows=rows)
+<html> 
 <head>    
 <style> 
 
 table,th,td{
-    border: 2px solid black;
+    border: 2px solid rgb(201, 6, 6);
     padding:2px;
     border-collapse: collapse;
+    text-align: center;
+    background-color: rgb(255, 255, 255);
+    margin-bottom:500px;
 }
 </style>
 <title>Finance Manager</title>
 
 </head>
+
 <body>
     <h1>What is up my dudes</h1>
     <p> This is a basic finance manager application. Which i am currently working on.</p>
-<table border=5 frame=red rules=rows, width = 75%>   
+<table border=5 frame=red rules=rows, width = 100% text-align = center>   
     <tr style="border-bottom: 1px solid #ff0000;">
         <th> Transaction ID </th> 
         <th> Description </th>
@@ -25,8 +29,8 @@ table,th,td{
         <th> Type </th>
         <th> Data </th>
     </tr>
-    <tbody>
-        <tr style="border-bottom: 1px solid #ff0000;">
+    <tbody> 
+        <tr >
         //A basic table row, which will be generated based on actual data
         {% for row in rows %}
         <td> {{row[1]}} </td>
@@ -36,21 +40,29 @@ table,th,td{
         <td> {{row[5]}} </td>
         <td> {{row[4]}} </td>
         <td>{{row[0]}}</td>
-     </tr>    {% endfor %} 
+     </tr>   
+      {% endfor %} 
     </tbody>
+
 </table>
-<style>
-button {
+<style >
+button  {
     border:  2px solid black;
     padding: 10px;
-    display: block;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    display: inline-block;
     text-decoration: wavy;
     font-size: large;
     margin : 10px;
+    gap: 100px;
     cursor: pointer;
-} </style>
-
-    <button >class=Add Transaction</button>
+} </style >
+    <button >Add </button>
+    <button>Delete </button>
+    <button>Update</button>
+    <button>View</button>
+    <button>Export</button>
+    <button>Graph</button>
 
 
 <body>
