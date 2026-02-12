@@ -1,27 +1,58 @@
 <!DOCTYPE html>
 <html> 
 <head>    
-<style> 
+<style> body{
+    background-image:url("{{ url_for('static', filename='background.jpg') }}");
+    url("{{ url_for('static', filename='background.jpg') }}");
+}
+toobar {
+    position: sticky;
+    justify-content: center;
+    margin-top: 20px;
+   }
+.table-container {
+    max-height: 3000px;
+    overflow-y: auto;
+}
+table {
+    table-layout: fixed;
+    width: 100%;
+}
+
+td, th {
+    word-wrap: break-word;
+}
+
+
+thead th {
+    position: sticky;
+    top: 0;
+    background: rgb(218, 204, 204);
+    z-index: 1;
+}
 
 table,th,td{
-    border: 2px solid rgb(201, 6, 6);
+    border: 2px solid rgb(209, 209, 209);
     padding:2px;
     border-collapse: collapse;
     text-align: center;
-    background-color: rgb(207, 154, 154);
+    background-color: rgb(255, 255, 255);
     margin-bottom:500px;
 }
+</style>
+
+<style>
+
 </style>
 <title>Finance Manager</title>
 
 </head>
 
-<body style="background-color: rgb(207, 154, 154);">
+<body style="background-color: rgb(255, 255, 255);">
     <h1>What is up my dudes</h1>
-
-
+<div class = "table-containment">
 <table border=5 frame=red rules=rows, width = 100% text-align = center>   
-    <tr style="border-bottom: 1px solid #ff0000;">
+    <tr style="border-bottom: 1px solid #ffffff;">
         <th> Transaction ID </th> 
          <th> Date </th> 
         <th> Amount </th>
@@ -37,8 +68,10 @@ table,th,td{
       {% endfor %} 
     </tbody>
 
-</table>
-<style >
+</table></div>
+
+<div class= "toolbar">
+    <style>
 button  {
     border:  2px solid black;
     padding: 10px;
@@ -59,11 +92,6 @@ button  {
 
   <input type="number" name="amount" step="0.01" placeholder="Amount" required>
 
-  <select name="ttype" required>
-    <option value="">Select type</option>
-    <option value="income">income</option>
-    <option value="expense">expense</option>
-  </select>
 
   <input type="text" name="category" placeholder="Category" required>
 
@@ -81,6 +109,7 @@ button  {
     <button>View</button>
   
     <button>Graph</button>
+</div>
 
 
 

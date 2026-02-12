@@ -13,7 +13,7 @@ def add():
     name = request.form["name"].strip()
     date = request.form["date"].strip()
     amount = float(request.form["amount"])
-    ttype = request.form["ttype"].strip().lower()
+    ttype = "income"
     category = request.form["category"].strip()
     description = request.form.get("description", "").strip()
 
