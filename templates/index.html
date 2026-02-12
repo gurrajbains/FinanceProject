@@ -8,7 +8,7 @@ table,th,td{
     padding:2px;
     border-collapse: collapse;
     text-align: center;
-    background-color: rgb(255, 255, 255);
+    background-color: rgb(207, 154, 154);
     margin-bottom:500px;
 }
 </style>
@@ -16,9 +16,10 @@ table,th,td{
 
 </head>
 
-<body>
+<body style="background-color: rgb(207, 154, 154);">
     <h1>What is up my dudes</h1>
-    <p> This is a basic finance manager application. Which i am currently working on.</p>
+
+
 <table border=5 frame=red rules=rows, width = 100% text-align = center>   
     <tr style="border-bottom: 1px solid #ff0000;">
         <th> Transaction ID </th> 
@@ -31,7 +32,6 @@ table,th,td{
     </tr>
     <tbody> 
         <tr >
-        //A basic table row, which will be generated based on actual data
         {% for row in rows %}
         <td> {{row[1]}} </td>
         <td> {{row[6]}} </td>
@@ -57,12 +57,39 @@ button  {
     gap: 100px;
     cursor: pointer;
 } </style >
-    <button >Add </button>
-    <button>Delete </button>
-    <button>Update</button>
+<script>
+function update() {
+    <button>View</button>
+}
+</script><form action="/add" method="POST">
+  <input type="text" name="name" placeholder="Name" required>
+
+  <input type="text" name="date" placeholder="YYYY-MM-DD" required>
+
+  <input type="number" name="amount" step="0.01" placeholder="Amount" required>
+
+  <select name="ttype" required>
+    <option value="">Select type</option>
+    <option value="income">income</option>
+    <option value="expense">expense</option>
+  </select>
+
+  <input type="text" name="category" placeholder="Category" required>
+
+  <input type="text" name="description" placeholder="Description (optional)">
+
+    <button type="submit">Add</button> 
+ 
+</form>
+    <button onclick="update()">Update</button>
     <button>View</button>
     <button>Export</button>
     <button>Graph</button>
+
+
+
+
+
 
 
 <body>
