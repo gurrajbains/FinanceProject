@@ -23,23 +23,16 @@ table,th,td{
 <table border=5 frame=red rules=rows, width = 100% text-align = center>   
     <tr style="border-bottom: 1px solid #ff0000;">
         <th> Transaction ID </th> 
-        <th> Description </th>
+         <th> Date </th> 
         <th> Amount </th>
-        <th> Date </th>
-        <th> Category </th>
-        <th> Type </th>
-        <th> Data </th>
+        <th> Type </th>  
+        <th> Source </th>
+         <th> Description </th>
     </tr>
     <tbody> 
         <tr >
         {% for row in rows %}
-        <td> {{row[1]}} </td>
-        <td> {{row[6]}} </td>
-        <td> {{row[3]}} </td>
-        <td> {{row[2]}} </td>
-        <td> {{row[5]}} </td>
-        <td> {{row[4]}} </td>
-        <td>{{row[0]}}</td>
+          <td>{{row[0]}}</td><td> {{row[1]}} </td> <td> {{row[2]}} </td>   <td> {{row[3]}} </td>  <td> {{row[4]}} </td>   <td> {{row[5]}} </td> 
      </tr>   
       {% endfor %} 
     </tbody>
@@ -57,11 +50,9 @@ button  {
     gap: 100px;
     cursor: pointer;
 } </style >
-<script>
-function update() {
-    <button>View</button>
-}
-</script><form action="/add" method="POST">
+
+
+<form action="/add" method="POST">
   <input type="text" name="name" placeholder="Name" required>
 
   <input type="text" name="date" placeholder="YYYY-MM-DD" required>
@@ -81,9 +72,14 @@ function update() {
     <button type="submit">Add</button> 
  
 </form>
-    <button onclick="update()">Update</button>
+<form action="/delete" method="POST">
+    <button type="submit">Delete</button> 
+</form>
+<form action="/export" method="GET">
+    <button type="submit">Export</button>
+</form>
     <button>View</button>
-    <button>Export</button>
+  
     <button>Graph</button>
 
 

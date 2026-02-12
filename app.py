@@ -1,5 +1,5 @@
-from flask import Flask, app, render_template, request, redirect, url_for
-from database import init_db, add_transaction, get_all_transactions, return_HTML_table
+from flask import Flask, app, render_template, request, redirect, send_file, url_for
+from database import delete_transaction, init_db, add_transaction, get_all_transactions, return_HTML_table, delete_all_transactions, export_to_csv, get_summary, get_transactions_by_type
 
 appp = Flask(__name__)
 
@@ -20,7 +20,21 @@ def add():
     add_transaction(name, date, amount, ttype, category, description)
 
     return redirect(url_for("house"))
-    
+@appp.route("/delete", methods=["POST"])
+def delete():
+    delete_all_transactions()
+    return redirect(url_for("house"))
+
+
+
+@appp.route("/export", methods=["POST"])
+def export():
+    rows = get_all_transactions()
+    export_to_csv(rows)
+    filename = "finance.csv"
+    attachment; filename="finance.csv"
+    return send_file(filename, as_attachment=True)
+    return redirect(url_for("house"))
 if(__name__ == '__main__'):
     init_db()
     appp.run(debug=True)

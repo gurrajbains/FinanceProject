@@ -1,4 +1,5 @@
 # database.py
+import csv
 import sqlite3
 from flask import g, render_template
 
@@ -102,3 +103,14 @@ def get_transactions_by_type(ttype):
     rows = cursor.fetchall()
     conn.close()
     return rows
+def export_to_csv(rows):
+    #Need to clean up data , need to clean up ui, need to clean up how data is being dsipalted on the CLI, add abiility to give percentages based on income etc; tax rates ; etc ; total percentage of money used; revenue across a few months etc;
+    """
+    Export all transactions to a CSV file.
+    """
+    with open('finance.csv', 'w', newline='') as csvfile:  #open file in write mode 
+        columns = ['Name', 'Date', 'Amount', 'Type', 'Category', 'Description'] # define ccollumns  fo rthe csv files
+        writer = csv.writer(csvfile)#writer will be write into csv file
+        writer.writerow(columns) # write the header rows 
+        for row in rows: #go through every single row in rows and put the values intoo the corresponding header 
+            writer.writerow(row)
