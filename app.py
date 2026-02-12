@@ -27,13 +27,12 @@ def delete():
 
 
 
-@appp.route("/export", methods=["POST"])
+@appp.route("/export", methods=["GET"])
 def export():
     rows = get_all_transactions()
     export_to_csv(rows)
-    filename = "finance.csv"
-    attachment; filename="finance.csv"
-    return send_file(filename, as_attachment=True)
+    
+    return send_file("finance.csv", as_attachment=True, download_name="finance.csv")
     return redirect(url_for("house"))
 if(__name__ == '__main__'):
     init_db()
