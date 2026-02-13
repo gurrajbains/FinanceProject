@@ -3,53 +3,42 @@
 <head>    
 <style> body{
     background-image:url("{{ url_for('static', filename='background.jpg') }}");
-    url("{{ url_for('static', filename='background.jpg') }}");
+    
 }
-toobar {
-    position: sticky;
-    justify-content: center;
-    margin-top: 20px;
+.toolbar {
+    position: fixed;
+    margin-top: 560px;
+
    }
-.table-container {
-    max-height: 3000px;
-    overflow-y: auto;
+.table-containment {
+    overflow: auto;
+    height: 550px;
+    position: fixed;
 }
+
+
+
+  thead th {
+    position: fixed;
+    top: 0;
+    background: white;
+    z-index: 2;
+}
+
+
+
 table {
     table-layout: fixed;
     width: 100%;
 }
 
-td, th {
-    word-wrap: break-word;
-}
-
-
-thead th {
-    position: sticky;
-    top: 0;
-    background: rgb(218, 204, 204);
-    z-index: 1;
-}
-
-table,th,td{
-    border: 2px solid rgb(209, 209, 209);
-    padding:2px;
-    border-collapse: collapse;
-    text-align: center;
-    background-color: rgb(255, 255, 255);
-    margin-bottom:500px;
-}
 </style>
 
-<style>
-
-</style>
 <title>Finance Manager</title>
 
 </head>
 
 <body style="background-color: rgb(255, 255, 255);">
-    <h1>What is up my dudes</h1>
 <div class = "table-containment">
 <table border=5 frame=red rules=rows, width = 100% text-align = center>   
     <tr style="border-bottom: 1px solid #ffffff;">
@@ -60,32 +49,20 @@ table,th,td{
         <th> Source </th>
          <th> Description </th>
     </tr>
-    <tbody> 
-        <tr >
+    <tbody>    
         {% for row in rows %}
+        <tr >
+     
           <td>{{row[0]}}</td><td> {{row[1]}} </td> <td> {{row[2]}} </td>   <td> {{row[3]}} </td>  <td> {{row[4]}} </td>   <td> {{row[5]}} </td> 
      </tr>   
       {% endfor %} 
     </tbody>
 
-</table></div>
+</table>
+</div>
 
-<div class= "toolbar">
-    <style>
-button  {
-    border:  2px solid black;
-    padding: 10px;
-    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
-    display: inline-block;
-    text-decoration: wavy;
-    font-size: large;
-    margin : 10px;
-    gap: 100px;
-    cursor: pointer;
-} </style >
-
-
-<form action="/add" method="POST">
+<div class = "toolbar">
+    <form action="/add" method="POST">
   <input type="text" name="name" placeholder="Name" required>
 
   <input type="text" name="date" placeholder="YYYY-MM-DD" required>
@@ -104,10 +81,10 @@ button  {
     <button type="submit">Delete</button> 
 </form>
 <form action="/export" method="GET">
+    
     <button type="submit">Export</button>
 </form>
     <button>View</button>
-  
     <button>Graph</button>
 </div>
 
@@ -117,5 +94,7 @@ button  {
 
 
 
-<body>
-<html>
+
+
+</body>
+</html>
