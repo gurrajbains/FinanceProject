@@ -5,15 +5,57 @@
     background-image:url("{{ url_for('static', filename='background.jpg') }}");
     
 }
+
+.bar{
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #333333;
+  display: flex;
+}
+
+
+ul li a {
+  display: block;
+  color: white;
+  text-align: center;
+  text-decoration: none;
+}
+
+ul li a:hover {
+  background-color: #e4dfdf;
+  color: black;
+}
+}
+
 .toolbar {
     position: fixed;
     margin-top: 560px;
-
-   }
+    text-align: center; font-family: Georgia, 'Times New Roman', Times, serif;
+    width: 65%;
+    button{
+        margin: 10px;
+        padding: 20px 20px;
+        font-size: 16px;
+        background-color: #bbeebb;
+        color: rgb(170, 148, 148);
+        border: none;
+        border-radius: 15px;
+        cursor: pointer; font-family: Georgia, 'Times New Roman', Times, serif;
+    }
+    form
+    {
+     margin: 10px 10px;
+     font-family: Georgia, 'Times New Roman', Times, serif;
+    }
+}
 .table-containment {
     overflow: auto;
     height: 550px;
     position: fixed;
+   
 }
 
 
@@ -29,10 +71,40 @@
 
 table {
     table-layout: fixed;
-    width: 100%;
+    width: 65%;
 }
 
 </style>
+
+<div class = "bar">
+    <ul> <li> <a href="http://127.0.0.1:5000/#home">Base</a></li></ul>
+     <ul> <li> <a href="http://127.0.0.1:5000/#home">Rates</a></li></ul>
+      <ul> <li> <a href="http://127.0.0.1:5000/#home">Expectations</a></li></ul>
+       <ul> <li> <a href="http://127.0.0.1:5000/#home">Statistics</a></li></ul>
+        <ul> <li> <a href="http://127.0.0.1:5000/#home">Settings</a></li></ul>
+         <ul> <li> <a href="http://127.0.0.1:5000/#home">Market</a></li></ul>
+
+   
+
+    
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 <title>Finance Manager</title>
 
@@ -65,11 +137,16 @@ table {
     <form action="/add" method="POST">
   <input type="text" name="name" placeholder="Name" required>
 
-  <input type="text" name="date" placeholder="YYYY-MM-DD" required>
+  <input type="text" name="date" placeholder="MM-DD-YYYY" required>
 
   <input type="number" name="amount" step="0.01" placeholder="Amount" required>
+ 
+  <select name="type" required>
 
-
+    <option value="">Select Type</option>
+    <option value="income">Income</option>
+    <option value="expense">Expense</option>
+</select>
   <input type="text" name="category" placeholder="Category" required>
 
   <input type="text" name="description" placeholder="Description (optional)">
@@ -81,7 +158,7 @@ table {
     <button type="submit">Delete</button> 
 </form>
 <form action="/export" method="GET">
-    
+
     <button type="submit">Export</button>
 </form>
     <button>View</button>
@@ -89,6 +166,12 @@ table {
 </div>
 
 
+
+
+<form action = "settings" method = "GET">
+<input type="image" src="{{ url_for('static', filename='gears.jpg') }}" alt="Settings" width="50" height="50" style="margin-top: 10px; margin-left: 1920px; position: relative; top: 0; left: 0;">
+
+</form>
 
 
 
