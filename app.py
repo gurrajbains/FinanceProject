@@ -34,6 +34,15 @@ def export():
     
     return send_file("finance.csv", as_attachment=True, download_name="finance.csv")
     return redirect(url_for("house"))
+
+@appp.route("/search", methods=["GET"])
+def search():
+    q = request.args.get("q", "")
+    ttype = request.args.get("type", "all")
+    rows = search_transactions(q, ttype)
+    return render_template("index.html", rows=rows, q=q, type=ttype)
+
+
 if(__name__ == '__main__'):
     init_db()
     appp.run(debug=True)

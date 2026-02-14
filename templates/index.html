@@ -1,153 +1,219 @@
 <!DOCTYPE html>
-<html> 
-<head>    
-<style> body{
-    background-image:url("{{ url_for('static', filename='background.jpg') }}");
-    
-}
-ul {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-  background-color: #333333;
-  display: flex;
-  justify-content: center;
-}
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Finance Manager</title>
 
-ul li {
-  float: left;
-}
-
-ul li a {
-  display: block;
-  color: white;
-  text-align: center;
-  padding: 14px 16px;
-  text-decoration: none;
-}
-
-ul li a:hover {
-  background-color: #111111;
-}
-.toolbar {
-    margin-top: 500px;
-    form {
-        display: inline-block;
-        padding: 10px;
+  <style>
+    body{
+      margin: 0;
+      background-image:url("{{ url_for('static', filename='background.jpg') }}");
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
     }
-    
-}
-.table-containment {
-    overflow: auto;
-    height: 550px;
-    position: fixed;
+
+    ul {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+      background-color: #333333;
+      display: flex;
+      justify-content: center;
+    }
+
+    ul li {
+      position: relative;
+    }
+
+    ul li a {
+      display: block;
+      color: white;
+      text-align: center;
+      padding: 14px 16px;
+      text-decoration: none;
+    }
+
+    ul li a:hover {
+      background-color: #ad5151;
+    }
+
    
-}
+    .content {
+      padding: 12px;
+    }
 
+    .table-containment {
+      overflow: auto;
+      height: 550px;
+      position: relative;
+      background: rgba(255,255,255,0.90);
+      padding: 8px;
+      width: min(1800px, 100%); 
+    }
 
+    table {
+       margin-left: 20px;
+      align-content: center;
+      width: min(1750px, 100%);     
+      border-radius: 20px;
 
-  thead th {
-    position: fixed;
-    top: 0;
-    background: white;
-    z-index: 2;
-}
+    }
 
+    tr,th, td {
+    padding: 10px;
+    text-align: center;
+    border-radius: 12px;
+    border: 1px solid #000000;
+    }
+     
 
+    thead th {
+      margin-left: 15px;
+      position: sticky; 
+      top: 0; border-radius:20px;
+      position: relative;
+      border-style: hidden;
+ 
+      background: rgb(192, 154, 154);
+      z-index: 2;
+    }
 
-table {
-    table-layout: fixed;
-    width: 65%;
-}
+ 
+    .toolbar {
+      display: flex;
+      justify-content: flex-start;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+      padding: 10px;
+      width: min(1800px, 100%);
+      background: rgba(200, 177, 177, 0.9);
+      border-radius: 20px;
+    }
 
-</style>
+    .toolbar form {
+      display: inline-block;
+    }
 
- <ul>
-    <li> <a href="http://127.0.0.1:5000/#home">Base</a></li>
-    <li> <a href="http://127.0.0.1:5000/#home">Rates</a></li>
-    <li> <a href="http://127.0.0.1:5000/#home">Expectations</a></li>
-    <li> <a href="http://127.0.0.1:5000/#home">Statistics</a></li>
-    <li> <a href="http://127.0.0.1:5000/#home">Settings</a></li>
-    <li> <a href="http://127.0.0.1:5000/#home">Market</a></li>
-</ul>
+    .add-form input{
+      margin: 6px 6px 6px 0;
+      padding: 8px;
+         padding: 8px;
+         border-radius: 12px;
+    }
+    .add-form select {
+      margin: 6px 6px 6px 0;
+      padding: 8px;
+      padding: 8px;
+      border-radius: 12px;
+        width: 125px;
 
+    }
+    .toolbar input {
+      padding: 8px;
+      margin: 6px 0;
+      border-radius: 12px;
+      text-align: left;
+    }
 
+    .add-form button,
+    .action-buttons button {
+      padding: 8px 12px;
+      border-radius: 12px;
+      margin: 6px 6px 6px 0;
+      cursor: pointer;
+    }
 
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
 
-<title>Finance Manager</title>
-
+  
+   
+  </style>
 </head>
 
-<body style="background-color: rgb(255, 255, 255);">
-<div class = "table-containment">
-<table border=5 frame=red rules=rows, width = 100% text-align = center>   
-    <tr style="border-bottom: 1px solid #ffffff;">
-        <th> Transaction ID </th> 
-         <th> Date </th> 
-        <th> Amount </th>
-        <th> Type </th>  
-        <th> Source </th>
-         <th> Description </th>
-    </tr>
-    <tbody>    
-        {% for row in rows %}
-        <tr >
-     
-          <td>{{row[0]}}</td><td> {{row[1]}} </td> <td> {{row[2]}} </td>   <td> {{row[3]}} </td>  <td> {{row[4]}} </td>   <td> {{row[5]}} </td> 
-     </tr>   
-      {% endfor %} 
-    </tbody>
+<body style="background-color: rgb(215, 146, 146);">
+  <ul>
+    <li><a href="http://127.0.0.1:5000/#home">Base</a></li>
+    <li><a href="http://127.0.0.1:5000/#home">Rates</a></li>
+    <li><a href="http://127.0.0.1:5000/#home">Expectations</a></li>
+    <li><a href="http://127.0.0.1:5000/#home">Statistics</a></li>
+    <li><a href="http://127.0.0.1:5000/#home">Settings</a></li>
+    <li><a href="http://127.0.0.1:5000/#home">Market</a></li>
+  </ul>
 
-</table>
+  <div class="content">
+    <div class="table-containment">
+      <table  frame="red" rules="rows">
+        <thead>
+          <tr style="border-bottom: 1px solid #ffffff;">
+            <th>Transaction ID</th>
+            <th>Date</th>
+            <th>Amount</th>
+            <th>Type</th>
+            <th>Source</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {% for row in rows %}
+          <tr>
+            <td>{{row[0]}}</td>
+            <td>{{row[1]}}</td>
+            <td>{{row[2]}}</td>
+            <td>{{row[3]}}</td>
+            <td>{{row[4]}}</td>
+            <td>{{row[5]}}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="toolbar">
+      <div class="add-form">
+        <form action="/add" method="POST">
+          <input type="text" name="name" placeholder="Name" required>
+          <input type="text" name="date" placeholder="MM-DD-YYYY" required>
+          <input type="number" name="amount" step="0.01" placeholder="Amount" required>
+
+          <select style="width: 100px;" name="type" required>
+            <option value="">Select Type</option>
+            <option value="income">Income</option>
+            <option value="expense">Expense</option>
+          </select>
+
+          <input type="text" name="category" placeholder="Category" required>
+          <input type="text" name="description" placeholder="Description (optional)">
+
+          <button type="submit">Add</button>
+        </form>
+      </div>
+
+      <div class="action-buttons">
+        <form action="/delete" method="POST">
+          <button type="submit">Delete</button>
+        </form>
+
+        <form action="/export" method="GET">
+          <button type="submit">Export</button>
+        </form>
+
+        <button type="button">View</button>
+        <button type="button">Graph</button>
+        <div class="searchbar">
+      
+          <input type="text" placeholder="Search..">
 </div>
-<div class="toolbar">
-
-  <div class="add-form">
-    <form action="/add" method="POST">
-      <input type="text" name="name" placeholder="Name" required>
-      <input type="text" name="date" placeholder="MM-DD-YYYY" required>
-      <input type="number" name="amount" step="0.01" placeholder="Amount" required>
-
-      <select name="type" required>
-        <option value="">Select Type</option>
-        <option value="income">Income</option>
-        <option value="expense">Expense</option>
-      </select>
-
-      <input type="text" name="category" placeholder="Category" required>
-      <input type="text" name="description" placeholder="Description (optional)">
-
-      <button type="submit">Add</button>
-    </form>
+      </div>
+    </div>
   </div>
-
-  <div class="action-buttons">
-    <form action="/delete" method="POST">
-      <button type="submit">Delete</button>
-    </form>
-
-    <form action="/export" method="GET">
-      <button type="submit">Export</button>
-    </form>
-
-    <button>View</button>
-    <button>Graph</button>
-  </div>
-
-</div>
-
-
-
-<form action = "settings" method = "GET">
-<input type="image" src="{{ url_for('static', filename='gears.jpg') }}" alt="Settings" width="50" height="50" style="margin-top: 10px; margin-left: 1920px; position: relative; top: 0; left: 0;">
-
-</form>
-
-
-
-
-
-
-
 </body>
 </html>

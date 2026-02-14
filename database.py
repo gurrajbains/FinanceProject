@@ -114,3 +114,25 @@ def export_to_csv(rows):
         writer.writerow(columns) # write the header rows 
         for row in rows: #go through every single row in rows and put the values intoo the corresponding header 
             writer.writerow(row)
+
+
+def search_transactions(q, ttype):
+    conn = get_connection()
+    cursor = conn.cursor()
+    if ttype == "all":
+        cursor.execute("""
+            SELECT name, date, amount, ttype, category, description 
+            FROM finance 
+            WHERE name LIKE ? OR category LIKE ? OR description LIKE ?
+            ORDER BY date DESC, id DESC
+        """, (f"%{q}%", f"%{q}%", f"%{q}%"))
+    else:
+        cursor.execute("""
+            SELECT name, date, amount, ttype, category, description 
+            FROM finance 
+            WHERE (name LIKE ? OR category LIKE ? OR description LIKE ?) AND ttype=?
+            ORDER BY date DESC, id DESC
+        """, (f"%{q}%", f"%{q}%", f"%{q}%", ttype))
+    rows = cursor.fetchall()
+    conn.close()
+    return rows
