@@ -136,3 +136,9 @@ def search_transactions(q, ttype):
     rows = cursor.fetchall()
     conn.close()
     return rows
+def return_ChartJS_data():
+    summary = get_summary() # get all the data
+    data = {"income": 0, "expense": 0} ## create variables for each type of transaction
+    for ttype, amount in summary: #go through summary and put the values into the corresponding header
+        data[ttype] = amount #for each data type in summary, assign the amount to the corresponding type in data
+    return data
