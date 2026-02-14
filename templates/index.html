@@ -5,51 +5,37 @@
     background-image:url("{{ url_for('static', filename='background.jpg') }}");
     
 }
-
-.bar{
 ul {
   list-style-type: none;
   margin: 0;
   padding: 0;
-  overflow: hidden;
   background-color: #333333;
   display: flex;
+  justify-content: center;
 }
 
+ul li {
+  float: left;
+}
 
 ul li a {
   display: block;
   color: white;
   text-align: center;
+  padding: 14px 16px;
   text-decoration: none;
 }
 
 ul li a:hover {
-  background-color: #e4dfdf;
-  color: black;
+  background-color: #111111;
 }
-}
-
 .toolbar {
-    position: fixed;
-    margin-top: 560px;
-    text-align: center; font-family: Georgia, 'Times New Roman', Times, serif;
-    width: 65%;
-    button{
-        margin: 10px;
-        padding: 20px 20px;
-        font-size: 16px;
-        background-color: #bbeebb;
-        color: rgb(170, 148, 148);
-        border: none;
-        border-radius: 15px;
-        cursor: pointer; font-family: Georgia, 'Times New Roman', Times, serif;
+    margin-top: 500px;
+    form {
+        display: inline-block;
+        padding: 10px;
     }
-    form
-    {
-     margin: 10px 10px;
-     font-family: Georgia, 'Times New Roman', Times, serif;
-    }
+    
 }
 .table-containment {
     overflow: auto;
@@ -76,32 +62,14 @@ table {
 
 </style>
 
-<div class = "bar">
-    <ul> <li> <a href="http://127.0.0.1:5000/#home">Base</a></li></ul>
-     <ul> <li> <a href="http://127.0.0.1:5000/#home">Rates</a></li></ul>
-      <ul> <li> <a href="http://127.0.0.1:5000/#home">Expectations</a></li></ul>
-       <ul> <li> <a href="http://127.0.0.1:5000/#home">Statistics</a></li></ul>
-        <ul> <li> <a href="http://127.0.0.1:5000/#home">Settings</a></li></ul>
-         <ul> <li> <a href="http://127.0.0.1:5000/#home">Market</a></li></ul>
-
-   
-
-    
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+ <ul>
+    <li> <a href="http://127.0.0.1:5000/#home">Base</a></li>
+    <li> <a href="http://127.0.0.1:5000/#home">Rates</a></li>
+    <li> <a href="http://127.0.0.1:5000/#home">Expectations</a></li>
+    <li> <a href="http://127.0.0.1:5000/#home">Statistics</a></li>
+    <li> <a href="http://127.0.0.1:5000/#home">Settings</a></li>
+    <li> <a href="http://127.0.0.1:5000/#home">Market</a></li>
+</ul>
 
 
 
@@ -132,39 +100,41 @@ table {
 
 </table>
 </div>
+<div class="toolbar">
 
-<div class = "toolbar">
+  <div class="add-form">
     <form action="/add" method="POST">
-  <input type="text" name="name" placeholder="Name" required>
+      <input type="text" name="name" placeholder="Name" required>
+      <input type="text" name="date" placeholder="MM-DD-YYYY" required>
+      <input type="number" name="amount" step="0.01" placeholder="Amount" required>
 
-  <input type="text" name="date" placeholder="MM-DD-YYYY" required>
+      <select name="type" required>
+        <option value="">Select Type</option>
+        <option value="income">Income</option>
+        <option value="expense">Expense</option>
+      </select>
 
-  <input type="number" name="amount" step="0.01" placeholder="Amount" required>
- 
-  <select name="type" required>
+      <input type="text" name="category" placeholder="Category" required>
+      <input type="text" name="description" placeholder="Description (optional)">
 
-    <option value="">Select Type</option>
-    <option value="income">Income</option>
-    <option value="expense">Expense</option>
-</select>
-  <input type="text" name="category" placeholder="Category" required>
+      <button type="submit">Add</button>
+    </form>
+  </div>
 
-  <input type="text" name="description" placeholder="Description (optional)">
+  <div class="action-buttons">
+    <form action="/delete" method="POST">
+      <button type="submit">Delete</button>
+    </form>
 
-    <button type="submit">Add</button> 
- 
-</form>
-<form action="/delete" method="POST">
-    <button type="submit">Delete</button> 
-</form>
-<form action="/export" method="GET">
+    <form action="/export" method="GET">
+      <button type="submit">Export</button>
+    </form>
 
-    <button type="submit">Export</button>
-</form>
     <button>View</button>
     <button>Graph</button>
-</div>
+  </div>
 
+</div>
 
 
 
