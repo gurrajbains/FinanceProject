@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html overflow>
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,6 +7,10 @@
 
   <style>
     body{
+      html, body {
+  overflow-x: hidden;
+}
+
       margin: 0;
       background-image:url("{{ url_for('static', filename='background.jpg') }}");
       background-size: cover;
@@ -132,8 +136,16 @@
       flex-wrap: wrap;
       align-items: center;
     }
+    .canvas {
+      margin-top: -600px;
+      margin-left: 1860px;
+      width: min(25%, 500px);
+      background: rgba(200, 177, 177, 0.9);
+      border-radius: 20px;
+      padding: 10px;
+    }
 
-  
+ 
    
   </style>
 </head>
@@ -147,7 +159,6 @@
     <li><a href="http://127.0.0.1:5000/#home">Settings</a></li>
     <li><a href="http://127.0.0.1:5000/#home">Market</a></li>
   </ul>
-
   <div class="content">
     <div class="table-containment">
       <table  frame="red" rules="rows">
@@ -209,11 +220,17 @@
         <button type="button">View</button>
         <button type="button">Graph</button>
         <div class="searchbar">
-      
-          <input type="text" placeholder="Search..">
+          
+          <form action="/search" method="GET">
+            <input type="text" placeholder="Search..">
+            <button type="submit">Search</button>
+         
 </div>
       </div>
     </div>
+     <div class ="canvas"><canvas id="graphic-Canvas" width="1800" height="500">
+</canvas>
+</div>
   </div>
 </body>
 </html>

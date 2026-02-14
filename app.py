@@ -1,5 +1,5 @@
 from flask import Flask, app, render_template, request, redirect, send_file, url_for
-from database import delete_transaction, init_db, add_transaction, get_all_transactions, return_HTML_table, delete_all_transactions, export_to_csv, get_summary, get_transactions_by_type
+from database import delete_transaction, init_db, add_transaction, get_all_transactions, return_HTML_table, delete_all_transactions, export_to_csv, get_summary, get_transactions_by_type, search_transactions
 
 appp = Flask(__name__)
 
