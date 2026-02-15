@@ -51,7 +51,7 @@ def api_summary():
     for item in summary_data:
         labels.append(item[0])
         values.append(item[1])
-    return  jsonify({"labels": labels, "values": values})
+    return  jsonify({"labels": labels, "values": values}) #if i want to return date i can add naother aarary for the others and then return that in the json as well
 
 if(__name__ == '__main__'):
     init_db()

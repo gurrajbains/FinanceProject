@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html width="2000px" height="1000px">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Finance Manager</title>
 
   <style>
@@ -143,7 +141,7 @@
     .canvas {
       margin-top: -600px;
       margin-left: 1860px;
-      width: min(25%, 500px);
+      width: 500px;
       background: rgba(200, 177, 177, 0.9);
       border-radius: 20px;
       padding: 10px;
@@ -236,9 +234,32 @@
 </canvas>
 </div>
   </div>
+
+ 
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
+<script>
+async function fetchDataAndRenderChart() {
+  const response = await fetch("/api/summary");
+  const data = await response.json();
+
+  const canvasEl = document.getElementById("graphic-Canvas");
+  const ctx = canvasEl.getContext("2d");
+
+  new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: data.labels,
+      datasets: [{
+        label: "expense vs income",
+        data: data.values
+      }]
+    }
+  });
+}
+fetchDataAndRenderChart();
+</script>
+
   
-  
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 </body>
 </html>
