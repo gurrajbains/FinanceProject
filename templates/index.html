@@ -142,10 +142,22 @@
       margin-top: -600px;
       margin-left: 1860px;
       width: 500px;
+      height: 500px;
       background: rgba(200, 177, 177, 0.9);
       border-radius: 20px;
       padding: 10px;
     }
+
+  .graphicSettings {
+  margin-top: 0px;
+  display: flex;  
+  position: relative;
+  margin-left: 430px;
+  button:hover {
+    background-color: #ad5151;
+    cursor: pointer;
+  }
+}
 
  
    
@@ -220,7 +232,6 @@
         </form>
 
         <button type="button">View</button>
-        <button type="button">Graph</button>
         <div class="searchbar">
           
           <form action="/search" method="GET">
@@ -230,13 +241,15 @@
 </div>
       </div>
     </div>
-     <div class ="canvas"><canvas id="graphic-Canvas" width="1800" height="500">
+     <div class ="canvas"><canvas id="graphic-Canvas">
 </canvas>
-</div>
-  </div>
+<div class=" graphicSettings">
+    <button style="width: 100px; height: 30px; border-radius: 20px;" type="submit">Settings</button>
 
- 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
+</div>
+</div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
 <script>
 async function fetchDataAndRenderChart() {
   const response = await fetch("/api/summary");
@@ -251,7 +264,10 @@ async function fetchDataAndRenderChart() {
       labels: data.labels,
       datasets: [{
         label: "expense vs income",
-        data: data.values
+        data: data.values,
+        borderColor: "rgba(255, 99, 132, 1)",
+        backgroundColor: "rgba(255, 99, 132, 0.2)",
+
       }]
     }
   });
