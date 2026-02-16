@@ -243,21 +243,20 @@ margin-top: 20px;
         <div class="searchbar">
           
           <form action="/search" method="GET">
-            <input type="text" placeholder="Search..">
+            <input type="text" name="query" placeholder="Search..">
             <button type="submit">Search</button>
+          </form>  
          
 </div>
       </div>
     </div>
      <div class ="canvas"><canvas id="graphic-Canvas"></canvas>
       <div class=" graphicSettings">
-    
-</div><button style="width: 100px; height: 30px; border-radius: 20px;" type="submit">Settings</button>
+    <button style="width: 100px; height: 30px; border-radius: 20px;" type="submit">Settings</button>
+</div>
 
 </div>
-<div class ="secCanvas"><canvas id="graphic-Canvas-2"></canvas>
-  
-</div>
+<div class ="secCanvas"><canvas id="graphic-Canvas-2"></canvas></div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
 <script>
 async function fetchDataAndRenderChart() {
@@ -276,6 +275,63 @@ async function fetchDataAndRenderChart() {
         data: data.values,
         borderColor: "rgba(255, 99, 132, 1)",
         backgroundColor: "rgba(255, 99, 132, 0.2)",
+        color: "rgba(0, 0, 0, 1)",
+        font: {
+          size: 14,
+          family: "Arial",
+          weight: "bold"
+        }
+      }]
+    }
+  });
+}
+fetchDataAndRenderChart();
+</script>
+<script>
+async function fetchDataAndRenderChart() {
+  const response = await fetch("/api/summary");
+  const data = await response.json();
+
+  const canvasEl = document.getElementById("graphic-Canvas");
+  const ctx = canvasEl.getContext("2d");
+
+  new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: data.labels,
+      datasets: [{
+        label: "expense vs income",
+        data: data.values,
+        borderColor: "rgba(255, 99, 132, 1)",
+        backgroundColor: "rgba(255, 99, 132, 0.2)",
+        color: "rgba(0, 0, 0, 1)",
+        font: {
+          size: 14,
+          family: "Arial",
+          weight: "bold"
+        }
+      }]
+    }
+  });
+}
+fetchDataAndRenderChart();
+</script><script>
+async function fetchDataAndRenderChart() {
+  const response = await fetch("/api/summary");
+  const data = await response.json();
+
+  const canvasEl = document.getElementById("graphic-Canvas-2");
+  const ctx = canvasEl.getContext("2d");
+
+  new Chart(ctx, {
+    type: "pie",
+    data: {
+      labels: data.labels,
+      datasets: [{
+        label: "expense vs income",
+        data: data.values,
+        borderColor: "rgba(255, 99, 132, 1)",
+        backgroundColor: "rgba(0, 99, 132, 0.2)",
         color: "rgba(0, 0, 0, 1)",
         font: {
           size: 14,

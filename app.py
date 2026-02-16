@@ -38,9 +38,9 @@ def export():
 
 @appp.route("/search", methods=["GET"])
 def search():
-    q = request.args.get("q", "")
+    q = request.args.get("query", "")
     ttype = request.args.get("type", "all")
-    rows = search_transactions(q, ttype)
+    rows = search_transactions(q=q, ttype=ttype)
     return render_template("index.html", rows=rows, q=q, type=ttype)
 
 @appp.route("/api/summary", methods=["GET"])
