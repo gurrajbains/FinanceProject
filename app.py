@@ -54,9 +54,11 @@ def api_summary():
     return  jsonify({"labels": labels, "values": values}) #if i want to return date i can add naother aarary for the others and then return that in the json as well
 
 @appp.route("/sort", methods=["GET"])
-def sort():
-   rows= sort_transactions("query","")
-   return render_template("index.html", rows=rows)
+def sort():    
+    sort_by = request.args.get("sort_by", "all")
+    type = request.args.get("type", "all")
+    rows = sort_transactions(sort_by, type)
+    return render_template("index.html", rows=rows, sort_by=sort_by, type=type)
 if(__name__ == '__main__'):
     init_db()
     appp.run(debug=True)

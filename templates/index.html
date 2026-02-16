@@ -239,10 +239,15 @@ margin-top: 20px;
         </form>
         <form action ="/sort" method="GET">
           <button type="submit">Sort</button>
-          <select style="width: 100px;" name="type" required>
-            <option value="">Select</option>
+          <select style="width: 75px;" name="sort_by" required>
+            <option value="sort_by">Select</option>
             <option value="date">Date</option>
             <option value="amount">Amount</option>
+          </select>
+          <select style="width: 75px;" name="type" required>
+            <option value="type">Select</option>
+            <option value="income">Income</option>
+            <option value="expense">Expense</option>
           </select>
         </form>
         <div class="searchbar">
