@@ -1,6 +1,6 @@
 from cProfile import label
 from flask import Flask, app, jsonify, render_template, request, redirect, send_file, url_for
-from database import delete_transaction, init_db, add_transaction, get_all_transactions, return_HTML_table, delete_all_transactions, export_to_csv, get_summary, search_transactions
+from database import delete_transaction, init_db, add_transaction, get_all_transactions, return_HTML_table, delete_all_transactions, export_to_csv, get_summary, search_transactions, sort_transactions
 
 appp = Flask(__name__)
 
@@ -53,6 +53,10 @@ def api_summary():
         values.append(item[1])
     return  jsonify({"labels": labels, "values": values}) #if i want to return date i can add naother aarary for the others and then return that in the json as well
 
+@appp.route("/sort", methods=["GET"])
+def sort():
+   rows= sort_transactions("query","")
+   return render_template("index.html", rows=rows)
 if(__name__ == '__main__'):
     init_db()
     appp.run(debug=True)

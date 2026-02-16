@@ -171,7 +171,6 @@ margin-top: 20px;
    
   </style>
 </head>
-
 <body style="overflow-x: hidden;">
   <ul>
     <li><a href="http://127.0.0.1:5000/#home">Base</a></li>
@@ -238,14 +237,19 @@ margin-top: 20px;
         <form action="/export" method="GET">
           <button type="submit">Export</button>
         </form>
-
-        <button type="button">View</button>
+        <form action ="/sort" method="GET">
+          <button type="submit">Sort</button>
+          <select style="width: 100px;" name="type" required>
+            <option value="">Select</option>
+            <option value="date">Date</option>
+            <option value="amount">Amount</option>
+          </select>
+        </form>
         <div class="searchbar">
-          
           <form action="/search" method="GET">
             <input type="text" name="query" placeholder="Search..">
             <button type="submit">Search</button>
-          </form>  
+        </form>  
          
 </div>
       </div>

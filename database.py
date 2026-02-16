@@ -136,3 +136,16 @@ def search_transactions(q, ttype):
     rows = cursor.fetchall()
     conn.close()
     return rows
+
+def sort_transactions(sort_by, ttype):
+    conn = get_connection() 
+    cursor = conn.cursor()
+    if sort_by == "date":
+        cursor.execute("SELECT name, date, amount, ttype, category, description FROM finance WHERE ttype=? ORDER BY date DESC", (ttype,))
+    elif sort_by == "amount":
+        cursor.execute("SELECT name, date, amount, ttype, category, description FROM finance WHERE ttype=? ORDER BY amount DESC", (ttype,))
+    else:
+        cursor.execute("SELECT name, date, amount, ttype, category, description FROM finance WHERE ttype=? ORDER BY id DESC", (ttype,))
+    rows = cursor.fetchall()
+    conn.close()
+    return rows
