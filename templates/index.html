@@ -139,10 +139,10 @@
       align-items: center;
     }
     .canvas {
-      margin-top: -600px;
+      margin-top: -645px;
       margin-left: 1860px;
       width: 500px;
-      height: 500px;
+      height: 290px;
       background: rgba(200, 177, 177, 0.9);
       border-radius: 20px;
       padding: 10px;
@@ -158,13 +158,21 @@
     cursor: pointer;
   }
 }
-
+.secCanvas {
+margin-top: 20px;
+      margin-left: 1860px;
+      width: 500px;
+      height: 290px;
+      background: rgba(200, 177, 177, 0.9);
+      border-radius: 20px;
+      padding: 10px;
+    }
  
    
   </style>
 </head>
 
-<body style="background-color: rgb(215, 146, 146);">
+<body style="overflow-x: hidden;">
   <ul>
     <li><a href="http://127.0.0.1:5000/#home">Base</a></li>
     <li><a href="http://127.0.0.1:5000/#home">Rates</a></li>
@@ -241,13 +249,14 @@
 </div>
       </div>
     </div>
-     <div class ="canvas"><canvas id="graphic-Canvas">
-</canvas>
-<div class=" graphicSettings">
-    <button style="width: 100px; height: 30px; border-radius: 20px;" type="submit">Settings</button>
+     <div class ="canvas"><canvas id="graphic-Canvas"></canvas>
+      <div class=" graphicSettings">
+    
+</div><button style="width: 100px; height: 30px; border-radius: 20px;" type="submit">Settings</button>
 
 </div>
-</div>
+<div class ="secCanvas"><canvas id="graphic-Canvas-2"></canvas>
+  
 </div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
 <script>
@@ -259,7 +268,7 @@ async function fetchDataAndRenderChart() {
   const ctx = canvasEl.getContext("2d");
 
   new Chart(ctx, {
-    type: "bar",
+    type: "line",
     data: {
       labels: data.labels,
       datasets: [{
@@ -267,7 +276,12 @@ async function fetchDataAndRenderChart() {
         data: data.values,
         borderColor: "rgba(255, 99, 132, 1)",
         backgroundColor: "rgba(255, 99, 132, 0.2)",
-
+        color: "rgba(0, 0, 0, 1)",
+        font: {
+          size: 14,
+          family: "Arial",
+          weight: "bold"
+        }
       }]
     }
   });
