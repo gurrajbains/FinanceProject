@@ -169,6 +169,6 @@ def split_date(date_str):
     parts = date_str.split("-") # take a data string and everytime a dash is seen we split it
     if len(parts) == 3:# for thee parts we have month day and year
         month, day, year= parts #In ordder of partitioning  we assign parts to mdy
-        return  f"{month}-{year}-{day}" #return month day and year as separate values
+        return  f"{year}-{month}-{day}" #return month day and year as separate values
     
     return None

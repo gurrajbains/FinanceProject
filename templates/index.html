@@ -200,7 +200,7 @@ margin-top: 20px;
           {% for row in rows %}
           <tr>
             <td>{{row[0]}}</td>
-            <td>{{row[1]}}</td>
+            <td>{{row[1].split('-')[1] }}-{{ row[1].split('-')[2] }}-{{ row[1].split('-')[0] }}</td>
             <td>{{row[2]}}</td>
             <td>{{row[3]}}</td>
             <td>{{row[4]}}</td>
