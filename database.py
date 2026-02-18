@@ -158,7 +158,7 @@ def return_by_month():
     rows = cursor.fetchall()
     for(ttype, amount, date) in rows:
         year = split_date(date)[2] 
-        month = split_date(date)[0]
+        month = split_date(date)[1]
     conn.close()
     return rows
 
@@ -167,6 +167,5 @@ def split_date(date_str):
     parts = date_str.split("-") # take a data string and everytime a dash is seen we split it
     if len(parts) == 3:# for thee parts we have month day and year
         month, day, year= parts #In ordder of partitioning  we assign parts to mdy
-        return year, month #return month day and year as separate values
-    
+        return month, day, year #return month day and year as separate values
     return None, None, None
