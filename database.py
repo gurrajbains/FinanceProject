@@ -140,6 +140,7 @@ def search_transactions(q, ttype):
 def sort_transactions(sort_by, ttype):
     conn = get_connection() 
     cursor = conn.cursor()
+
     if sort_by == "date":
         cursor.execute("SELECT name, date, amount, ttype, category, description FROM finance WHERE ttype=? ORDER BY date DESC", (ttype,))
     elif sort_by == "amount":
@@ -149,3 +150,23 @@ def sort_transactions(sort_by, ttype):
     rows = cursor.fetchall()
     conn.close()
     return rows
+
+def return_by_month():
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT ttype, SUM (amount), date FROM finance GROUP BY date;")
+    rows = cursor.fetchall()
+    for(ttype, amount, date) in rows:
+        year = split_date(date)[2] 
+        month = split_date(date)[0]
+    conn.close()
+    return rows
+
+def split_date(date_str):
+    # ate_str is in the format "mm-DD-yyyy"
+    parts = date_str.split("-") # take a data string and everytime a dash is seen we split it
+    if len(parts) == 3:# for thee parts we have month day and year
+        month, day, year= parts #In ordder of partitioning  we assign parts to mdy
+        return year, month #return month day and year as separate values
+    
+    return None, None, None

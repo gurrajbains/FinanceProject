@@ -23,6 +23,7 @@
       background-color: #333333;
       display: flex;
       justify-content: center;
+      height: 75px;
     }
 
     ul li {
@@ -33,6 +34,7 @@
       display: block;
       color: white;
       text-align: center;
+
       padding: 14px 16px;
       text-decoration: none;
     }
@@ -240,7 +242,7 @@ margin-top: 20px;
         <form action ="/sort" method="GET">
           <button type="submit">Sort</button>
           <select style="width: 75px;" name="sort_by" required>
-            <option value="sort_by">Select</option>
+            <option value="">Select</option>
             <option value="date">Date</option>
             <option value="amount">Amount</option>
           </select>
@@ -295,38 +297,12 @@ async function fetchDataAndRenderChart() {
   });
 }
 fetchDataAndRenderChart();
+
 </script>
+
 <script>
 async function fetchDataAndRenderChart() {
-  const response = await fetch("/api/summary");
-  const data = await response.json();
-
-  const canvasEl = document.getElementById("graphic-Canvas");
-  const ctx = canvasEl.getContext("2d");
-
-  new Chart(ctx, {
-    type: "bar",
-    data: {
-      labels: data.labels,
-      datasets: [{
-        label: "expense vs income",
-        data: data.values,
-        borderColor: "rgba(255, 99, 132, 1)",
-        backgroundColor: "rgba(255, 99, 132, 0.2)",
-        color: "rgba(0, 0, 0, 1)",
-        font: {
-          size: 14,
-          family: "Arial",
-          weight: "bold"
-        }
-      }]
-    }
-  });
-}
-fetchDataAndRenderChart();
-</script><script>
-async function fetchDataAndRenderChart() {
-  const response = await fetch("/api/summary");
+  const response = await fetch("/api/get_by_month");
   const data = await response.json();
 
   const canvasEl = document.getElementById("graphic-Canvas-2");
@@ -337,7 +313,7 @@ async function fetchDataAndRenderChart() {
     data: {
       labels: data.labels,
       datasets: [{
-        label: "expense vs income",
+        label: "Date vs income",
         data: data.values,
         borderColor: "rgba(255, 99, 132, 1)",
         backgroundColor: "rgba(0, 99, 132, 0.2)",
