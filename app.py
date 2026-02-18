@@ -61,6 +61,7 @@ def get_by_month():
     for item in rows:
         labels.append(item[2]) 
         values.append(item[1]) 
+        values.append(item[0])
     return jsonify({"labels": labels, "values": values})
 
 @appp.route("/sort", methods=["GET"])

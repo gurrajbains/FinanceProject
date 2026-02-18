@@ -40,7 +40,11 @@ def return_HTML_table(rows):
 
 
 def add_transaction(name, date, amount, ttype, category, description=""):
+   
+    converted_date = split_date(date)
+    
     """
+
     Add a transaction to the database.
     TODO: Insert row into finance table
     """
@@ -49,7 +53,7 @@ def add_transaction(name, date, amount, ttype, category, description=""):
     cursor.execute("""
         INSERT INTO finance (name, date, amount, ttype, category, description)
         VALUES (?,?, ?, ?, ?, ?)
-    """, (name, date, amount, ttype, category, description))
+    """, (name, converted_date, amount, ttype, category, description))
     conn.commit()
     conn.close()
 
@@ -154,18 +158,17 @@ def sort_transactions(sort_by, ttype):
 def return_by_month():
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT ttype, SUM (amount), date FROM finance GROUP BY date;")
+    cursor.execute("SELECT ttype, SUM (amount), date FROM finance GROUP BY date;")  # rows will look like (Ttype SUM(amount) date) want to update with new date
     rows = cursor.fetchall()
-    for(ttype, amount, date) in rows:
-        year = split_date(date)[2] 
-        month = split_date(date)[1]
     conn.close()
-    return rows
+    return rows # ret
 
 def split_date(date_str):
     # ate_str is in the format "mm-DD-yyyy"
+    
     parts = date_str.split("-") # take a data string and everytime a dash is seen we split it
     if len(parts) == 3:# for thee parts we have month day and year
         month, day, year= parts #In ordder of partitioning  we assign parts to mdy
-        return month, day, year #return month day and year as separate values
-    return None, None, None
+        return  f"{month}-{year}-{day}" #return month day and year as separate values
+    
+    return None
