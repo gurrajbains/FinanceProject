@@ -214,9 +214,9 @@ margin-top: 20px;
     <div class="toolbar">
       <div class="add-form">
         <form action="/add" method="POST">
-          <input type="text" name="name" placeholder="Name" required>
-          <input type="text" name="date" placeholder="MM-DD-YYYY" required>
-          <input type="number" name="amount" step="0.01" placeholder="Amount" required>
+          <input type="name" name="name" placeholder="Name" required minlength="2" maxlength="50">
+          <input type="text" name="date" placeholder="MM-DD-YYYY" required pattern="^(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])-\d{4}$" title="Please enter a date in the format MM-DD-YYYY">
+          <input type="number" name="amount" step="0.01" placeholder="Amount" required  number-only max = "100000000000" min = "0" title ="Please enter a valid amount">
 
           <select style="width: 100px;" name="type" required>
             <option value="">Select Type</option>
@@ -224,8 +224,8 @@ margin-top: 20px;
             <option value="expense">Expense</option>
           </select>
 
-          <input type="text" name="category" placeholder="Category" required>
-          <input type="text" name="description" placeholder="Description (optional)">
+          <input type="text" name="source" placeholder="Source" required text-only minlength="2" maxlength="50" title="Please enter a valid source">
+          <input type="text" name="description" placeholder="Description (optional)" maxlength="100">
 
           <button type="submit">Add</button>
         </form>
@@ -241,24 +241,31 @@ margin-top: 20px;
         </form>
         <form action ="/sort" method="GET">
           <button type="submit">Sort</button>
-          <select style="width: 75px;" name="sort_by" required>
+          <select style="width: 75px;" name="sort_by" required >
             <option value="">Select</option>
             <option value="date">Date</option>
             <option value="amount">Amount</option>
           </select>
           <select style="width: 75px;" name="type" required>
-            <option value="type">Select</option>
+            <option value="">Select</option>
             <option value="income">Income</option>
             <option value="expense">Expense</option>
           </select>
         </form>
         <div class="searchbar">
           <form action="/search" method="GET">
-            <input type="text" name="query" placeholder="Search..">
+            <input type="text" name="query" placeholder="Search.." maxlength="100">
             <button type="submit">Search</button>
+            
+        </form> </form>
+        
+</div><div class="reset">
+          <form action="/reset_Search" method="POST">
+            <button type="submit">Reset</button>
+            
         </form>  
-         
-</div>
+          
+         </div>
       </div>
     </div>
      <div class ="canvas"><canvas id="graphic-Canvas"></canvas>

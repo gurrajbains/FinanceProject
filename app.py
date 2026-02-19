@@ -9,18 +9,19 @@ appp = Flask(__name__)
 def house():
     rows = get_all_transactions()
     return render_template('index.html', rows = rows)
+#house is the basic route which gives all the rows the user hada made 
 @appp.route("/add", methods=["POST"])
 def add():
     name = request.form["name"].strip()
     date = request.form["date"].strip()
     amount = float(request.form["amount"])
     ttype = request.form["type"].strip()
-    category = request.form["category"].strip()
+    category = request.form["source"].strip()
     description = request.form.get("description", "").strip()
 
     add_transaction(name, date, amount, ttype, category, description)
 
-    return redirect(url_for("house"))
+    return redirect(url_for("house")) # one its been added go back to home page and update the table with the new rows 
 @appp.route("/delete", methods=["POST"])
 def delete():
     delete_all_transactions()
@@ -70,6 +71,12 @@ def sort():
     type = request.args.get("type", "all")
     rows = sort_transactions(sort_by, type)
     return render_template("index.html", rows=rows, sort_by=sort_by, type=type)
+
+
+@appp.route("/reset_Search", methods=["POST"])
+def reset_search():
+    return redirect(url_for("house"))
+
 if(__name__ == '__main__'):
     init_db()
     appp.run(debug=True)

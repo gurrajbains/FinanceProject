@@ -42,7 +42,8 @@ def return_HTML_table(rows):
 def add_transaction(name, date, amount, ttype, category, description=""):
    
     converted_date = split_date(date)
-    
+    if(ttype == "expense" and amount > 0):
+        amount = -amount
     """
 
     Add a transaction to the database.
