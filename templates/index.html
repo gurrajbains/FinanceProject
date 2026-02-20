@@ -150,18 +150,26 @@
       padding: 10px;
     }
 
-  .graphicSettings {
+  .graphic-settings {
   margin-top: 0px;
+  padding-top: 10px;
+  margin-left: 1860px;
+  width : 470px;
+  height: 30px;
+  border-radius: 20px; 
+  padding-left: 50px;
+  background-color: #ad5151;
   display: flex;  
   position: relative;
-  margin-left: 430px;
   button:hover {
     background-color: #ad5151;
     cursor: pointer;
   }
 }
+
 .secCanvas {
 margin-top: 20px;
+position: relative;
       margin-left: 1860px;
       width: 500px;
       height: 290px;
@@ -268,15 +276,53 @@ margin-top: 20px;
          </div>
       </div>
     </div>
-     <div class ="canvas"><canvas id="graphic-Canvas"></canvas>
-      <div class=" graphicSettings">
-    <button style="width: 100px; height: 30px; border-radius: 20px;" type="submit">Settings</button>
-</div>
+    <div class="canvasWrapper">
+     <div class ="canvas"><canvas id="graphic-Canvas"></canvas></div>
+      <div class = "graphic-settings"> 
+        
+        <form action="/graphic_Settings" method="GET">
+          <button type="submit">Settings</button>
+          <select style="width: 75px;" name="type" required>
+            <option value="">Graph Type</option>
+            <option value="bar">Bar</option>
+            <option value="line">Line</option>
+            <option value="pie">Pie</option>
+            <option value="doughnut">Doughnut</option>
+            <option value="radar">Radar</option>
+            <option value="polarArea">Polar Area</option>
+            <option value="bubble">Bubble</option>
+            <option value="scatter">Scatter</option>
+            <option value="bar">Bar</option>
+            <option value="area">Area</option>
+          </select>
+        </form>
 
-</div>
+    </div>
 <div class ="secCanvas"><canvas id="graphic-Canvas-2"></canvas></div>
+      <div class = "graphic-settings"> 
+        
+        <form action="/graphic_Settings" method="GET">
+          <button type="submit">Settings</button>
+          <select style="width: 75px;" name="type" required>
+            <option value="">Graph Type</option>
+            <option value="bar">Bar</option>
+            <option value="line">Line</option>
+            <option value="pie">Pie</option>
+            <option value="doughnut">Doughnut</option>
+            <option value="radar">Radar</option>
+            <option value="polarArea">Polar Area</option>
+            <option value="bubble">Bubble</option>
+            <option value="scatter">Scatter</option>
+            <option value="bar">Bar</option>
+            <option value="area">Area</option>
+          </select>
+        </form>
+
+    </div>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
 <script>
+
 async function fetchDataAndRenderChart() {
   const response = await fetch("/api/summary");
   const data = await response.json();
@@ -308,7 +354,7 @@ fetchDataAndRenderChart();
 </script>
 
 <script>
-async function fetchDataAndRenderChart() {
+async function fetchDataAndRenderChart2() {
   const response = await fetch("/api/get_by_month");
   const data = await response.json();
 
@@ -334,7 +380,7 @@ async function fetchDataAndRenderChart() {
     }
   });
 }
-fetchDataAndRenderChart();
+fetchDataAndRenderChart2();
 </script>
 
   
