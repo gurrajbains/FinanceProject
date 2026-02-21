@@ -55,15 +55,17 @@ def api_summary():
     return  jsonify({"labels": labels, "values": values}) #if i want to return date i can add naother aarary for the others and then return that in the json as well
 
 @appp.route("/api/get_by_month", methods=["GET"])
-def get_by_month():
+def get_by_month(): 
     rows = return_by_month()
     labels = []
     values = []
+    #get the type of chart the user wants to see
     for item in rows:
         labels.append(item[2]) 
         values.append(item[1]) 
         values.append(item[0])
-    return jsonify({"labels": labels, "values": values})
+
+    return jsonify({"labels": labels, "values": values,})
 
 @appp.route("/sort", methods=["GET"])
 def sort():    
@@ -76,6 +78,12 @@ def sort():
 @appp.route("/reset_Search", methods=["POST"])
 def reset_search():
     return redirect(url_for("house"))
+
+@appp.route("/graphic_Settings", methods=["GET"])
+def graphic_Settings():
+    chart_type = request.args.get("graphic","line")
+    return render_template("graphic_Settings.html", chart_type=chart_type)
+
 
 if(__name__ == '__main__'):
     init_db()

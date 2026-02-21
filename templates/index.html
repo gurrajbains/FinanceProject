@@ -279,59 +279,35 @@ position: relative;
     <div class="canvasWrapper">
      <div class ="canvas"><canvas id="graphic-Canvas"></canvas></div>
       <div class = "graphic-settings"> 
-        
-        <form action="/graphic_Settings" method="GET">
-          <button type="submit">Settings</button>
-          <select style="width: 75px;" name="type" required>
-            <option value="">Graph Type</option>
+          <select style="width: 75px;" onchange="fetchDataAndRenderChart(this)" name="graphic" required>  
+            <option value="line" selected>Line</option>
             <option value="bar">Bar</option>
-            <option value="line">Line</option>
             <option value="pie">Pie</option>
             <option value="doughnut">Doughnut</option>
             <option value="radar">Radar</option>
             <option value="polarArea">Polar Area</option>
             <option value="bubble">Bubble</option>
             <option value="scatter">Scatter</option>
-            <option value="bar">Bar</option>
-            <option value="area">Area</option>
           </select>
-        </form>
-
     </div>
 <div class ="secCanvas"><canvas id="graphic-Canvas-2"></canvas></div>
-      <div class = "graphic-settings"> 
-        
-        <form action="/graphic_Settings" method="GET">
-          <button type="submit">Settings</button>
-          <select style="width: 75px;" name="type" required>
-            <option value="">Graph Type</option>
-            <option value="bar">Bar</option>
-            <option value="line">Line</option>
-            <option value="pie">Pie</option>
-            <option value="doughnut">Doughnut</option>
-            <option value="radar">Radar</option>
-            <option value="polarArea">Polar Area</option>
-            <option value="bubble">Bubble</option>
-            <option value="scatter">Scatter</option>
-            <option value="bar">Bar</option>
-            <option value="area">Area</option>
-          </select>
-        </form>
-
-    </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
 <script>
 
-async function fetchDataAndRenderChart() {
-  const response = await fetch("/api/summary");
+async function fetchDataAndRenderChart(graphic) {
+  const response = await fetch("/api/get_by_month");
   const data = await response.json();
 
   const canvasEl = document.getElementById("graphic-Canvas");
   const ctx = canvasEl.getContext("2d");
 
-  new Chart(ctx, {
-    type: "line",
+
+if(Chart.getChart(canvasEl)) {
+  Chart.getChart(canvasEl).destroy();
+}
+new Chart(ctx, {
+    type: graphic.value,
     data: {
       labels: data.labels,
       datasets: [{
@@ -348,11 +324,9 @@ async function fetchDataAndRenderChart() {
       }]
     }
   });
-}
-fetchDataAndRenderChart();
-
+  
+  }fetchDataAndRenderChart();
 </script>
-
 <script>
 async function fetchDataAndRenderChart2() {
   const response = await fetch("/api/get_by_month");
