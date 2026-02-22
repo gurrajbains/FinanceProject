@@ -302,6 +302,13 @@ position: relative;
             <option value="bubble">Bubble</option>
             <option value="scatter">Scatter</option>
           </select>
+          <form action="/update_graphics" method="POST">
+              <select style="width: 75px;" name="timeFrame" required>  
+                <option value="Monthly" selected>Monthly</option>
+                <option value="Quarterly">Quarterly</option>
+                <option value="Yearly">Yearly</option>
+            <button type="submit">Submit</button>
+            </form>
     </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
