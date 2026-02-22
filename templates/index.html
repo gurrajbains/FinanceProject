@@ -291,6 +291,18 @@ position: relative;
           </select>
     </div>
 <div class ="secCanvas"><canvas id="graphic-Canvas-2"></canvas></div>
+    <div class = "graphic-settings"> 
+          <select style="width: 75px;" onchange="fetchDataAndRenderChart2(this)" name="graphic2" required>  
+            <option value="line" selected>Line</option>
+            <option value="bar">Bar</option>
+            <option value="pie">Pie</option>
+            <option value="doughnut">Doughnut</option>
+            <option value="radar">Radar</option>
+            <option value="polarArea">Polar Area</option>
+            <option value="bubble">Bubble</option>
+            <option value="scatter">Scatter</option>
+          </select>
+    </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
 <script>
@@ -306,8 +318,11 @@ async function fetchDataAndRenderChart(graphic) {
 if(Chart.getChart(canvasEl)) {
   Chart.getChart(canvasEl).destroy();
 }
+if(graphic.value==""){
+  graphic.value = "line";
+}
 new Chart(ctx, {
-    type: graphic.value,
+    type: graphic.value || "line",
     data: {
       labels: data.labels,
       datasets: [{
@@ -325,10 +340,10 @@ new Chart(ctx, {
     }
   });
   
-  }fetchDataAndRenderChart();
+  }fetchDataAndRenderChart(type="line" );
 </script>
 <script>
-async function fetchDataAndRenderChart2() {
+async function fetchDataAndRenderChart2(graphic2) {
   const response = await fetch("/api/get_by_month");
   const data = await response.json();
 
@@ -336,7 +351,7 @@ async function fetchDataAndRenderChart2() {
   const ctx = canvasEl.getContext("2d");
 
   new Chart(ctx, {
-    type: "line",
+    type: graphic2.value || "line",
     data: {
       labels: data.labels,
       datasets: [{
