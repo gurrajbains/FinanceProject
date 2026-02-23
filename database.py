@@ -174,4 +174,31 @@ def split_date(date_str):
     
     return None
 
+def get_new_Graphic_data(timeFrame, data):
+    conn = get_connection()
+    cursor = conn.cursor()
+    if timeFrame == "Monthly":
+        cursor.execute("SELECT ttype, SUM (amount), date FROM finance GROUP BY strftime('%Y-%m', date);")
+    elif timeFrame == "Quarterly":
+        cursor.execute("SELECT ttype, SUM (amount), date FROM finance GROUP BY strftime('%Y-Q%q', date);")
+    elif timeFrame == "Yearly":
+        cursor.execute("SELECT ttype, SUM (amount), date FROM finance GROUP BY strftime('%Y', date);")
+    rows = cursor.fetchall()
+    conn.close()
+    return rows
+
+def get_versus_data(data):
+    if data == "earn rate":
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT date, SUM(amount) FROM finance WHERE ttype='income' GROUP BY strftime('%Y-%m', date);")
+        rows = cursor.fetchall()
+        conn.close()
+    elif data == "spend_rate":
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT date, SUM(amount) FROM finance WHERE ttype='expense' GROUP BY strftime('%Y-%m', date);")
+        rows = cursor.fetchall()
+        conn.close()
+        return rows
 

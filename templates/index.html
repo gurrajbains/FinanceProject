@@ -152,10 +152,11 @@
 
   .graphic-settings {
   margin-top: 0px;
-  padding-top: 10px;
+  display: flex;
+  justify-content:  center;
   margin-left: 1860px;
-  width : 470px;
-  height: 30px;
+  width : 475px;
+  height: 40px;
   border-radius: 20px; 
   padding-left: 50px;
   background-color: #ad5151;
@@ -292,7 +293,7 @@ position: relative;
     </div>
 <div class ="secCanvas"><canvas id="graphic-Canvas-2"></canvas></div>
     <div class = "graphic-settings"> 
-          <select style="width: 75px;" onchange="fetchDataAndRenderChart2(this)" name="graphic2" required>  
+          <select style="width: 55px; display: flex;" onchange="fetchDataAndRenderChart2(this)" name="graphic2" required>  
             <option value="line" selected>Line</option>
             <option value="bar">Bar</option>
             <option value="pie">Pie</option>
@@ -302,12 +303,19 @@ position: relative;
             <option value="bubble">Bubble</option>
             <option value="scatter">Scatter</option>
           </select>
-          <form action="/update_graphics" method="POST">
-              <select style="width: 75px;" name="timeFrame" required>  
+          <form action="/update_graphics"  style = "display:flex;" method="POST">
+              <select style="width: 55px;" name="timeFrame" required>  
                 <option value="Monthly" selected>Monthly</option>
                 <option value="Quarterly">Quarterly</option>
                 <option value="Yearly">Yearly</option>
-            <button type="submit">Submit</button>
+              </select>
+              <select style="width: 75px; display: flex;" onchange ="./" required>  
+                <option value="income" selected>Income</option>
+                <option value="expense">Expense</option>
+                <option value="earn rate">Earn Rate</option>
+                <option value="spend_rate">Spend Rate</option>
+              </select>
+               <p> Vs </p>
             </form>
     </div>
 </div>

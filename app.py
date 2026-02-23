@@ -79,12 +79,13 @@ def sort():
 def reset_search():
     return redirect(url_for("house"))
 
-@appp.route("/graphic_Settings", methods=["GET"])
-def graphic_Settings():
-    chart_type = request.args.get("graphic","line")
-    return render_template("graphic_Settings.html", chart_type=chart_type)
 
-
+@appp.route("/update_graphics", methods=["POST"])
+def update_graphics():
+    chart_type = request.form.get("graphic", "line")
+    time_frame = request.form.get("timeFrame", "Monthly")
+    data = request.form.get("data", "income")
+    return render_template("graphic_Settings.html", chart_type=chart_type, time_frame=time_frame, data=data)
 if(__name__ == '__main__'):
     init_db()
     appp.run(debug=True)
