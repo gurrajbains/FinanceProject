@@ -280,63 +280,58 @@ position: relative;
     <div class="canvasWrapper">
      <div class ="canvas"><canvas id="graphic-Canvas"></canvas></div>
       <div class = "graphic-settings"> 
-          <select style="width: 75px;" onchange="fetchDataAndRenderChart(this)" name="graphic" required>  
-            <option value="line" selected>Line</option>
-            <option value="bar">Bar</option>
-            <option value="pie">Pie</option>
-            <option value="doughnut">Doughnut</option>
-            <option value="radar">Radar</option>
-            <option value="polarArea">Polar Area</option>
-            <option value="bubble">Bubble</option>
-            <option value="scatter">Scatter</option>
-          </select>
+          <select id="graphic-1" style="width:75px;" onchange="fetchDataAndRenderChart(this)" required>
+          <option value="line" selected>Line</option>
+          <option value="bar">Bar</option>
+          <option value="pie">Pie</option>
+          <option value="doughnut">Doughnut</option>
+          <option value="radar">Radar</option>
+          <option value="polarArea">Polar Area</option>
+    </select>
     </div>
 <div class ="secCanvas"><canvas id="graphic-Canvas-2"></canvas></div>
     <div class = "graphic-settings"> 
-          <select style="width: 55px; display: flex;" onchange="fetchDataAndRenderChart2(this)" name="graphic2" required>  
-            <option value="line" selected>Line</option>
-            <option value="bar">Bar</option>
-            <option value="pie">Pie</option>
-            <option value="doughnut">Doughnut</option>
-            <option value="radar">Radar</option>
-            <option value="polarArea">Polar Area</option>
-            <option value="bubble">Bubble</option>
-            <option value="scatter">Scatter</option>
-          </select>
-          <form action="/update_graphics"  style = "display:flex;" method="POST">
+          <select id="graphic-2" style="width:55px;" onchange="fetchDataAndRenderChart2(this)" required>
+              <option value="line" selected>Line</option>
+              <option value="bar">Bar</option>
+              <option value="pie">Pie</option>
+              <option value="doughnut">Doughnut</option>
+              <option value="radar">Radar</option>
+              <option value="polarArea">Polar Area</option>
+</select>
+          <form style = "display:flex;" method="GET">
               <select style="width: 55px;" name="timeFrame" required>  
                 <option value="Monthly" selected>Monthly</option>
                 <option value="Quarterly">Quarterly</option>
                 <option value="Yearly">Yearly</option>
               </select>
-              <select style="width: 75px; display: flex;" onchange ="./" required>  
+              <select  style="width: 75px; display: flex;" name ="metric" required>  
                 <option value="income" selected>Income</option>
                 <option value="expense">Expense</option>
                 <option value="earn rate">Earn Rate</option>
                 <option value="spend_rate">Spend Rate</option>
               </select>
-               <p> Vs </p>
+              <button type="submit">Update</button>
             </form>
     </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
-<script>
 
+
+<script>
 async function fetchDataAndRenderChart(graphic) {
-  const response = await fetch("/api/get_by_month");
+  graphic = graphic || document.getElementById("graphic-1");
+
+  const response = await fetch("/api/make_graph?graphic=" + (graphic.value || "line"));/* need to fetchg from jsonfiy but we need to send the specific datatype we want which is the bottoms grpah type*/
   const data = await response.json();
 
   const canvasEl = document.getElementById("graphic-Canvas");
   const ctx = canvasEl.getContext("2d");
-
-
-if(Chart.getChart(canvasEl)) {
-  Chart.getChart(canvasEl).destroy();
-}
-if(graphic.value==""){
-  graphic.value = "line";
-}
-new Chart(ctx, {
+ 
+  if (Chart.getChart(canvasEl)) {
+    Chart.getChart(canvasEl).destroy();
+  }
+  new Chart(ctx, {
     type: graphic.value || "line",
     data: {
       labels: data.labels,
@@ -344,26 +339,27 @@ new Chart(ctx, {
         label: "date vs income",
         data: data.values,
         borderColor: "rgba(255, 99, 132, 1)",
-        backgroundColor: "rgba(255, 99, 132, 0.2)",
-        color: "rgba(0, 0, 0, 1)",
-        font: {
-          size: 14,
-          family: "Arial",
-          weight: "bold"
-        }
+        backgroundColor: "rgba(255, 99, 132, 0.2)"
       }]
     }
   });
-  
-  }fetchDataAndRenderChart(type="line" );
+}
+fetchDataAndRenderChart(document.getElementById("graphic-1"));
 </script>
+
 <script>
 async function fetchDataAndRenderChart2(graphic2) {
-  const response = await fetch("/api/get_by_month");
+  graphic2 = graphic2 || document.getElementById("graphic-2");
+
+  const response = await fetch("/api/make_graph?graphic=" + (graphic2.value || "line")); 
   const data = await response.json();
 
   const canvasEl = document.getElementById("graphic-Canvas-2");
   const ctx = canvasEl.getContext("2d");
+
+  if (Chart.getChart(canvasEl)) {
+    Chart.getChart(canvasEl).destroy();
+  }
 
   new Chart(ctx, {
     type: graphic2.value || "line",
@@ -373,18 +369,12 @@ async function fetchDataAndRenderChart2(graphic2) {
         label: "date vs income",
         data: data.values,
         borderColor: "rgba(255, 99, 132, 1)",
-        backgroundColor: "rgba(0, 99, 132, 0.2)",
-        color: "rgba(0, 0, 0, 1)",
-        font: {
-          size: 14,
-          family: "Arial",
-          weight: "bold"
-        }
+        backgroundColor: "rgba(0, 99, 132, 0.2)"
       }]
     }
   });
 }
-fetchDataAndRenderChart2();
+fetchDataAndRenderChart2(document.getElementById("graphic-2"));
 </script>
 
   

@@ -43,7 +43,7 @@ def search():
     ttype = request.args.get("type", "all")
     rows = search_transactions(q=q, ttype=ttype)
     return render_template("index.html", rows=rows, q=q, type=ttype)
-
+#needs to go
 @appp.route("/api/summary", methods=["GET"])
 def api_summary():
     summary_data = get_summary()
@@ -53,7 +53,7 @@ def api_summary():
         labels.append(item[0])
         values.append(item[1])
     return  jsonify({"labels": labels, "values": values}) #if i want to return date i can add naother aarary for the others and then return that in the json as well
-
+#needs to go
 @appp.route("/api/get_by_month", methods=["GET"])
 def get_by_month(): 
     rows = return_by_month()
@@ -78,14 +78,20 @@ def sort():
 @appp.route("/reset_Search", methods=["POST"])
 def reset_search():
     return redirect(url_for("house"))
+@appp.route("/api/make_graph", methods=["GET"])
+def make_graph():
+    chart_type = request.args.get("graphic", "line")
+    time_frame = request.args.get("timeFrame", "Monthly")
+    metric = request.args.get("metric", "income")
+    labels = ["A", "B", "C"]
+    values = [10, 20, 30]
 
+    return jsonify({
+        "chart": chart_type,
+        "labels": labels,
+        "values": values
+    }) # need to make it such that get_by_month is that everytime a graph is being made it calls this function and then updates the data based on the time frame and data type the user wants to see rather than multiple functions for each type of graph and time frame
 
-@appp.route("/update_graphics", methods=["POST"])
-def update_graphics():
-    chart_type = request.form.get("graphic", "line")
-    time_frame = request.form.get("timeFrame", "Monthly")
-    data = request.form.get("data", "income")
-    return render_template("graphic_Settings.html", chart_type=chart_type, time_frame=time_frame, data=data)
 if(__name__ == '__main__'):
     init_db()
     appp.run(debug=True)
