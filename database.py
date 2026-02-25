@@ -1,6 +1,7 @@
 # database.py
 import csv
 import sqlite3
+from turtle import st
 from flask import g, render_template
 
 
@@ -94,12 +95,13 @@ def delete_all_transactions():
 
 
 
-def get_summary(metric, timeframe):
+def get_summary(metric, timeframe, timeRange=None):
     conn = get_connection()
     cursor = conn.cursor()
+    timeRange = timeRange.strip() if timeRange else None
+
 
     if metric == "income":
-
         if timeframe == "Monthly":
             cursor.execute("""
                 SELECT strftime('%Y-%m', date), SUM(amount) FROM finance WHERE ttype='income' GROUP BY strftime('%Y-%m', date)ORDER BY strftime('%Y-%m', date); """)
@@ -116,7 +118,15 @@ def get_summary(metric, timeframe):
         # fallback monthly income
         cursor.execute("""
             SELECT strftime('%Y-%m', date), SUM(amount) FROM finance WHERE ttype='income' GROUP BY strftime('%Y-%m', date)ORDER BY strftime('%Y-%m', date);""")
+    
     summary = cursor.fetchall()
+    for rows in summary[:]:  # Create a copy of the list to avoid modifying it during iteration
+        if timeRange:
+                    start, end = timeRange.split("to")
+                    start = start.strip()
+                    end = end.strip()
+                    if rows[0] < start or rows[0] > end:
+                        summary.remove(rows)
     conn.close()
     return summary
 def get_transactions_by_type(ttype):

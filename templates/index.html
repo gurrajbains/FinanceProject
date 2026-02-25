@@ -301,7 +301,7 @@ position: relative;
                 <option value="earn rate">Earn Rate</option>
                 <option value="spend_rate">Spend Rate</option>
               </select>
-                <input type="text" name="timeRange1" placeholder="MM-YYYY to MM YYYY" maxlength="20" pattern="^(0[1-9]|1[0-2])-(\d{4}) to (0[1-9]|1[0-2])-(\d{4})$" title="Please enter a time range in the format MM-YYYY to MM-YYYY">
+                <input type="text" name="timeRange1" placeholder="YYYY-MM to YYYY-MM" maxlength="20" pattern="^(19|20)\d{2}-(0[1-9]|1[0-2]) to (19|20)\d{2}-(0[1-9]|1[0-2])$" title="Please enter a time range in the format YYYY-MM to YYYY-MM">
               <button type="submit">Update</button>
             </form>
     </div>
@@ -328,7 +328,7 @@ position: relative;
                 <option value="earn rate">Earn Rate</option>
                 <option value="spend_rate">Spend Rate</option>
               </select>
-              <input type="text" name="timeRange2" placeholder="MM-YYYY to MM YYYY" maxlength="20" pattern="^(0[1-9]|1[0-2])-(\d{4}) to (0[1-9]|1[0-2])-(\d{4})$" title="Please enter a time range in the format MM-YYYY to MM-YYYY">
+              <input type="text" name="timeRange2" placeholder="YYYY-MM to YYYY-MM" maxlength="20" pattern="^(19|20)\d{2}-(0[1-9]|1[0-2]) to (19|20)\d{2}-(0[1-9]|1[0-2])$" title="Please enter a time range in the format YYYY-MM to YYYY-MM">
               <button type="submit">Update</button>
             </form>
     </div>
@@ -340,7 +340,8 @@ position: relative;
 async function fetchDataAndRenderChart(graphic) {
   graphic = graphic || document.getElementById("graphic-1");
 
-  const response = await fetch("/api/make_graph?graphic=" + (graphic.value || "line"));/* need to fetchg from jsonfiy but we need to send the specific datatype we want which is the bottoms grpah type*/
+  const timeRange1 = document.querySelector("input[name='timeRange1']").value;
+  const response = await fetch("/api/make_graph?graphic=" + (graphic.value || "line") + "&timeRange=" + timeRange1);/* need to fetchg from jsonfiy but we need to send the specific datatype we want which is the bottoms grpah type*/
   const data = await response.json();
 
   const canvasEl = document.getElementById("graphic-Canvas");
@@ -368,7 +369,7 @@ fetchDataAndRenderChart(document.getElementById("graphic-1"));
 <script>
 async function fetchDataAndRenderChart2(graphic2) {
   graphic2 = graphic2 || document.getElementById("graphic-2");
-
+  timeRange2 = document.querySelector("input[name='timeRange2']").value;
   const response = await fetch("/api/make_graph?graphic=" + (graphic2.value || "line")); 
   const data = await response.json();
 
