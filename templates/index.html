@@ -280,18 +280,7 @@ position: relative;
     <div class="canvasWrapper">
      <div class ="canvas"><canvas id="graphic-Canvas"></canvas></div>
       <div class = "graphic-settings"> 
-          <select id="graphic-1" style="width:75px;" onchange="fetchDataAndRenderChart(this)" required>
-          <option value="line" selected>Line</option>
-          <option value="bar">Bar</option>
-          <option value="pie">Pie</option>
-          <option value="doughnut">Doughnut</option>
-          <option value="radar">Radar</option>
-          <option value="polarArea">Polar Area</option>
-    </select>
-    </div>
-<div class ="secCanvas"><canvas id="graphic-Canvas-2"></canvas></div>
-    <div class = "graphic-settings"> 
-          <select id="graphic-2" style="width:55px;" onchange="fetchDataAndRenderChart2(this)" required>
+          <select id="graphic-1" style="width:55px;" onchange="fetchDataAndRenderChart(this)" required>
               <option value="line" selected>Line</option>
               <option value="bar">Bar</option>
               <option value="pie">Pie</option>
@@ -299,7 +288,8 @@ position: relative;
               <option value="radar">Radar</option>
               <option value="polarArea">Polar Area</option>
 </select>
-          <form style = "display:flex;" method="GET">
+          <form style = "display:flex;" action="/api/make_graph" method="GET"
+      onsubmit="fetchDataAndRenderChart(document.getElementById('graphic-1')); return false;">
               <select style="width: 55px;" name="timeFrame" required>  
                 <option value="Monthly" selected>Monthly</option>
                 <option value="Quarterly">Quarterly</option>
@@ -311,6 +301,34 @@ position: relative;
                 <option value="earn rate">Earn Rate</option>
                 <option value="spend_rate">Spend Rate</option>
               </select>
+                <input type="text" name="timeRange1" placeholder="MM-YYYY to MM YYYY" maxlength="20" pattern="^(0[1-9]|1[0-2])-(\d{4}) to (0[1-9]|1[0-2])-(\d{4})$" title="Please enter a time range in the format MM-YYYY to MM-YYYY">
+              <button type="submit">Update</button>
+            </form>
+    </div>
+<div class ="secCanvas"><canvas id="graphic-Canvas-2"></canvas></div>
+    <div class = "graphic-settings"> 
+          <select id="graphic-2" style="width:55px;" onchange="fetchDataAndRenderChart2(this)" required>
+              <option value="line" selected>Line</option>
+              <option value="bar">Bar</option>
+              <option value="pie">Pie</option>
+              <option value="doughnut">Doughnut</option>
+              <option value="radar">Radar</option>
+              <option value="polarArea">Polar Area</option>
+</select>
+          <form  style = "display:flex;" action="/api/make_graph" method="GET"
+      onsubmit="fetchDataAndRenderChart2(document.getElementById('graphic-2')); return false;">
+              <select style="width: 55px;" name="timeFrame" required>  
+                <option value="Monthly" selected>Monthly</option>
+                <option value="Quarterly">Quarterly</option>
+                <option value="Yearly">Yearly</option>
+              </select>
+              <select  style="width: 75px; display: flex;" name ="metric" required>  
+                <option value="income" selected>Income</option>
+                <option value="expense">Expense</option>
+                <option value="earn rate">Earn Rate</option>
+                <option value="spend_rate">Spend Rate</option>
+              </select>
+              <input type="text" name="timeRange2" placeholder="MM-YYYY to MM YYYY" maxlength="20" pattern="^(0[1-9]|1[0-2])-(\d{4}) to (0[1-9]|1[0-2])-(\d{4})$" title="Please enter a time range in the format MM-YYYY to MM-YYYY">
               <button type="submit">Update</button>
             </form>
     </div>
@@ -339,7 +357,7 @@ async function fetchDataAndRenderChart(graphic) {
         label: "date vs income",
         data: data.values,
         borderColor: "rgba(255, 99, 132, 1)",
-        backgroundColor: "rgba(255, 99, 132, 0.2)"
+        backgroundColor: ["#FF6384","#36A2EB","#FFCE56","#4BC0C0","#9966FF"],
       }]
     }
   });
@@ -368,8 +386,14 @@ async function fetchDataAndRenderChart2(graphic2) {
       datasets: [{
         label: "date vs income",
         data: data.values,
-        borderColor: "rgba(255, 99, 132, 1)",
-        backgroundColor: "rgba(0, 99, 132, 0.2)"
+        borderColor: "rgba(54, 162, 235, 1)",
+        tickColor: "rgba(54, 162, 235, 1)",
+       backgroundColor: ["#FF6384","#36A2EB","#FFCE56","#4BC0C0","#9966FF"],
+        color: "rgba(0, 162, 235, 1)",
+        options: {
+          responsive: true,
+          maintainAspectRatio: false
+        }
       }]
     }
   });
