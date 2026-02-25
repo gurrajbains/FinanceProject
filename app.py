@@ -54,18 +54,6 @@ def api_summary():
         values.append(item[1])
     return  jsonify({"labels": labels, "values": values}) #if i want to return date i can add naother aarary for the others and then return that in the json as well
 #needs to go
-@appp.route("/api/get_by_month", methods=["GET"])
-def get_by_month(): 
-    rows = return_by_month()
-    labels = []
-    values = []
-    #get the type of chart the user wants to see
-    for item in rows:
-        labels.append(item[2]) 
-        values.append(item[1]) 
-        values.append(item[0])
-
-    return jsonify({"labels": labels, "values": values,})
 
 @appp.route("/sort", methods=["GET"])
 def sort():    
@@ -81,17 +69,14 @@ def reset_search():
 @appp.route("/api/make_graph", methods=["GET"])
 def make_graph():
     chart_type = request.args.get("graphic", "line")
-    time_frame = request.args.get("timeFrame", "Monthly")
+    timeframe = request.args.get("timeframe", "Monthly")
     metric = request.args.get("metric", "income")
-    labels = ["A", "B", "C"]
-    values = [10, 20, 30]
-
-    return jsonify({
-        "chart": chart_type,
-        "labels": labels,
-        "values": values
-    }) # need to make it such that get_by_month is that everytime a graph is being made it calls this function and then updates the data based on the time frame and data type the user wants to see rather than multiple functions for each type of graph and time frame
-
+    if(metric != "income"):
+        return jsonify({"error": "Only income metric is supported for graphing."}), 400
+    rows = get_summary(metric, timeframe)
+    labels = [item[0] for item in rows]
+    values = [item[1] for item in rows]
+    return jsonify({"labels": labels, "values": values, "chart": chart_type, "timeframe": timeframe})
 if(__name__ == '__main__'):
     init_db()
     appp.run(debug=True)

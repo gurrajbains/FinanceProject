@@ -94,13 +94,31 @@ def delete_all_transactions():
 
 
 
-def get_summary(): 
+def get_summary(metric, timeframe):
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT ttype, SUM (amount) FROM finance GROUP BY ttype;")
-    summary = cursor.fetchall() 
+
+    if metric == "income":
+
+        if timeframe == "Monthly":
+            cursor.execute("""
+                SELECT strftime('%Y-%m', date), SUM(amount) FROM finance WHERE ttype='income' GROUP BY strftime('%Y-%m', date)ORDER BY strftime('%Y-%m', date); """)
+        elif timeframe == "Yearly":
+            cursor.execute("""
+                SELECT strftime('%Y', date), SUM(amount)FROM finance WHERE ttype='income'GROUP BY strftime('%Y', date) ORDER BY strftime('%Y', date);""")
+
+        elif timeframe == "Quarterly":
+            cursor.execute("""
+                SELECT strftime('%Y', date) || '-Q' || (((cast(strftime('%m', date) as int)-1)/3)+1),SUM(amount)FROM financeWHERE ttype='income'GROUP BY strftime('%Y', date) || '-Q' || 
+                         (((cast(strftime('%m', date) as int)-1)/3)+1)ORDER BY strftime('%Y', date) || '-Q' || (((cast(strftime('%m', date) as int)-1)/3)+1);""") #got from stack overflow to get quarter grouping
+
+    else:
+        # fallback monthly income
+        cursor.execute("""
+            SELECT strftime('%Y-%m', date), SUM(amount) FROM finance WHERE ttype='income' GROUP BY strftime('%Y-%m', date)ORDER BY strftime('%Y-%m', date);""")
+    summary = cursor.fetchall()
     conn.close()
-    return summary  
+    return summary
 def get_transactions_by_type(ttype):
     conn = get_connection()
     cursor = conn.cursor()
