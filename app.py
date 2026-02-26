@@ -69,14 +69,15 @@ def reset_search():
 @appp.route("/api/make_graph", methods=["GET"])
 def make_graph():
     chart_type = request.args.get("graphic", "line")
-    timeframe = request.args.get("timeframe", "Monthly")
-    metric = request.args.get("metric", "income")
-    timeRange = request.args.get("timeRange", "")
-    if(metric != "income"):
-        return jsonify({"error": "Only income metric is supported for graphing."}), 400
+    timeframe = request.args.get("timeFrame", "Monthly")
+    print(chart_type, timeframe)
+    metric = request.args.get("metric","income")
+    timeRange = request.args.get("timeRange","")
+   
     rows = get_summary(metric, timeframe, timeRange)
     labels = [item[0] for item in rows]
     values = [item[1] for item in rows]
+    print(chart_type, timeframe, metric, timeRange)
     return jsonify({"labels": labels, "values": values, "chart": chart_type, "timeframe": timeframe})
 if(__name__ == '__main__'):
     init_db()
