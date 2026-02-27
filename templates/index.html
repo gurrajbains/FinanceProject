@@ -1,48 +1,19 @@
 <!DOCTYPE html>
-<html width="2000px" height="1000px">
+<html width="100%" height="100%">
 <head>
   <title>Finance Manager</title>
 
   <style>
-    body{
-      html, body {
-  overflow-x: hidden;
-}
-
+    body {       width: 100%;
+      height: 100%;
       margin: 0;
       background-image:url("{{ url_for('static', filename='background.jpg') }}");
       background-size: cover;
       background-repeat: no-repeat;
       background-attachment: fixed;
     }
-
-    ul {
-      list-style-type: none;
-      margin: 0;
-      padding: 0;
-      background-color: #333333;
-      display: flex;
-      justify-content: center;
-      height: 75px;
-    }
-
-    ul li {
-      position: relative;
-    }
-
-    ul li a {
-      display: block;
-      color: white;
-      text-align: center;
-
-      padding: 14px 16px;
-      text-decoration: none;
-    }
-
-    ul li a:hover {
-      background-color: #ad5151;
-    }
-
+ 
+   
    
     .content {
       padding: 12px;
@@ -54,7 +25,7 @@
       position: relative;
       background: rgba(255,255,255,0.90);
       padding: 8px;
-      width: min(1800px, 100%); 
+      width: min(60%, 100%);     
       border-radius: 20px;
       overflow-x: hidden
     }
@@ -62,7 +33,7 @@
     table {
        margin-left: 20px;
       align-content: center;
-      width: min(1750px, 100%);     
+      width: min(100%, 100%);     
       border-radius: 20px;
 
     }
@@ -74,7 +45,11 @@
     border: 1px solid #000000;
     
     }
-     
+     @media (max-width: 1100px) {
+  .content {
+    grid-template-columns: 1fr;
+  }
+}
 
     thead th {
       margin-left: 15px;
@@ -91,12 +66,13 @@
  
     .toolbar {
       display: flex;
+      position: relative;
       justify-content: flex-start;
       gap: 12px;
       flex-wrap: wrap;
       margin-top: 12px;
       padding: 10px;
-      width: min(1800px, 100%);
+      width: min(60%, 100%);     
       background: rgba(200, 177, 177, 0.9);
       border-radius: 20px;
     }
@@ -183,14 +159,6 @@ position: relative;
   </style>
 </head>
 <body style="overflow-x: hidden;">
-  <ul>
-    <li><a href="http://127.0.0.1:5000/#home">Base</a></li>
-    <li><a href="http://127.0.0.1:5000/#home">Rates</a></li>
-    <li><a href="http://127.0.0.1:5000/#home">Expectations</a></li>
-    <li><a href="http://127.0.0.1:5000/#home">Statistics</a></li>
-    <li><a href="http://127.0.0.1:5000/#home">Settings</a></li>
-    <li><a href="http://127.0.0.1:5000/#home">Market</a></li>
-  </ul>
   <div class="content">
     <div class="table-containment">
       <table  frame="red" rules="rows">

@@ -109,19 +109,15 @@ def get_summary(metric, timeframe, timeRange=None):
             cursor.execute("""
                 SELECT strftime('%Y', date), SUM(amount)FROM finance WHERE ttype='income'GROUP BY strftime('%Y', date) ORDER BY strftime('%Y', date);""")
 
-        elif timeframe == "Quarterly":
-             cursor.execute(""" SELECT strftime('%Y', date), SUM(amount)FROM finance WHERE ttype='expense'GROUP BY strftime('%Y', date) ORDER BY strftime('%Y', date);""")
-
+        elif timeframe == "Quarterly": cursor.execute("SELECT strftime('%Y', date) || '-Q' || ((cast(strftime('%m', date) as integer) - 1) / 3 + 1) AS year_quarter, SUM(amount) AS total FROM finance WHERE ttype = 'income' GROUP BY year_quarter ORDER BY year_quarter;")
     if metric == "expense":
         if timeframe == "Monthly":
             cursor.execute("""
                 SELECT strftime('%Y-%m', date), SUM(amount) FROM finance WHERE ttype='expense' GROUP BY strftime('%Y-%m', date)ORDER BY strftime('%Y-%m', date); """)
         elif timeframe == "Yearly":
-            cursor.execute("""
-                SELECT strftime('%Y', date), SUM(amount)FROM finance WHERE ttype='expense'GROUP BY strftime('%Y', date) ORDER BY strftime('%Y', date);""")
+            cursor.execute(""" SELECT strftime('%Y', date), SUM(amount)FROM finance WHERE ttype='expense'GROUP BY strftime('%Y', date) ORDER BY strftime('%Y', date);""")
 
-        elif timeframe == "Quarterly":
-                cursor.execute(""" SELECT strftime('%Y', date), SUM(amount)FROM finance WHERE ttype='expense'GROUP BY strftime('%Y', date) ORDER BY strftime('%Y', date);""")
+        elif timeframe == "Quarterly": cursor.execute("SELECT strftime('%Y', date) || '-Q' || ((cast(strftime('%m', date) as integer) - 1) / 3 + 1) AS year_quarter, SUM(amount) AS total FROM finance WHERE ttype = 'expense' GROUP BY year_quarter ORDER BY year_quarter;")
 
     summary = cursor.fetchall()
     for rows in summary[:]:  # Create a copy of the list to avoid modifying it during iteration
