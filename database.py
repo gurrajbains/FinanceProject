@@ -66,7 +66,7 @@ def get_all_transactions():
     """
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT name, date, amount, ttype, category, description FROM finance;")
+    cursor.execute("SELECT id, name, date, amount, ttype, category, description FROM finance;")
     rows = cursor.fetchall()
     conn.close()
     return rows
@@ -229,4 +229,12 @@ def get_versus_data(data):
         rows = cursor.fetchall()
         conn.close()
         return rows
-
+def delet_transaction(transaction_id):
+    conn= get_connection()
+    cursor = conn.cursor()
+    cursor.execute(" DELETE FROM finance WHERE id = ?", (transaction_id,))
+    conn.commit()
+    cursor.rowcount
+    rowcount = cursor.rowcount
+    conn.close()
+    return rowcount

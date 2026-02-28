@@ -1,6 +1,6 @@
 from cProfile import label
 from flask import Flask, app, jsonify, render_template, request, redirect, send_file, url_for
-from database import delete_transaction, init_db, add_transaction, get_all_transactions, return_HTML_table, delete_all_transactions, export_to_csv, get_summary, return_by_month, search_transactions, sort_transactions
+from database import delete_transaction, get_connection, init_db, add_transaction, get_all_transactions, return_HTML_table, delete_all_transactions, export_to_csv, get_summary, return_by_month, search_transactions, sort_transactions
 
 appp = Flask(__name__)
 
@@ -24,10 +24,23 @@ def add():
     return redirect(url_for("house")) # one its been added go back to home page and update the table with the new rows 
 @appp.route("/delete", methods=["POST"])
 def delete():
-    delete_all_transactions()
+    mode = request.form.get("delete_mode", "selected")
+
+    if mode == "all":
+        delete_all_transactions()
+        return redirect(url_for("house"))
+
+    ids = request.form.getlist("delete_ids")
+    if not ids:
+        return redirect(url_for("house"))
+
+    conn = get_connection()
+    cursor = conn.cursor()
+    placeholders = ",".join(["?"] * len(ids))
+    cursor.execute(f"DELETE FROM finance WHERE id IN ({placeholders})", ids)
+    conn.commit()
+    conn.close()
     return redirect(url_for("house"))
-
-
 
 @appp.route("/export", methods=["GET"])
 def export():

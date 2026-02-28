@@ -161,32 +161,39 @@ position: relative;
 <body style="overflow-x: hidden;">
   <div class="content">
     <div class="table-containment">
-      <table  frame="red" rules="rows">
-        <thead>
-          <tr style="border-bottom: 1px solid #ffffff;">
-            <th>Transaction ID</th>
-            <th>Date</th>
-            <th>Amount</th>
-            <th>Type</th>
-            <th>Source</th>
-            <th>Description</th>
-          </tr>
-        </thead>
+  <form id="delete-form" action="/delete" method="POST">
+    <table rules = "rows">
+      <thead>
+        <tr>
+          <th>
+            <input type="checkbox" id="select-all"
+              onclick="document.querySelectorAll('input[name=delete_ids]').forEach(cb => cb.checked = this.checked);">
+          </th>
+          <th>Transaction ID</th>
+          <th>Date</th>
+          <th>Amount</th>
+          <th>Type</th>
+          <th>Source</th>
+          <th>Description</th>
+        </tr>
+      </thead>
 
-        <tbody>
-          {% for row in rows %}
-          <tr>
-            <td>{{row[0]}}</td>
-            <td>{{row[1].split('-')[1] }}-{{ row[1].split('-')[2] }}-{{ row[1].split('-')[0] }}</td>
-            <td>{{row[2]}}</td>
-            <td>{{row[3]}}</td>
-            <td>{{row[4]}}</td>
-            <td>{{row[5]}}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
+      <tbody>
+        {% for row in rows %}
+        <tr>
+          <td><input type="checkbox" name="delete_ids" value="{{ row[0] }}"></td>
+          <td>{{ row[0] }}</td>
+          <td>{{ row[1].split('-')[1] }}-{{ row[1].split('-')[2] }}-{{ row[1].split('-')[0] }}</td>
+          <td>{{ row[2] }}</td>
+          <td>{{ row[3] }}</td>
+          <td>{{ row[4] }}</td>
+          <td>{{ row[5] }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </form>
+</div>
 
     <div class="toolbar">
       <div class="add-form">
@@ -210,8 +217,8 @@ position: relative;
 
       <div class="action-buttons">
         <form action="/delete" method="POST">
-          <button type="submit">Delete</button>
-        </form>
+          <button type="submit" form="delete-form">Delete</button>
+        </form> 
 
         <form action="/export" method="GET">
           <button type="submit">Export</button>
