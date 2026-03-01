@@ -203,12 +203,12 @@ button:hover {
         {% for row in rows %}
         <tr>
           <td><input type="checkbox" name="delete_ids" value="{{ row[0] }}"></td>
-          <td>{{ row[0] }}</td>
-          <td>{{ row[1].split('-')[1] }}-{{ row[1].split('-')[2] }}-{{ row[1].split('-')[0] }}</td>
-          <td>{{ row[2] }}</td>
+          <td>{{ row[1] }}</td>
+          <td>{{ row[2].split('-')[1] }}-{{ row[2].split('-')[2] }}-{{ row[2].split('-')[0] }}</td>
           <td>{{ row[3] }}</td>
           <td>{{ row[4] }}</td>
           <td>{{ row[5] }}</td>
+          <td>{{ row[6] }}</td>
         </tr>
         {% endfor %}
       </tbody>

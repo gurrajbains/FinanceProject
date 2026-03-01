@@ -154,14 +154,14 @@ def search_transactions(q, ttype):
     cursor = conn.cursor()
     if ttype == "all":
         cursor.execute("""
-            SELECT name, date, amount, ttype, category, description 
+            SELECT  id, name, date, amount, ttype, category, description 
             FROM finance 
             WHERE name LIKE ? OR category LIKE ? OR description LIKE ?
             ORDER BY date DESC, id DESC
         """, (f"%{q}%", f"%{q}%", f"%{q}%"))
     else:
         cursor.execute("""
-            SELECT name, date, amount, ttype, category, description 
+            SELECT id, name, date, amount, ttype, category, description 
             FROM finance 
             WHERE (name LIKE ? OR category LIKE ? OR description LIKE ?) AND ttype=?
             ORDER BY date DESC, id DESC
@@ -175,11 +175,11 @@ def sort_transactions(sort_by, ttype):
     cursor = conn.cursor()
 
     if sort_by == "date":
-        cursor.execute("SELECT name, date, amount, ttype, category, description FROM finance WHERE ttype=? ORDER BY date DESC", (ttype,))
+        cursor.execute("SELECT id, name, date, amount, ttype, category, description FROM finance WHERE ttype=? ORDER BY date DESC", (ttype,))
     elif sort_by == "amount":
-        cursor.execute("SELECT name, date, amount, ttype, category, description FROM finance WHERE ttype=? ORDER BY amount DESC", (ttype,))
+        cursor.execute("SELECT id, name, date, amount, ttype, category, description FROM finance WHERE ttype=? ORDER BY amount DESC", (ttype,))
     else:
-        cursor.execute("SELECT name, date, amount, ttype, category, description FROM finance WHERE ttype=? ORDER BY id DESC", (ttype,))
+        cursor.execute("SELECT id, name, date, amount, ttype, category, description FROM finance WHERE ttype=? ORDER BY id DESC", (ttype,))
     rows = cursor.fetchall()
     conn.close()
     return rows

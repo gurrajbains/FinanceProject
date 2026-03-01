@@ -33,7 +33,7 @@ def delete():
     ids = request.form.getlist("delete_ids")
     if not ids:
         return redirect(url_for("house"))
-
+ 
     conn = get_connection()
     cursor = conn.cursor()
     placeholders = ",".join(["?"] * len(ids))
