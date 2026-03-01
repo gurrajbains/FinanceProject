@@ -4,162 +4,183 @@
   <title>Finance Manager</title>
 
   <style>
-    body {       width: 100%;
-      height: 100%;
-      margin: 0;
-      background-image:url("{{ url_for('static', filename='background.jpg') }}");
-      background-size: cover;
-      background-repeat: no-repeat;
-      background-attachment: fixed;
-    }
- 
-   
-   
-    .content {
-      padding: 12px;
-    }
 
-    .table-containment {
-      overflow: auto;
-      height: 550px;
-      position: relative;
-      background: rgba(255,255,255,0.90);
-      padding: 8px;
-      width: min(60%, 100%);     
-      border-radius: 20px;
-      overflow-x: hidden
-    }
+* { box-sizing: border-box; }
 
-    table {
-       margin-left: 20px;
-      align-content: center;
-      width: min(100%, 100%);     
-      border-radius: 20px;
+html, body {
+  height: 100%;
+}
 
-    }
+body {
+  margin: 0;
+  background-image: url("{{ url_for('static', filename='background.jpg') }}");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  overflow-x: hidden;
+}
 
-    tr,th, td {
-    padding: 10px;
-    text-align: center;
-    border-radius: 20px;
-    border: 1px solid #000000;
-    
-    }
-     @media (max-width: 1100px) {
+
+.content {
+  display: grid;
+  grid-template-columns: minmax(620px, 1fr) minmax(340px, 520px);
+  gap: 20px;
+  padding: 20px;
+  align-items: start;
+}
+
+.leftColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;             
+}
+
+
+.canvasWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+
+@media (max-width: 1100px) {
   .content {
     grid-template-columns: 1fr;
   }
 }
 
-    thead th {
-      margin-left: 15px;
-      position: sticky; 
-      top: 0; border-radius:20px;
-      position: relative;
-      border-style: hidden;
 
- 
-      background: rgb(192, 154, 154);
-      z-index: 2;
-    }
-
- 
-    .toolbar {
-      display: flex;
-      position: relative;
-      justify-content: flex-start;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-top: 12px;
-      padding: 10px;
-      width: min(60%, 100%);     
-      background: rgba(200, 177, 177, 0.9);
-      border-radius: 20px;
-    }
-
-    .toolbar form {
-      display: inline-block;
-    }
-
-    .add-form input{
-      margin: 6px 6px 6px 0;
-      padding: 8px;
-         padding: 8px;
-         border-radius: 12px;
-    }
-    .add-form select {
-      margin: 6px 6px 6px 0;
-      padding: 8px;
-      padding: 8px;
-      border-radius: 12px;
-        width: 125px;
-
-    }
-    .toolbar input {
-      padding: 8px;
-      margin: 6px 0;
-      border-radius: 12px;
-      text-align: left;
-    }
-
-    .add-form button,
-    .action-buttons button {
-      padding: 8px 12px;
-      border-radius: 12px;
-      margin: 6px 6px 6px 0;
-      cursor: pointer;
-    }
-
-    .action-buttons {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-    .canvas {
-      margin-top: -645px;
-      margin-left: 1860px;
-      width: 500px;
-      height: 290px;
-      background: rgba(200, 177, 177, 0.9);
-      border-radius: 20px;
-      padding: 10px;
-    }
-
-  .graphic-settings {
-  margin-top: 0px;
-  display: flex;
-  justify-content:  center;
-  margin-left: 1860px;
-  width : 475px;
-  height: 40px;
-  border-radius: 20px; 
-  padding-left: 50px;
-  background-color: #ad5151;
-  display: flex;  
-  position: relative;
-  button:hover {
-    background-color: #ad5151;
-    cursor: pointer;
-  }
+.table-containment {
+  width: 100%;
+  background: rgba(255,255,255,0.90);
+  border-radius: 18px;
+  padding: 10px;
+  height: 550px;
+  overflow: auto;
 }
 
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0;               
+}
+
+thead th {
+  position: sticky;
+  top: 0;
+  background: rgb(192, 154, 154);
+  z-index: 2;
+  border: 1px solid rgba(0,0,0,0.25);
+}
+
+th, td {
+  padding: 10px;
+  text-align: center;
+  border: 1px solid rgba(0,0,0,0.25);
+}
+
+.toolbar,
+.action-bar {
+  width: 100%;
+  background: rgba(200, 177, 177, 0.9);
+  border-radius: 18px;
+  padding: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+
+.add-form form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+
+.add-form input,
+.add-form select,
+.action-bar input,
+.action-bar select {
+  height: 34px;
+  padding: 6px 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.25);
+  background: rgba(255,255,255,0.95);
+}
+
+
+button {
+  height: 34px;
+  padding: 6px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.25);
+  cursor: pointer;
+}
+
+.action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+
+.canvas,
 .secCanvas {
-margin-top: 20px;
-position: relative;
-      margin-left: 1860px;
-      width: 500px;
-      height: 290px;
-      background: rgba(200, 177, 177, 0.9);
-      border-radius: 20px;
-      padding: 10px;
-    }
- 
-   
+  width: 100%;
+  background: rgba(200, 177, 177, 0.9);
+  border-radius: 18px;
+  padding: 10px;
+}
+
+
+.canvas { height: 290px; }
+.secCanvas { height: 290px; }
+
+
+.canvas canvas,
+.secCanvas canvas {
+  width: 100% ;
+  height: 100% ;
+}
+
+
+.graphic-settings {
+  width: 100%;
+  background-color: #ad5151;
+  border-radius: 18px;
+  padding: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+}
+
+.graphic-settings select,
+.graphic-settings input {
+  height: 34px;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.25);
+  padding: 6px 10px;
+}
+
+
+.graphic-settings button:hover,
+button:hover {
+  filter: brightness(0.95);
+}
+
   </style>
 </head>
 <body style="overflow-x: hidden;">
   <div class="content">
+    <div class = "leftColumn">
     <div class="table-containment">
   <form id="delete-form" action="/delete" method="POST">
     <table rules = "rows">
@@ -214,12 +235,10 @@ position: relative;
           <button type="submit">Add</button>
         </form>
       </div>
-
+    </div>
+    <div class ="action-bar">
       <div class="action-buttons">
-        <form action="/delete" method="POST">
           <button type="submit" form="delete-form">Delete</button>
-        </form> 
-
         <form action="/export" method="GET">
           <button type="submit">Export</button>
         </form>
@@ -251,7 +270,11 @@ position: relative;
           
          </div>
       </div>
+      </div>
     </div>
+    
+
+    
     <div class="canvasWrapper">
      <div class ="canvas"><canvas id="graphic-Canvas"></canvas></div>
       <div class = "graphic-settings"> 
@@ -307,77 +330,155 @@ position: relative;
             </form>
     </div>
 </div>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
 
-
 <script>
+function renderChart({
+  canvasId,
+  chartType = "line",
+  labels = [],
+  values = [],
+  datasetLabel = "date vs value",
+  borderColor = "rgba(255, 99, 132, 1)",
+  fillColor = "rgba(255, 99, 132, 0.2)"
+}) {
+
+const canvasEl = document.getElementById(canvasId);
+  const ctx = canvasEl.getContext("2d");
+  const existingChart = Chart.getChart(canvasEl);
+  if (existingChart) existingChart.destroy();
+
+  if (!labels.length || !values.length) return;
+
+  const isPieLike =
+    chartType === "pie" ||
+    chartType === "doughnut" ||
+    chartType === "polarArea";
+
+  const palette = [
+    "#FF6384","#36A2EB","#FFCE56",
+    "#4BC0C0","#9966FF","#FF9F40","#C9CBCF"
+  ];
+
+  const dataset = isPieLike
+    ? {
+        label: datasetLabel,
+        data: values,
+        backgroundColor: palette.slice(0, values.length),
+        borderWidth: 1
+      }
+    : {
+        label: datasetLabel,
+        data: values,
+        borderColor: borderColor,
+        backgroundColor: fillColor,
+        borderWidth: 2,
+        pointRadius: 3,
+        tension: 0.25,
+        fill: true
+      };
+
+  new Chart(ctx, {
+    type: chartType,
+    data: {
+      labels: labels,
+      datasets: [dataset]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          labels: {
+            color: "#111"
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              const value = context.parsed.y ?? context.parsed;
+              if (typeof value === "number") {
+                return context.dataset.label + ": $" + value.toFixed(2);
+              }
+              return context.dataset.label + ": " + value;
+            }
+          }
+        }
+      },
+      scales: isPieLike ? {} : {
+        x: {
+          ticks: { color: "#111" },
+          grid: { color: "rgba(0,0,0,0.1)" }
+        },
+        y: {
+          ticks: { color: "#111" },
+          grid: { color: "rgba(0,0,0,0.1)" }
+        }
+      }
+    }
+  });
+}
+
+
+
 async function fetchDataAndRenderChart(graphic) {
+
   graphic = graphic || document.getElementById("graphic-1");
 
-  const timeRange1 = document.querySelector("input[name='timeRange1']").value;
-  const response = await fetch("/api/make_graph?graphic=" + (graphic.value || "line") + "&timeRange=" + timeRange1 + "&metric=" + document.querySelector("select[name='metric']").value + "&timeFrame=" + document.querySelector("select[name = 'timeFrame']").value) /* need to fetchg from jsonfiy but we need to send the specific datatype we want which is the bottoms grpah type*/
+  const timeRange = document.querySelector("input[name='timeRange1']").value;
+  const metric = document.querySelector("select[name='metric']").value;
+  const timeframe = document.querySelector("select[name='timeFrame']").value;
+
+  const response = await fetch(
+    "/api/make_graph?graphic=" + (graphic.value || "line") +
+    "&timeRange=" + timeRange +
+    "&metric=" + metric +
+    "&timeFrame=" + timeframe
+  );
+
   const data = await response.json();
 
-  const canvasEl = document.getElementById("graphic-Canvas");
-  const ctx = canvasEl.getContext("2d");
- 
-  if (Chart.getChart(canvasEl)) {
-    Chart.getChart(canvasEl).destroy();
-  }
-  new Chart(ctx, {
-    type: graphic.value || "line",
-      
-    data: {
-       labels: data.labels,
-      datasets: [{ 
-        label: "date vs " + document.querySelector("select[name='metric']").value,
-        data: data.values,
-        borderColor: "rgba(255, 99, 132, 1)",
-        backgroundColor: ["#FF6384","#36A2EB","#FFCE56","#4BC0C0","#9966FF"],
-      }]
-    }
+  renderChart({
+    canvasId: "graphic-Canvas",
+    chartType: graphic.value || "line",
+    labels: data.labels,
+    values: data.values,
+    datasetLabel: "date vs " + metric,
+    borderColor: "rgba(255, 99, 132, 1)",
+    fillColor: "rgba(255, 99, 132, 0.2)"
   });
 }
-fetchDataAndRenderChart(document.getElementById("graphic-1"));
-</script>
 
-<script>
 async function fetchDataAndRenderChart2(graphic2) {
+
   graphic2 = graphic2 || document.getElementById("graphic-2");
-  timeRange2 = document.querySelector("input[name='timeRange2']").value;
-  const response = await fetch("/api/make_graph?graphic=" + (graphic2.value || "line") + "&timeRange=" + timeRange2 + "&metric=" + document.querySelector("select[name='metric2']").value + "&timeFrame=" + document.querySelector("select[name='timeFrame2']").value);/* need to fetchg from jsonfiy but we need to send the specific datatype we want which is the bottoms grpah type*/
+
+  const timeRange = document.querySelector("input[name='timeRange2']").value;
+  const metric = document.querySelector("select[name='metric2']").value;
+  const timeframe = document.querySelector("select[name='timeFrame2']").value;
+
+  const response = await fetch(
+    "/api/make_graph?graphic=" + (graphic2.value || "line") +
+    "&timeRange=" + timeRange +
+    "&metric=" + metric +
+    "&timeFrame=" + timeframe
+  );
+
   const data = await response.json();
 
-  const canvasEl = document.getElementById("graphic-Canvas-2");
-  const ctx = canvasEl.getContext("2d");
-
-  if (Chart.getChart(canvasEl)) {
-    Chart.getChart(canvasEl).destroy();
-  }
-
-  new Chart(ctx, {
-    type: graphic2.value || "line",
-    data: {
-      labels: data.labels,
-      datasets: [{
-       label: "date vs " + document.querySelector("select[name='metric2']").value,
-        data: data.values,
-        borderColor: "rgba(54, 162, 235, 1)",
-        tickColor: "rgba(54, 162, 235, 1)",
-       backgroundColor: ["#FF6384","#36A2EB","#FFCE56","#4BC0C0","#9966FF"],
-        color: "rgba(0, 162, 235, 1)",
-        options: {
-          responsive: true,
-          maintainAspectRatio: false
-        }
-      }]
-    }
+  renderChart({
+    canvasId: "graphic-Canvas-2",
+    chartType: graphic2.value || "line",
+    labels: data.labels,
+    values: data.values,
+    datasetLabel: "date vs " + metric,
+    borderColor: "rgba(54, 162, 235, 1)",
+    fillColor: "rgba(54, 162, 235, 0.2)"
   });
 }
-fetchDataAndRenderChart2(document.getElementById("graphic-2"));
+fetchDataAndRenderChart();
+fetchDataAndRenderChart2();
 </script>
-
-  
-
 </body>
 </html>
