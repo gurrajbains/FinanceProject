@@ -100,7 +100,21 @@ def get_summary(metric, timeframe, timeRange=None):
     cursor = conn.cursor()
     timeRange = timeRange.strip() if timeRange else None
 
+    if metric == "earn_rate":
+        if timeframe == "Monthly":
+            cursor.execute("SELECT strftime('%Y-%m', date), SUM(CASE WHEN ttype='income' THEN amount ELSE 0 END) - SUM(CASE WHEN ttype='expense' THEN -amount ELSE 0 END) FROM finance GROUP BY strftime('%Y-%m', date) ORDER BY strftime('%Y-%m', date);")
+        elif timeframe == "Yearly":
+            cursor.execute("SELECT strftime('%Y', date), SUM(CASE WHEN ttype='income' THEN amount ELSE 0 END) - SUM(CASE WHEN ttype='expense' THEN -amount ELSE 0 END) FROM finance GROUP BY strftime('%Y', date) ORDER BY strftime('%Y', date);")
+        elif timeframe == "Quarterly":
+            cursor.execute("SELECT strftime('%Y', date) || '-Q' || ((CAST(strftime('%m', date) AS INTEGER) - 1) / 3 + 1), SUM(CASE WHEN ttype='income' THEN amount ELSE 0 END) - SUM(CASE WHEN ttype='expense' THEN -amount ELSE 0 END) FROM finance GROUP BY strftime('%Y', date) || '-Q' || ((CAST(strftime('%m', date) AS INTEGER) - 1) / 3 + 1) ORDER BY strftime('%Y', date), ((CAST(strftime('%m', date) AS INTEGER) - 1) / 3 + 1);")
 
+    elif metric == "spend_rate":
+        if timeframe == "Monthly":
+            cursor.execute("SELECT strftime('%Y-%m', date), SUM(CASE WHEN ttype='expense' THEN -amount ELSE 0 END) FROM finance GROUP BY strftime('%Y-%m', date) ORDER BY strftime('%Y-%m', date);")
+        elif timeframe == "Yearly":
+            cursor.execute("SELECT strftime('%Y', date), SUM(CASE WHEN ttype='expense' THEN -amount ELSE 0 END) FROM finance GROUP BY strftime('%Y', date) ORDER BY strftime('%Y', date);")
+        elif timeframe == "Quarterly":
+            cursor.execute("SELECT strftime('%Y', date) || '-Q' || ((CAST(strftime('%m', date) AS INTEGER) - 1) / 3 + 1), SUM(CASE WHEN ttype='expense' THEN -amount ELSE 0 END) FROM finance GROUP BY strftime('%Y', date) || '-Q' || ((CAST(strftime('%m', date) AS INTEGER) - 1) / 3 + 1) ORDER BY strftime('%Y', date), ((CAST(strftime('%m', date) AS INTEGER) - 1) / 3 + 1);")
     if metric == "income":
         if timeframe == "Monthly":
             cursor.execute("""
@@ -142,7 +156,7 @@ def export_to_csv(rows):
     Export all transactions to a CSV file.
     """
     with open('finance.csv', 'w', newline='') as csvfile:  #open file in write mode 
-        columns = ['Name', 'Date', 'Amount', 'Type', 'Category', 'Description'] # define ccollumns  fo rthe csv files
+        columns = ['ID''Name', 'Date', 'Amount', 'Type', 'Category', 'Description'] # define ccollumns  fo rthe csv files
         writer = csv.writer(csvfile)#writer will be write into csv file
         writer.writerow(columns) # write the header rows 
         for row in rows: #go through every single row in rows and put the values intoo the corresponding header 

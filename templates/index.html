@@ -57,7 +57,7 @@ body {
   background: rgba(255,255,255,0.90);
   border-radius: 18px;
   padding: 10px;
-  height: 550px;
+  height: 585px;
   overflow: auto;
 }
 
@@ -173,8 +173,7 @@ button {
 
 .graphic-settings button:hover,
 button:hover {
-  filter: brightness(0.95);
-}
+background-color: #ad5151;}
 
   </style>
 </head>
@@ -322,7 +321,7 @@ button:hover {
               <select  style="width: 75px; display: flex;" name ="metric2" required>  
                 <option value="income" selected>Income</option>
                 <option value="expense">Expense</option>
-                <option value="earn rate">Earn Rate</option>
+                <option value="earn_rate">Earn Rate</option>
                 <option value="spend_rate">Spend Rate</option>
               </select>
               <input type="text" name="timeRange2" placeholder="YYYY-MM to YYYY-MM" maxlength="20" pattern="^(19|20)\d{2}-(0[1-9]|1[0-2]) to (19|20|21)\d{2}-(0[1-9]|1[0-2])$" title="Please enter a time range in the format YYYY-MM to YYYY-MM">
