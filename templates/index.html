@@ -84,10 +84,12 @@ th, td {
 .toolbar,
 .action-bar {
   width: 100%;
+  text-align: center;
   background: rgba(200, 177, 177, 0.9);
   border-radius: 18px;
   padding: 10px;
   display: flex;
+  
   flex-wrap: wrap;
   gap: 10px;
   align-items: center;
@@ -218,31 +220,38 @@ background-color: #ad5151;}
     <div class="toolbar">
       <div class="add-form">
         <form action="/add" method="POST">
-          <input type="name" name="name" placeholder="Name" required minlength="2" maxlength="50">
-          <input type="text" name="date" placeholder="MM-DD-YYYY" required pattern="^(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])-\d{4}$" title="Please enter a date in the format MM-DD-YYYY">
-          <input type="number" name="amount" step="0.01" placeholder="Amount" required  number-only max = "100000000000" min = "0" title ="Please enter a valid amount">
+          <input style = "width:100px;" type="name" name="name" placeholder="Name" required minlength="2" maxlength="50">
+          <input style = "width:110px;" type="text" name="date" placeholder="MM-DD-YYYY" required pattern="^(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])-\d{4}$" title="Please enter a date in the format MM-DD-YYYY">
+          <input style = "width:100px;"  type="number" name="amount" step="0.01" placeholder="Amount" required  number-only max = "100000000000" min = "0" title ="Please enter a valid amount">
 
-          <select style="width: 100px;" name="type" required>
-            <option value="">Select Type</option>
+          <select style="width: 75px;" name="type" required>
+            <option value="">Type</option>
             <option value="income">Income</option>
             <option value="expense">Expense</option>
           </select>
 
-          <input type="text" name="source" placeholder="Source" required text-only minlength="2" maxlength="50" title="Please enter a valid source">
-          <input type="text" name="description" placeholder="Description (optional)" maxlength="100">
+          <input style = "width:80px;"  type="text" name="source" placeholder="Source" required text-only minlength="1" maxlength="50" title="Please enter a valid source">
+          <input  style = "width:115px;"  type="text" name="description" placeholder="Desc (optional)" maxlength="100">
 
-          <button type="submit">Add</button>
+          <button type="icon-btn">
+            <img src="{{ url_for('static', filename='icons/add-icon.png') }}" alt="Add" style="width: 16px; height: 16px;">
+          </button>
         </form>
       </div>
     </div>
     <div class ="action-bar">
       <div class="action-buttons">
-          <button type="submit" form="delete-form">Delete</button>
+          <button type="icon-btn" form="delete-form">
+            <img src="{{ url_for('static', filename='icons/tash-icon.png') }}" alt="Delete"style="width: 16px; height: 16px;">
+          </button>
         <form action="/export" method="GET">
-          <button type="submit">Export</button>
+          <button type="icon-btn">
+            <img src="{{ url_for('static', filename='icons/export.png') }}" alt="Export" style="width: 16px; height: 16px;">
         </form>
         <form action ="/sort" method="GET">
-          <button type="submit">Sort</button>
+          <button type="icon-btn">
+            <img src="{{ url_for('static', filename='icons/filter.png') }}" alt="Sort" style="width: 16px; height: 16px;">
+          </button>
           <select style="width: 75px;" name="sort_by" required >
             <option value="">Select</option>
             <option value="date">Date</option>
@@ -257,13 +266,16 @@ background-color: #ad5151;}
         <div class="searchbar">
           <form action="/search" method="GET">
             <input type="text" name="query" placeholder="Search.." maxlength="100">
-            <button type="submit">Search</button>
-            
-        </form> </form>
+            <button type="icon-btn">
+              <img src="{{ url_for('static', filename='icons/search-icon.png') }}" alt="Search" style="width: 16px; height: 16px;">
+              </button>
+        </form> 
         
 </div><div class="reset">
           <form action="/reset_Search" method="POST">
-            <button type="submit">Reset</button>
+            <button type="icon-btn">
+              <img src="{{ url_for('static', filename='icons/reset-icon.png') }}" alt="Reset" style="width: 16px; height: 17px;">
+            </button>
             
         </form>  
           
@@ -277,7 +289,7 @@ background-color: #ad5151;}
     <div class="canvasWrapper">
      <div class ="canvas"><canvas id="graphic-Canvas"></canvas></div>
       <div class = "graphic-settings"> 
-          <select id="graphic-1" style="width:55px;" onchange="fetchDataAndRenderChart(this)" required>
+          <select id="graphic-1" style="width:55px;" onchange="fetchDataAndRenderChart(this)" required> <!-- Create a dropdown such that one the clcik of the drop down the options shown are actually just the images hard to due since we need to sync the dropdown and css -->
               <option value="line" selected>Line</option>
               <option value="bar">Bar</option>
               <option value="pie">Pie</option>
@@ -298,7 +310,7 @@ background-color: #ad5151;}
                 <option value="spend_rate">Spend Rate</option>
               </select>
                 <input type="text" name="timeRange1" placeholder="YYYY-MM to YYYY-MM" maxlength="20" pattern="^(19|20|21)\d{2}-(0[1-9]|1[0-2]) to (19|20)\d{2}-(0[1-9]|1[0-2])$" title="Please enter a time range in the format YYYY-MM to YYYY-MM">
-              <button type="submit">Update</button>
+              <button type="icon-btn"><img src="{{ url_for('static', filename='icons/update.png') }}" alt="Update" style = "width: 16px; height: 18px;"></button>
             </form>
     </div>
 <div class ="secCanvas"><canvas id="graphic-Canvas-2"></canvas></div>
@@ -325,7 +337,7 @@ background-color: #ad5151;}
                 <option value="spend_rate">Spend Rate</option>
               </select>
               <input type="text" name="timeRange2" placeholder="YYYY-MM to YYYY-MM" maxlength="20" pattern="^(19|20)\d{2}-(0[1-9]|1[0-2]) to (19|20|21)\d{2}-(0[1-9]|1[0-2])$" title="Please enter a time range in the format YYYY-MM to YYYY-MM">
-              <button type="submit">Update</button>
+              <button type="icon-btn"><img src="{{ url_for('static', filename='icons/update.png') }}" alt="Update" style = "width: 16px; height: 16px;"></button>
             </form>
     </div>
 </div>
