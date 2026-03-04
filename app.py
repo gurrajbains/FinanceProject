@@ -1,10 +1,28 @@
 from cProfile import label
-from flask import Flask, app, jsonify, render_template, request, redirect, send_file, url_for
+from flask import Flask, app, jsonify, render_template, request, redirect, send_file, url_for, ai_model 
+import load_model, predict
 from database import delete_transaction, get_connection, init_db, add_transaction, get_all_transactions, return_HTML_table, delete_all_transactions, export_to_csv, get_summary, return_by_month, search_transactions, sort_transactions
 
 appp = Flask(__name__)
 
+load_model()
+@appp.route("/api/ai/predict", methods=["POST"])
+def ai_predict():
+    data = request.get_json(silent=True) or {}
 
+ 
+    features = data.get("features", None)
+    if not isinstance(features, list) or len(features) != 6:
+        return jsonify({"error": "features must be a list of 6 numbers"}), 400
+
+    
+    try:
+        features = [float(v) for v in features]
+    except (TypeError, ValueError):
+        return jsonify({"error": "features must be numeric"}), 400
+
+    yhat = predict(features)  
+    return jsonify({"prediction": yhat[0]})
 @appp.route('/')
 def house():
     rows = get_all_transactions()

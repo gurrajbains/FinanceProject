@@ -100,7 +100,7 @@ def get_summary(metric, timeframe, timeRange=None):
     cursor = conn.cursor()
     timeRange = timeRange.strip() if timeRange else None
 
-    if metric == "earn_rate":
+    if metric == "spend_rate":
         if timeframe == "Monthly":
             cursor.execute("SELECT strftime('%Y-%m', date), SUM(CASE WHEN ttype='income' THEN amount ELSE 0 END) - SUM(CASE WHEN ttype='expense' THEN -amount ELSE 0 END) FROM finance GROUP BY strftime('%Y-%m', date) ORDER BY strftime('%Y-%m', date);")
         elif timeframe == "Yearly":
@@ -108,13 +108,13 @@ def get_summary(metric, timeframe, timeRange=None):
         elif timeframe == "Quarterly":
             cursor.execute("SELECT strftime('%Y', date) || '-Q' || ((CAST(strftime('%m', date) AS INTEGER) - 1) / 3 + 1), SUM(CASE WHEN ttype='income' THEN amount ELSE 0 END) - SUM(CASE WHEN ttype='expense' THEN -amount ELSE 0 END) FROM finance GROUP BY strftime('%Y', date) || '-Q' || ((CAST(strftime('%m', date) AS INTEGER) - 1) / 3 + 1) ORDER BY strftime('%Y', date), ((CAST(strftime('%m', date) AS INTEGER) - 1) / 3 + 1);")
 
-    elif metric == "spend_rate":
+    elif metric == "earn_rate":
         if timeframe == "Monthly":
-            cursor.execute("SELECT strftime('%Y-%m', date), SUM(CASE WHEN ttype='expense' THEN -amount ELSE 0 END) FROM finance GROUP BY strftime('%Y-%m', date) ORDER BY strftime('%Y-%m', date);")
+            cursor.execute("SELECT strftime('%Y-%m', date), SUM(CASE WHEN ttype='income' THEN amount ELSE 0 END) FROM finance GROUP BY strftime('%Y-%m', date) ORDER BY strftime('%Y-%m', date);")
         elif timeframe == "Yearly":
-            cursor.execute("SELECT strftime('%Y', date), SUM(CASE WHEN ttype='expense' THEN -amount ELSE 0 END) FROM finance GROUP BY strftime('%Y', date) ORDER BY strftime('%Y', date);")
+            cursor.execute("SELECT strftime('%Y', date), SUM(CASE WHEN ttype='income' THEN amount ELSE 0 END) FROM finance GROUP BY strftime('%Y', date) ORDER BY strftime('%Y', date);")
         elif timeframe == "Quarterly":
-            cursor.execute("SELECT strftime('%Y', date) || '-Q' || ((CAST(strftime('%m', date) AS INTEGER) - 1) / 3 + 1), SUM(CASE WHEN ttype='expense' THEN -amount ELSE 0 END) FROM finance GROUP BY strftime('%Y', date) || '-Q' || ((CAST(strftime('%m', date) AS INTEGER) - 1) / 3 + 1) ORDER BY strftime('%Y', date), ((CAST(strftime('%m', date) AS INTEGER) - 1) / 3 + 1);")
+            cursor.execute("SELECT strftime('%Y', date) || '-Q' || ((CAST(strftime('%m', date) AS INTEGER) - 1) / 3 + 1), SUM(CASE WHEN ttype='income' THEN amount ELSE 0 END) FROM finance GROUP BY strftime('%Y', date) || '-Q' || ((CAST(strftime('%m', date) AS INTEGER) - 1) / 3 + 1) ORDER BY strftime('%Y', date), ((CAST(strftime('%m', date) AS INTEGER) - 1) / 3 + 1);")
     if metric == "income":
         if timeframe == "Monthly":
             cursor.execute("""

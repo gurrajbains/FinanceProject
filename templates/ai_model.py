@@ -49,8 +49,20 @@ def train_model(X, y, epochs=100):
 
 
 def predict(input_values):
+   def predict(input_values):
+    """
+    input_values can be:
+      - [f1, f2, f3, f4, f5, f6]
+      - [[...6...], [...6...], ...]
+    returns python list (same batch shape)
+    """
     model.eval()
     with torch.no_grad():
-        tensor_input = torch.tensor(input_values, dtype=torch.float32)
-        result = model(tensor_input)
-        return result.tolist()
+        x = torch.tensor(input_values, dtype=torch.float32)
+
+       
+        x = x.unsqueeze(0)
+
+        result = model(x)  
+        return result.squeeze(1).tolist()  #
+    
