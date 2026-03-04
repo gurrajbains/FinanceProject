@@ -1,28 +1,28 @@
 from cProfile import label
-from flask import Flask, app, jsonify, render_template, request, redirect, send_file, url_for, ai_model 
-import load_model, predict
+from flask import Flask, app, jsonify, render_template, request, redirect, send_file, url_for
 from database import delete_transaction, get_connection, init_db, add_transaction, get_all_transactions, return_HTML_table, delete_all_transactions, export_to_csv, get_summary, return_by_month, search_transactions, sort_transactions
+from templates import ai_model
+from templates.ai_model import load_model, predict
+
 
 appp = Flask(__name__)
 
 load_model()
-@appp.route("/api/ai/predict", methods=["POST"])
-def ai_predict():
-    data = request.get_json(silent=True) or {}
+@appp.route("/api/predict", methods=["POST"])
+def api_predict():
+    data = request.get_json()
 
- 
-    features = data.get("features", None)
-    if not isinstance(features, list) or len(features) != 6:
-        return jsonify({"error": "features must be a list of 6 numbers"}), 400
+    features = data.get("features")
 
-    
-    try:
-        features = [float(v) for v in features]
-    except (TypeError, ValueError):
-        return jsonify({"error": "features must be numeric"}), 400
+    if not features:
+        return jsonify({"error": "Missing features"}), 400
 
-    yhat = predict(features)  
-    return jsonify({"prediction": yhat[0]})
+    if len(features[0]) != 6:
+        return jsonify({"error": "Input must contain 6 values"}), 400
+
+    prediction = predict(features)
+
+    return jsonify({"prediction": prediction})
 @appp.route('/')
 def house():
     rows = get_all_transactions()

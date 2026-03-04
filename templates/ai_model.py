@@ -49,7 +49,6 @@ def train_model(X, y, epochs=100):
 
 
 def predict(input_values):
-   def predict(input_values):
     """
     input_values can be:
       - [f1, f2, f3, f4, f5, f6]
