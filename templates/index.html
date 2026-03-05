@@ -70,8 +70,9 @@ table {
 thead th {
   position: sticky;
   top: 0;
-  background: rgb(192, 154, 154);
+  background: rgb(105, 104, 104);
   z-index: 2;
+  border-radius: 10px;
   border: 1px solid rgba(0,0,0,0.25);
 }
 
@@ -81,18 +82,16 @@ th, td {
   border: 1px solid rgba(0,0,0,0.25);
 }
 
-.toolbar,
-.action-bar {
+.toolbar {
   width: 100%;
-  text-align: center;
-  background: rgba(200, 177, 177, 0.9);
-  border-radius: 18px;
-  padding: 10px;
+  text-align: left;
+  background: rgba(231, 231, 231, 0.9);
+  border-radius: 10px;
+  padding: 5px;
   display: flex;
+  flex-direction: row;
+  gap: 5px;  
   
-  flex-wrap: wrap;
-  gap: 10px;
-  align-items: center;
 }
 
 
@@ -154,7 +153,7 @@ button {
 
 .graphic-settings {
   width: 100%;
-  background-color: #ad5151;
+  background-color: #e3d0d0;
   border-radius: 18px;
   padding: 8px;
   display: flex;
@@ -162,6 +161,7 @@ button {
   gap: 8px;
   align-items: center;
   justify-content: center;
+  flex-direction: row;
 }
 
 .graphic-settings select,
@@ -175,8 +175,25 @@ button {
 
 .graphic-settings button:hover,
 button:hover {
-background-color: #ad5151;}
+background-color: #847171;}
 
+.ai-card {
+  position: flex;  
+  button {
+  
+    border-radius: 12px;
+    border: 1px solid rgba(0,0,0,0.25);
+    padding: 6px 12px;
+    cursor: pointer;  background-color: #0d0b0b;
+  }
+  #ai-result {
+    margin-top: 8px;
+    background: rgba(44, 20, 20, 0.95);
+    border-radius: 12px;
+    padding: 10px;
+    border: 1px solid rgba(0,0,0,0.25);
+
+  }
   </style>
 </head>
 <body style="overflow-x: hidden;">
@@ -222,7 +239,7 @@ background-color: #ad5151;}
         <form action="/add" method="POST">
           <input style = "width:100px;" type="name" name="name" placeholder="Name" required minlength="2" maxlength="50">
           <input style = "width:110px;" type="text" name="date" placeholder="MM-DD-YYYY" required pattern="^(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])-\d{4}$" title="Please enter a date in the format MM-DD-YYYY">
-          <input style = "width:100px;"  type="number" name="amount" step="0.01" placeholder="Amount" required  number-only max = "100000000000" min = "0" title ="Please enter a valid amount">
+          <input style = "width:85px;"  type="number" name="amount" step="0.01" placeholder="Amount" required  number-only max = "100000000000" min = "0" title ="Please enter a valid amount">
 
           <select style="width: 75px;" name="type" required>
             <option value="">Type</option>
@@ -381,7 +398,7 @@ function renderChart({
   values = [],
   datasetLabel = "date vs value",
   borderColor = "rgba(255, 99, 132, 1)",
-  fillColor = "rgba(255, 99, 132, 0.2)"
+  fillColor = "rgba(2, 99, 132, 0.2)"
 }) {
 
 const canvasEl = document.getElementById(canvasId);
@@ -522,8 +539,10 @@ fetchDataAndRenderChart2();
 
 
 </script><div class="ai-card">
-  <button id="ai-predict-btn" type="button">Predict</button>
-  <div id="ai-result">Prediction: —</div>
+  <button id="ai-predict-btn" type="icon-btn">
+    <img src="{{ url_for('static', filename='icons/ai-icon.png') }}" alt="AI Predict" style="width: 16px; height: 16px;">
+  </button>
+  <div id="ai-result">Prediction:</div>
 </div><script>
 document.getElementById("ai-predict-btn").addEventListener("click", async () => {
   // TODO: replace these with real values from your app
@@ -537,7 +556,7 @@ document.getElementById("ai-predict-btn").addEventListener("click", async () => 
 
   const data = await res.json();
   document.getElementById("ai-result").textContent =
-    "Prediction: " + (data.prediction ?? data.error ?? "—");
+    "Prediction: " + (data.prediction ?? data.error ?? "—"); //garbage value for right now but will be the actual prediction once the backend is implemented properly
 });
 </script>
 
