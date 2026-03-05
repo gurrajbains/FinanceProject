@@ -1,13 +1,25 @@
 from cProfile import label
 from flask import Flask, app, jsonify, render_template, request, redirect, send_file, url_for
-from database import delete_transaction, get_connection, init_db, add_transaction, get_all_transactions, return_HTML_table, delete_all_transactions, export_to_csv, get_summary, return_by_month, search_transactions, sort_transactions
-from templates import ai_model
-from templates.ai_model import load_model, predict
+from database import get_connection, init_db, add_transaction, get_all_transactions, delete_all_transactions, export_to_csv, get_summary, search_transactions, sort_transactions, get_summary
+from templates.ai_model import load_model, predict, train_model
+from database import make_training_tensors
+import torch
+import torch.nn as nn
 
 
 appp = Flask(__name__)
 
 load_model()
+
+@appp.route("/api/train", methods=["POST"])
+def api_train():
+    X, y = make_training_tensors()
+    if X.shape[0] < 5:
+        return jsonify({"error": "Not enough data to train (add more transactions)."}), 400
+
+    train_model(X, y, epochs=300, lr=0.01)
+    return jsonify({"status": "trained", "rows_used": int(X.shape[0])})
+
 @appp.route("/api/predict", methods=["POST"])
 def api_predict():
     data = request.get_json()
@@ -113,5 +125,28 @@ def make_graph():
 if(__name__ == '__main__'):
     init_db()
     appp.run(debug=True)
+
+@appp.route("/import", methods=["GET", "POST"])
+def import_csv():
+    if request.method == "POST":
+        file = request.files.get("file")
+        if not file:
+            return redirect(url_for("house"))
+
+        # Read the uploaded CSV file and insert transactions into the database
+        import csv
+        stream = file.stream.read().decode("UTF-8").splitlines()
+        reader = csv.DictReader(stream)
+        for row in reader:
+            name = row.get("name", "").strip()
+            date = row.get("date", "").strip()
+            amount = float(row.get("amount", 0))
+            ttype = row.get("type", "").strip()
+            category = row.get("category", "").strip()
+            description = row.get("description", "").strip()
+
+            add_transaction(name, date, amount, ttype, category, description)
+
+        return redirect(url_for("house"))
 
     #v \Scripts\activate venv  to activate virtual environment

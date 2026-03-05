@@ -247,7 +247,23 @@ background-color: #ad5151;}
           <button type="icon-btn">
             <img src="{{ url_for('static', filename='icons/export.png') }}" alt="Export" style="width: 16px; height: 16px;">
         </form>
-        <form action ="/sort" method="GET">
+
+
+
+
+
+     <form action="/import" method="POST" enctype="multipart/form-data">
+  
+  <input type="file" id="fileInput" name="file" accept=".csv" style="display:none">
+
+  <button type="button" id="importBtn" onclick="document.getElementById('fileInput').click()"> <!-- we hid the file select and the on the clikc of button we pretend we click the file select -->
+    <img src="{{ url_for('static', filename='icons/export.png') }}" style="width:16px;height:16px;">
+  </button>
+
+</form>
+
+        
+        <form action ="/sort" method="POST">
           <button type="icon-btn">
             <img src="{{ url_for('static', filename='icons/filter.png') }}" alt="Sort" style="width: 16px; height: 16px;">
           </button>
@@ -344,7 +360,19 @@ background-color: #ad5151;}
 </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
+<script>const fileInput = document.getElementById("fileInput");
+const importBtn = document.getElementById("importBtn");
 
+fileInput.addEventListener("change", () => {
+
+    const fileName = fileInput.files[0]?.name;
+
+    if (fileName) {
+        importBtn.textContent = fileName;
+    }
+
+});
+</script>
 <script>
 function renderChart({
   canvasId,
