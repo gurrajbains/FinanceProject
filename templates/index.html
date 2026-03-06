@@ -269,14 +269,29 @@ background-color: #847171;}
 
 
 
-     <form action="/import" method="POST" enctype="multipart/form-data">
-  
+     <form id="importForm" action="/import" method="POST" enctype="multipart/form-data">
   <input type="file" id="fileInput" name="file" accept=".csv" style="display:none">
 
-  <button type="button" id="importBtn" onclick="document.getElementById('fileInput').click()"> <!-- we hid the file select and the on the clikc of button we pretend we click the file select -->
+  <button type="button" id="importBtn">
     <img src="{{ url_for('static', filename='icons/export.png') }}" style="width:16px;height:16px;">
   </button>
+</form>
 
+<script>
+const fileInput = document.getElementById("fileInput");
+const importBtn = document.getElementById("importBtn");
+const importForm = document.getElementById("importForm");
+
+importBtn.addEventListener("click", () => {
+  fileInput.click();
+});
+
+fileInput.addEventListener("change", () => {
+  if (fileInput.files.length > 0) {
+    importForm.submit();
+  }
+});
+</script>
 </form>
 
         
@@ -377,19 +392,7 @@ background-color: #847171;}
 </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
-<script>const fileInput = document.getElementById("fileInput");
-const importBtn = document.getElementById("importBtn");
 
-fileInput.addEventListener("change", () => {
-
-    const fileName = fileInput.files[0]?.name;
-
-    if (fileName) {
-        importBtn.textContent = fileName;
-    }
-
-});
-</script>
 <script>
 function renderChart({
   canvasId,

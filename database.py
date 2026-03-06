@@ -43,7 +43,7 @@ def return_HTML_table(rows):
 
 def add_transaction(name, date, amount, ttype, category, description=""):
    
-    converted_date = split_date(date)
+    #converted_date = split_date(date)
     if(ttype == "expense" and amount > 0):
         amount = -amount
     """
@@ -56,7 +56,7 @@ def add_transaction(name, date, amount, ttype, category, description=""):
     cursor.execute("""
         INSERT INTO finance (name, date, amount, ttype, category, description)
         VALUES (?,?, ?, ?, ?, ?)
-    """, (name, converted_date, amount, ttype, category, description))
+    """, (name, date, amount, ttype, category, description))
     conn.commit()
     conn.close()
 
@@ -194,7 +194,7 @@ def export_to_csv(rows):
     Export all transactions to a CSV file.
     """
     with open('finance.csv', 'w', newline='') as csvfile:  #open file in write mode 
-        columns = ['ID''Name', 'Date', 'Amount', 'Type', 'Category', 'Description'] # define ccollumns  fo rthe csv files
+        columns = ['ID','Name', 'Date', 'Amount', 'Type', 'Category', 'Description'] # define ccollumns  fo rthe csv files
         writer = csv.writer(csvfile)#writer will be write into csv file
         writer.writerow(columns) # write the header rows 
         for row in rows: #go through every single row in rows and put the values intoo the corresponding header 

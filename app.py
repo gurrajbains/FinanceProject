@@ -122,31 +122,44 @@ def make_graph():
     values = [item[1] for item in rows]
     print(chart_type, timeframe, metric, timeRange)
     return jsonify({"labels": labels, "values": values, "chart": chart_type, "timeframe": timeframe})
-if(__name__ == '__main__'):
-    init_db()
-    appp.run(debug=True)
 
-@appp.route("/import", methods=["GET", "POST"])
+
+@appp.route("/import", methods=["POST"])
 def import_csv():
-    if request.method == "POST":
-        file = request.files.get("file")
-        if not file:
-            return redirect(url_for("house"))
+    file = request.files.get("file")
 
-        # Read the uploaded CSV file and insert transactions into the database
-        import csv
-        stream = file.stream.read().decode("UTF-8").splitlines()
-        reader = csv.DictReader(stream)
-        for row in reader:
-            name = row.get("name", "").strip()
-            date = row.get("date", "").strip()
-            amount = float(row.get("amount", 0))
-            ttype = row.get("type", "").strip()
-            category = row.get("category", "").strip()
-            description = row.get("description", "").strip()
-
-            add_transaction(name, date, amount, ttype, category, description)
-
+    if not file or file.filename == "":
         return redirect(url_for("house"))
 
-    #v \Scripts\activate venv  to activate virtual environment
+    import csv
+
+    stream = file.stream.read().decode("utf-8-sig").splitlines()
+    reader = csv.DictReader(stream)
+
+    print("CSV headers:", reader.fieldnames)
+
+    for row in reader:
+        print("ROW:", row)
+
+        name = (row.get("Name") or "").strip()
+        date = (row.get("Date") or "").strip()
+
+        try:
+            amount = float((row.get("Amount") or 0))
+        except ValueError:
+            amount = 0
+
+        ttype = (row.get("Type") or "").strip()
+        category = (row.get("Category") or "").strip()
+        description = (row.get("Description") or "").strip()
+
+        if date == "":
+            print("Skipping row because date is missing:", row)
+            continue
+
+        add_transaction(name, date, amount, ttype, category, description)
+
+    return redirect(url_for("house"))
+if(__name__ == '__main__'):
+    init_db()
+    appp.run(debug=True) #v \Scripts\activate venv  to activate virtual environment
