@@ -19,7 +19,48 @@ def api_train():
 
     train_model(X, y, epochs=300, lr=0.01)
     return jsonify({"status": "trained", "rows_used": int(X.shape[0])})
+@appp.route("/api/predict_next", methods=["GET"])
+def predict_next():
 
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "SELECT date, amount FROM finance ORDER BY date DESC LIMIT 4"
+    )
+
+    rows = cursor.fetchall()
+    conn.close()
+
+    if len(rows) < 4:
+        return jsonify({"error": "Not enough data"}), 400
+
+    rows = rows[::-1]
+
+    current = float(rows[-1][1])
+    prev = float(rows[-2][1])
+
+    avg_last_3 = (
+        float(rows[-2][1]) +
+        float(rows[-3][1]) +
+        float(rows[-4][1])
+    ) / 3
+
+    from datetime import datetime
+    dt = datetime.strptime(rows[-1][0], "%Y-%m-%d")
+
+    features = [[
+        dt.month,
+        dt.day,
+        dt.year,
+        current,
+        prev,
+        avg_last_3
+    ]]
+
+    prediction = predict(features)
+
+    return jsonify({"prediction": prediction})
 @appp.route("/api/predict", methods=["POST"])
 def api_predict():
     data = request.get_json()

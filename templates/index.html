@@ -186,6 +186,7 @@ background-color: #847171;}
     padding: 6px 12px;
     cursor: pointer;  background-color: #0d0b0b;
   }
+}
   #ai-result {
     margin-top: 8px;
     background: rgba(44, 20, 20, 0.95);
@@ -541,25 +542,27 @@ fetchDataAndRenderChart();
 fetchDataAndRenderChart2();
 
 
-</script><div class="ai-card">
-  <button id="ai-predict-btn" type="icon-btn">
-    <img src="{{ url_for('static', filename='icons/ai-icon.png') }}" alt="AI Predict" style="width: 16px; height: 16px;">
-  </button>
-  <div id="ai-result">Prediction:</div>
-</div><script>
+</script>
+<div class="ai-card">
+  <button id="ai-predict-btn" type="button">
+  <img src="{{ url_for('static', filename='icons/ai-icon.png') }}" 
+       alt="AI Predict"
+       style="width:16px;height:16px;">
+</button>
+
+<div id="ai-result">Prediction:</div>
+
+<script>
 document.getElementById("ai-predict-btn").addEventListener("click", async () => {
-  // TODO: replace these with real values from your app
-  const features = [[1, 2, 3, 4, 5, 6]];
 
-  const res = await fetch("/api/predict", {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({ features })
-  });
-
+  const res = await fetch("/api/predict_next");
   const data = await res.json();
-  document.getElementById("ai-result").textContent =
-    "Prediction: " + (data.prediction ?? data.error ?? "—"); //garbage value for right now but will be the actual prediction once the backend is implemented properly
+
+  const value = Number(data.prediction[0]).toFixed(2)
+
+document.getElementById("ai-result").textContent =
+  "Next transaction prediction: $" + value
+
 });
 </script>
 

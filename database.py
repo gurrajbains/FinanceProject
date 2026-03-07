@@ -95,43 +95,42 @@ def delete_all_transactions():
     conn.close()
     return deleted
 
-def make_training_tensors(limit=None):
+
+def make_training_tensors():
     conn = get_connection()
-    cur = conn.cursor()
+    cursor = conn.cursor()
 
-    q = "SELECT date, amount, ttype, category, IFNULL(description,'') FROM finance"
-    if limit:
-        q += " LIMIT ?"
-        cur.execute(q, (limit,))
-    else:
-        cur.execute(q)
-
-    rows = cur.fetchall()
+    cursor.execute("SELECT date, amount FROM finance ORDER BY date;")
+    rows = cursor.fetchall()
     conn.close()
 
-    X_list = []
-    y_list = []
+    if len(rows) < 4:
+        return None, None
 
-    for date_str, amount, ttype, category, desc in rows:
-        # date is stored as "YYYY-MM-DD" in your db
+    X = []
+    y = []
+
+    amounts = [float(row[1]) for row in rows]
+
+    for i in range(3, len(rows) - 1):
+        date_str = rows[i][0]
+        current_amount = float(rows[i][1])
+        previous_amount = float(rows[i - 1][1])
+        avg_last_3 = (amounts[i - 1] + amounts[i - 2] + amounts[i - 3]) / 3.0
+        next_amount = float(rows[i + 1][1])
+
         dt = datetime.strptime(date_str, "%Y-%m-%d")
-        month = dt.month / 12.0
-        day = dt.day / 31.0
-        year = (dt.year - 2000) / 50.0  # rough scaling for 2000-2050
 
-        ttype_num = 1.0 if ttype == "income" else 0.0
+        month = float(dt.month)
+        day = float(dt.day)
+        year = float(dt.year)
 
-        # simple stable numeric encoding for category
-        cat_num = (abs(hash(category)) % 1000) / 1000.0
+        X.append([month, day, year, current_amount, previous_amount, avg_last_3])
+        y.append([next_amount])
 
-        desc_len = min(len(desc), 120) / 120.0
+    X = torch.tensor(X, dtype=torch.float32)
+    y = torch.tensor(y, dtype=torch.float32)
 
-        features = [month, day, year, ttype_num, cat_num, desc_len]
-        X_list.append(features)
-        y_list.append([float(amount)])
-
-    X = torch.tensor(X_list, dtype=torch.float32)
-    y = torch.tensor(y_list, dtype=torch.float32)
     return X, y
 
 def get_summary(metric, timeframe, timeRange=None):
@@ -293,7 +292,7 @@ def get_versus_data(data):
         rows = cursor.fetchall()
         conn.close()
         return rows
-def delet_transaction(transaction_id):
+def delete_transaction(transaction_id):
     conn= get_connection()
     cursor = conn.cursor()
     cursor.execute(" DELETE FROM finance WHERE id = ?", (transaction_id,))

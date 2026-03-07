@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
-
-
+from datetime import datetime
 
 class BasicModel(nn.Module):
     def __init__(self, input_size=6, hidden_size=16):
@@ -28,10 +27,6 @@ def save_model(path="model.pt"):
     torch.save(model.state_dict(), path)
 
 def train_model(X, y, epochs=200, lr=0.01):
-    """
-    X: torch.FloatTensor shape [N, 6]
-    y: torch.FloatTensor shape [N, 1]
-    """
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     loss_fn = nn.MSELoss()
 
@@ -46,22 +41,52 @@ def train_model(X, y, epochs=200, lr=0.01):
     save_model()
 
 def predict(input_values):
-    """
-    input_values can be:
-      - [f1, f2, f3, f4, f5, f6]
-      - [[...6...], [...6...], ...]
-    returns list
-    """
     model.eval()
     with torch.no_grad():
         x = torch.tensor(input_values, dtype=torch.float32)
 
-        # If user passed one row [6], make it a batch [1,6]
         if x.dim() == 1:
             x = x.unsqueeze(0)
 
         if x.shape[1] != 6:
             raise ValueError("features must be a list of 6 numbers")
 
-        out = model(x)             # [N,1]
+        out = model(x)
         return out.squeeze(1).tolist()
+
+def make_training_tensors():
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT date, amount FROM finance ORDER BY date;")
+    rows = cursor.fetchall()
+    conn.close()
+
+    if len(rows) < 4:
+        return None, None
+
+    X = []
+    y = []
+
+    amounts = [float(row[1]) for row in rows]
+
+    for i in range(3, len(rows) - 1):
+        date_str = rows[i][0]
+        current_amount = float(rows[i][1])
+        previous_amount = float(rows[i - 1][1])
+        avg_last_3 = (amounts[i - 1] + amounts[i - 2] + amounts[i - 3]) / 3.0
+        next_amount = float(rows[i + 1][1])
+
+        dt = datetime.strptime(date_str, "%Y-%m-%d")
+
+        month = float(dt.month)
+        day = float(dt.day)
+        year = float(dt.year)
+
+        X.append([month, day, year, current_amount, previous_amount, avg_last_3])
+        y.append([next_amount])
+
+    X = torch.tensor(X, dtype=torch.float32)
+    y = torch.tensor(y, dtype=torch.float32)
+
+    return X, y
