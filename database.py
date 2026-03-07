@@ -42,21 +42,22 @@ def return_HTML_table(rows):
 
 
 def add_transaction(name, date, amount, ttype, category, description=""):
-   
-    #converted_date = split_date(date)
-    if(ttype == "expense" and amount > 0):
-        amount = -amount
-    """
+    converted_date = split_date(date)
 
-    Add a transaction to the database.
-    TODO: Insert row into finance table
-    """
+
+    if not converted_date:
+        print("Skipping invalid date:", date)
+        return
+
+    if ttype == "expense" and amount > 0:
+        amount = -amount
+
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("""
         INSERT INTO finance (name, date, amount, ttype, category, description)
-        VALUES (?,?, ?, ?, ?, ?)
-    """, (name, date, amount, ttype, category, description))
+        VALUES (?, ?, ?, ?, ?, ?)
+    """, (name, converted_date, amount, ttype, category, description))
     conn.commit()
     conn.close()
 
@@ -244,14 +245,25 @@ def return_by_month():
     conn.close()
     return rows # ret
 
+
 def split_date(date_str):
-    # ate_str is in the format "mm-DD-yyyy"
-    
-    parts = date_str.split("-") # take a data string and everytime a dash is seen we split it
-    if len(parts) == 3:# for thee parts we have month day and year
-        month, day, year= parts #In ordder of partitioning  we assign parts to mdy
-        return  f"{year}-{month}-{day}" #return month day and year as separate values
-    
+    if not date_str:
+        return None
+
+    date_str = date_str.strip()
+
+    formats = [
+        "%Y-%m-%d",  "%m/%d/%Y",  "%m/%d/%y",   "%m-%d-%Y",    "%m-%d-%y",  "%Y/%m/%d",  "%Y.%m.%d",   "%d-%m-%Y",    "%d/%m/%Y",    "%d.%m.%Y",
+    ]
+
+    for fmt in formats:
+        try:
+            dt = datetime.strptime(date_str, fmt)
+            return dt.strftime("%Y-%m-%d")
+        except ValueError:
+            continue
+
+    print("Bad date format:", date_str)
     return None
 
 def get_new_Graphic_data(timeFrame, data):
