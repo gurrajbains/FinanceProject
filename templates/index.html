@@ -554,15 +554,17 @@ fetchDataAndRenderChart2();
 
 <script>
 document.getElementById("ai-predict-btn").addEventListener("click", async () => {
-
   const res = await fetch("/api/predict_next");
   const data = await res.json();
 
-  const value = Number(data.prediction[0]).toFixed(2)
-
-document.getElementById("ai-result").textContent =
-  "Next transaction prediction: $" + value
-
+  if (data.prediction) {
+    const value = Number(data.prediction[0]).toFixed(2);
+    document.getElementById("ai-result").textContent =
+      "Next transaction prediction: $" + value;
+  } else {
+    document.getElementById("ai-result").textContent =
+      "Prediction: " + (data.error ?? "—");
+  }
 });
 </script>
 

@@ -104,7 +104,7 @@ def make_training_tensors():
     rows = cursor.fetchall()
     conn.close()
 
-    if len(rows) < 4:
+    if len(rows) < 8:
         return None, None
 
     X = []
@@ -114,25 +114,35 @@ def make_training_tensors():
 
     for i in range(3, len(rows) - 1):
         date_str = rows[i][0]
-        current_amount = float(rows[i][1])
-        previous_amount = float(rows[i - 1][1])
-        avg_last_3 = (amounts[i - 1] + amounts[i - 2] + amounts[i - 3]) / 3.0
-        next_amount = float(rows[i + 1][1])
-
         dt = datetime.strptime(date_str, "%Y-%m-%d")
 
-        month = float(dt.month)
-        day = float(dt.day)
-        year = float(dt.year)
+        month = dt.month / 12.0
+        day = dt.day / 31.0
+        day_of_week = dt.weekday() / 6.0
 
-        X.append([month, day, year, current_amount, previous_amount, avg_last_3])
+        current_amount = float(rows[i][1]) / 3000.0
+        previous_amount = float(rows[i - 1][1]) / 3000.0
+
+        avg_last_3 = (
+            amounts[i - 1] + amounts[i - 2] + amounts[i - 3]
+        ) / 3.0 / 3000.0
+
+        next_amount = float(rows[i + 1][1]) / 3000.0
+
+        X.append([
+            month,
+            day,
+            day_of_week,
+            current_amount,
+            previous_amount,
+            avg_last_3
+        ])
         y.append([next_amount])
 
     X = torch.tensor(X, dtype=torch.float32)
     y = torch.tensor(y, dtype=torch.float32)
 
     return X, y
-
 def get_summary(metric, timeframe, timeRange=None):
     conn = get_connection()
     cursor = conn.cursor()

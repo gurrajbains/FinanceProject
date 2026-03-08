@@ -21,14 +21,10 @@ def api_train():
     return jsonify({"status": "trained", "rows_used": int(X.shape[0])})
 @appp.route("/api/predict_next", methods=["GET"])
 def predict_next():
-
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute(
-        "SELECT date, amount FROM finance ORDER BY date DESC LIMIT 4"
-    )
-
+    cursor.execute("SELECT date, amount FROM finance ORDER BY date DESC LIMIT 4")
     rows = cursor.fetchall()
     conn.close()
 
@@ -37,29 +33,32 @@ def predict_next():
 
     rows = rows[::-1]
 
-    current = float(rows[-1][1])
-    prev = float(rows[-2][1])
+    from datetime import datetime
+    dt = datetime.strptime(rows[-1][0], "%Y-%m-%d")
 
+    month = dt.month / 12.0
+    day = dt.day / 31.0
+    day_of_week = dt.weekday() / 6.0
+
+    current = float(rows[-1][1]) / 3000.0
+    prev = float(rows[-2][1]) / 3000.0
     avg_last_3 = (
         float(rows[-2][1]) +
         float(rows[-3][1]) +
         float(rows[-4][1])
-    ) / 3
-
-    from datetime import datetime
-    dt = datetime.strptime(rows[-1][0], "%Y-%m-%d")
+    ) / 3.0 / 3000.0
 
     features = [[
-        dt.month,
-        dt.day,
-        dt.year,
+        month,
+        day,
+        day_of_week,
         current,
         prev,
         avg_last_3
     ]]
 
     prediction = predict(features)
-
+    prediction = [p * 3000.0 for p in prediction]
     return jsonify({"prediction": prediction})
 @appp.route("/api/predict", methods=["POST"])
 def api_predict():
@@ -73,8 +72,9 @@ def api_predict():
     if len(features[0]) != 6:
         return jsonify({"error": "Input must contain 6 values"}), 400
 
+    
     prediction = predict(features)
-
+    prediction = [p*3000 for p in prediction] # scale up the prediction to match the scale of the amounts in the database
     return jsonify({"prediction": prediction})
 @appp.route('/')
 def house():
