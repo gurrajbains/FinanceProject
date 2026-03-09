@@ -1,32 +1,42 @@
 import torch
 import torch.nn as nn
 from datetime import datetime
+from flask import Flask, jsonify
 
+
+SCALE_AMOUNT = 3000.0 # codee has been refactored tyo use two differen t m,doels fo rincom,e and expenses as the nature of the training data is fundermentally different. 
 class BasicModel(nn.Module):
     def __init__(self, input_size=6, hidden_size=32):
         super().__init__()
         self.network = nn.Sequential(
             nn.Linear(input_size, hidden_size),
-            nn.ReLU(), nn.Linear(hidden_size, hidden_size),
-             nn.ReLU(),nn.Linear(hidden_size, 1),
+            nn.ReLU(),
+            nn.Linear(hidden_size, hidden_size),
+            nn.ReLU(),
+            nn.Linear(hidden_size, 1),
         )
 
     def forward(self, x):
         return self.network(x)
 
-model = BasicModel()
+# Separate models
+income_model = BasicModel()
+expense_model = BasicModel()
 
-def load_model(path="model.pt"):
+
+def load_model(model, path):
     try:
         model.load_state_dict(torch.load(path, map_location="cpu"))
         model.eval()
     except FileNotFoundError:
-        print("No saved model found. Using fresh model.")
+        print(f"No saved model found at {path}. Using fresh model.")
 
-def save_model(path="model.pt"):
+
+def save_model(model, path):
     torch.save(model.state_dict(), path)
 
-def train_model(X, y, epochs=200, lr=0.01):
+
+def train_model(model, X, y, save_path, epochs=300, lr=0.001):
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     loss_fn = nn.MSELoss()
 
@@ -38,9 +48,10 @@ def train_model(X, y, epochs=200, lr=0.01):
         loss.backward()
         optimizer.step()
 
-    save_model()
+    save_model(model, save_path)
 
-def predict(input_values):
+
+def predict(model, input_values):
     model.eval()
     with torch.no_grad():
         x = torch.tensor(input_values, dtype=torch.float32)
@@ -54,7 +65,32 @@ def predict(input_values):
         out = model(x)
         return out.squeeze(1).tolist()
 
-def make_training_tensors():
+
+def build_features(rows, amounts, i):
+    date_str = rows[i][0]
+    dt = datetime.strptime(date_str, "%Y-%m-%d")
+
+    month = dt.month / 12.0
+    day = dt.day / 31.0
+    day_of_week = dt.weekday() / 6.0
+
+    current_amount = float(rows[i][1]) / SCALE_AMOUNT
+    previous_amount = float(rows[i - 1][1]) / SCALE_AMOUNT
+    avg_last_3 = (
+        amounts[i - 1] + amounts[i - 2] + amounts[i - 3]
+    ) / 3.0 / SCALE_AMOUNT
+
+    return [
+        month,
+        day,
+        day_of_week,
+        current_amount,
+        previous_amount,
+        avg_last_3
+    ]
+
+
+def make_expense_training_tensors():
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -67,40 +103,52 @@ def make_training_tensors():
 
     X = []
     y = []
-
     amounts = [float(row[1]) for row in rows]
 
     for i in range(3, len(rows) - 1):
-        date_str = rows[i][0]
-        dt = datetime.strptime(date_str, "%Y-%m-%d")
+        next_amount_raw = float(rows[i + 1][1])
 
-        month = dt.month / 12.0
-        day = dt.day / 31.0
-        day_of_week = dt.weekday() / 6.0
+        # Only train on expenses
+        if next_amount_raw >= 0:
+            continue
 
-        current_amount = float(rows[i][1]) / 3000.0
-        previous_amount = float(rows[i - 1][1]) / 3000.0
-        avg_last_3 = (
-            amounts[i - 1] + amounts[i - 2] + amounts[i - 3]
-        ) / 3.0 /3000.0
+        features = build_features(rows, amounts, i)
+        X.append(features)
+        y.append([next_amount_raw / SCALE_AMOUNT])
 
-        next_amount_raw = float(rows[i + 1][1]) / 3000.0
-            if(next_amount_raw > 0):
-                continue
-        next_amount = next_amount_raw
-    
+    if not X:
+        return None, None
 
-        X.append([
-            month,
-            day,
-            day_of_week,
-            current_amount,
-            previous_amount,
-            avg_last_3
-        ])
-        y.append([next_amount])
+    return torch.tensor(X, dtype=torch.float32), torch.tensor(y, dtype=torch.float32)
 
-    X = torch.tensor(X, dtype=torch.float32)
-    y = torch.tensor(y, dtype=torch.float32)
 
-    return X, y
+def make_income_training_tensors():
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT date, amount FROM finance ORDER BY date;")
+    rows = cursor.fetchall()
+    conn.close()
+
+    if len(rows) < 8:
+        return None, None
+
+    X = []
+    y = []
+    amounts = [float(row[1]) for row in rows]
+
+    for i in range(3, len(rows) - 1):
+        next_amount_raw = float(rows[i + 1][1])
+
+        # Only train on income
+        if next_amount_raw <= 0:
+            continue
+
+        features = build_features(rows, amounts, i)
+        X.append(features)
+        y.append([next_amount_raw / SCALE_AMOUNT])
+
+    if not X:
+        return None, None
+
+    return torch.tensor(X, dtype=torch.float32), torch.tensor(y, dtype=torch.float32)

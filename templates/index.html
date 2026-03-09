@@ -554,16 +554,24 @@ fetchDataAndRenderChart2();
 
 <script>
 document.getElementById("ai-predict-btn").addEventListener("click", async () => {
-  const res = await fetch("/api/predict_next");
-  const data = await res.json();
+  try {
+    const res = await fetch("/api/predict_next_expense");
+    const data = await res.json();
 
-  if (data.prediction) {
-    const value = Number(data.prediction[0]).toFixed(2);
+    if (data.prediction) {
+      const value = Number(data.prediction[0]).toFixed(2);
+
+      document.getElementById("ai-result").textContent =
+        "Next expense prediction: $" + value;
+
+    } else {
+      document.getElementById("ai-result").textContent =
+        "Prediction error: " + (data.error ?? "Unknown error");
+    }
+
+  } catch (err) {
     document.getElementById("ai-result").textContent =
-      "Next transaction prediction: $" + value;
-  } else {
-    document.getElementById("ai-result").textContent =
-      "Prediction: " + (data.error ?? "—");
+      "Server error while predicting.";
   }
 });
 </script>

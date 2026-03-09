@@ -1,26 +1,47 @@
-from cProfile import label
-from flask import Flask, app, jsonify, render_template, request, redirect, send_file, url_for
-from database import get_connection, init_db, add_transaction, get_all_transactions, delete_all_transactions, export_to_csv, get_summary, search_transactions, sort_transactions, get_summary
-from templates.ai_model import load_model, predict, train_model
-from database import make_training_tensors
-import torch
-import torch.nn as nn
-
+from flask import Flask, jsonify, render_template, request, redirect, send_file, url_for
+from database import get_connection, init_db, add_transaction, get_all_transactions, delete_all_transactions, export_to_csv, get_summary, search_transactions, sort_transactions
+from templates.ai_model import (
+    SCALE_AMOUNT,
+    build_features,
+    load_model,
+    make_expense_training_tensors,
+    make_income_training_tensors,
+    predict,
+    train_model,
+    expense_model,
+    income_model
+)
 
 appp = Flask(__name__)
 
-load_model()
+load_model(expense_model, "expense_model.pt")
+load_model(income_model, "income_model.pt")
 
-@appp.route("/api/train", methods=["POST"])
-def api_train():
-    X, y = make_training_tensors()
-    if X.shape[0] < 5:
-        return jsonify({"error": "Not enough data to train (add more transactions)."}), 400
 
-    train_model(X, y, epochs=300, lr=0.01)
-    return jsonify({"status": "trained", "rows_used": int(X.shape[0])})
-@appp.route("/api/predict_next", methods=["GET"])
-def predict_next():
+@appp.route("/api/trainExpenses", methods=["POST"])
+def api_trainExpenses():
+    X, y = make_expense_training_tensors()
+
+    if X is None or y is None or X.shape[0] < 5:
+        return jsonify({"error": "Not enough expense data to train."}), 400
+
+    train_model(expense_model, X, y, "expense_model.pt", epochs=300, lr=0.001)
+    return jsonify({"status": "expense model trained", "rows_used": int(X.shape[0])})
+
+
+@appp.route("/api/trainIncomes", methods=["POST"])
+def api_trainIncomes():
+    X, y = make_income_training_tensors()
+
+    if X is None or y is None or X.shape[0] < 5:
+        return jsonify({"error": "Not enough income data to train."}), 400
+
+    train_model(income_model, X, y, "income_model.pt", epochs=300, lr=0.001)
+    return jsonify({"status": "income model trained", "rows_used": int(X.shape[0])})
+
+
+@appp.route("/api/predict_next_expense", methods=["GET"])
+def predict_next_expense():
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -32,38 +53,40 @@ def predict_next():
         return jsonify({"error": "Not enough data"}), 400
 
     rows = rows[::-1]
+    amounts = [float(r[1]) for r in rows]
+    features = [build_features(rows, amounts, 3)]
 
-    from datetime import datetime
-    dt = datetime.strptime(rows[-1][0], "%Y-%m-%d")
+    prediction = predict(expense_model, features)
+    prediction = [p * SCALE_AMOUNT for p in prediction]
 
-    month = dt.month / 12.0
-    day = dt.day / 31.0
-    day_of_week = dt.weekday() / 6.0
-
-    current = float(rows[-1][1]) / 3000.0
-    prev = float(rows[-2][1]) / 3000.0
-    avg_last_3 = (
-        float(rows[-2][1]) +
-        float(rows[-3][1]) +
-        float(rows[-4][1])
-    ) / 3.0 / 3000.0
-
-    features = [[
-        month,
-        day,
-        day_of_week,
-        current,
-        prev,
-        avg_last_3
-    ]]
-
-    prediction = predict(features)
-    prediction = [p * 3000.0 for p in prediction]
     return jsonify({"prediction": prediction})
-@appp.route("/api/predict", methods=["POST"])
-def api_predict():
-    data = request.get_json()
 
+
+@appp.route("/api/predict_next_income", methods=["GET"])
+def predict_next_income():
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT date, amount FROM finance ORDER BY date DESC LIMIT 4")
+    rows = cursor.fetchall()
+    conn.close()
+
+    if len(rows) < 4:
+        return jsonify({"error": "Not enough data"}), 400
+
+    rows = rows[::-1]
+    amounts = [float(r[1]) for r in rows]
+    features = [build_features(rows, amounts, 3)]
+
+    prediction = predict(income_model, features)
+    prediction = [p * SCALE_AMOUNT for p in prediction]
+
+    return jsonify({"prediction": prediction})
+
+
+@appp.route("/api/predictIncomes", methods=["POST"])
+def api_predictIncomes():
+    data = request.get_json()
     features = data.get("features")
 
     if not features:
@@ -72,9 +95,9 @@ def api_predict():
     if len(features[0]) != 6:
         return jsonify({"error": "Input must contain 6 values"}), 400
 
-    
-    prediction = predict(features)
-    prediction = [p*3000 for p in prediction] # scale up the prediction to match the scale of the amounts in the database
+    prediction = predict(income_model, features)
+    prediction = [p * SCALE_AMOUNT for p in prediction]
+
     return jsonify({"prediction": prediction})
 @appp.route('/')
 def house():
