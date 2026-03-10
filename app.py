@@ -92,7 +92,7 @@ def api_prediction_accuracy():
     actual_next_amount = amounts[-1]
     if actual_next_amount < 0:
         error = abs(expense_prediction - actual_next_amount)
-        accuracy = max(0, 100 - (error / abs(actual_next_amount)) * 100)
+        accuracy = max(0, 100 - (error / abs(actual_next_amount)) * 100) #might implemnet perccent error 
     else:
         error = abs(income_prediction - actual_next_amount)
         accuracy = max(0, 100 - (error / abs(actual_next_amount)) * 100)
