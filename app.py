@@ -73,11 +73,40 @@ def api_ai_comments():
         comments.append("Your income is predicted to be higher than your expenses. Keep up the good work!")
 
     return jsonify({"comments": comments})
+
+@appp.route("/api/prediction_accuracy", methods=["GET"])
+def api_prediction_accuracy():
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT date, amount FROM finance ORDER BY date DESC LIMIT 5")
+    rows = cursor.fetchall()
+    conn.close()
+    if len(rows) < 5: # use less than 5 as the preidction we used for output is based off the last 4 thus we need at least 5 to have a real next amount to compare it to or the correect comparison
+
+        return jsonify({"error": "Not enough data"}), 400
+    rows = rows[::-1]
+    amounts = [float(r[1]) for r in rows]
+    features = [build_features(rows, amounts, 3)]
+    expense_prediction = predict(expense_model, features)[0] * SCALE_AMOUNT
+    income_prediction = predict(income_model, features)[0] * SCALE_AMOUNT
+    actual_next_amount = amounts[-1]
+    if actual_next_amount < 0:
+        error = abs(expense_prediction - actual_next_amount)
+        accuracy = max(0, 100 - (error / abs(actual_next_amount)) * 100)
+    else:
+        error = abs(income_prediction - actual_next_amount)
+        accuracy = max(0, 100 - (error / abs(actual_next_amount)) * 100)
+        print("Expense Prediction:", expense_prediction)
+        print("Income Prediction:", income_prediction)
+        print("Actual Next Amount:", actual_next_amount)
+        print("Prediction Accuracy:", accuracy)
+        
+    return jsonify({"expense_prediction": expense_prediction,"income_prediction": income_prediction,"actual_next_amount": actual_next_amount,"accuracy": accuracy})
+
+
 @appp.route("/api/predict_next_expense", methods=["GET"])
 def predict_next_expense():
     
-
-
     conn = get_connection()
     cursor = conn.cursor()
 
