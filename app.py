@@ -1,3 +1,5 @@
+from pyexpat import features
+
 from flask import Flask, jsonify, render_template, request, redirect, send_file, url_for
 from database import get_connection, init_db, add_transaction, get_all_transactions, delete_all_transactions, export_to_csv, get_summary, search_transactions, sort_transactions
 from templates.ai_model import (
@@ -16,7 +18,14 @@ appp = Flask(__name__)
 
 load_model(expense_model, "expense_model.pt")
 load_model(income_model, "income_model.pt")
+def retrain_models(): #helper fucntion such that 
+    X_exp, y_exp = make_expense_training_tensors()
+    if X_exp is not None and y_exp is not None and X_exp.shape[0] >= 5:
+        train_model(expense_model, X_exp, y_exp, "expense_model.pt", epochs=300, lr=0.001)
 
+    X_inc, y_inc = make_income_training_tensors()
+    if X_inc is not None and y_inc is not None and X_inc.shape[0] >= 5:
+        train_model(income_model, X_inc, y_inc, "income_model.pt", epochs=300, lr=0.001)
 
 @appp.route("/api/trainExpenses", methods=["POST"])
 def api_trainExpenses():
@@ -39,9 +48,36 @@ def api_trainIncomes():
     train_model(income_model, X, y, "income_model.pt", epochs=300, lr=0.001)
     return jsonify({"status": "income model trained", "rows_used": int(X.shape[0])})
 
+@appp.route("/api/ai_comments", methods=["GET"])
+def api_ai_comments():
+    conn = get_connection()
+    cursor = conn.cursor()
 
+    cursor.execute("SELECT date, amount FROM finance ORDER BY date DESC LIMIT 4")
+    rows = cursor.fetchall()
+    conn.close()
+
+    if len(rows) < 4: # determiens how many rowsd we need
+        return jsonify({"error": "Not enough data"}), 400
+
+    rows = rows[::-1] 
+    amounts = [float(r[1]) for r in rows] # grabs the amounts in the r in rows and then makes a list of thouse in amoutns  a
+    features = [build_features(rows, amounts, 3)] #features are thge last 4 transactions 
+    expense_prediction = predict(expense_model, features)[0] * SCALE_AMOUNT
+    income_prediction = predict(income_model, features)[0] * SCALE_AMOUNT    # send the data to income model and then scale it back up to the real amount
+
+    comments = []
+    if (abs(expense_prediction) > income_prediction):
+        comments.append("Your expenses are predicted to be higher than your income. Consider reviewing your spending habits.")
+    else:
+        comments.append("Your income is predicted to be higher than your expenses. Keep up the good work!")
+
+    return jsonify({"comments": comments})
 @appp.route("/api/predict_next_expense", methods=["GET"])
 def predict_next_expense():
+    
+
+
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -64,6 +100,7 @@ def predict_next_expense():
 
 @appp.route("/api/predict_next_income", methods=["GET"])
 def predict_next_income():
+   
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -114,6 +151,7 @@ def add():
     description = request.form.get("description", "").strip()
 
     add_transaction(name, date, amount, ttype, category, description)
+    retrain_models()   
 
     return redirect(url_for("house")) # one its been added go back to home page and update the table with the new rows 
 @appp.route("/delete", methods=["POST"])
@@ -222,7 +260,7 @@ def import_csv():
             continue
 
         add_transaction(name, date, amount, ttype, category, description)
-
+        retrain_models()
     return redirect(url_for("house"))
 if(__name__ == '__main__'):
     init_db()

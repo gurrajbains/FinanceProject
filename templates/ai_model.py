@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 from datetime import datetime
 from flask import Flask, jsonify
+from database import get_connection 
 
 
 SCALE_AMOUNT = 3000.0 # codee has been refactored tyo use two differen t m,doels fo rincom,e and expenses as the nature of the training data is fundermentally different. 
