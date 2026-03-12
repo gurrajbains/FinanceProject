@@ -5,9 +5,9 @@ from flask import Flask, jsonify
 from database import get_connection 
 
 
-SCALE_AMOUNT = 3000.0 # codee has been refactored tyo use two differen t m,doels fo rincom,e and expenses as the nature of the training data is fundermentally different. 
+SCALE_AMOUNT = 600.0 # codee has been refactored tyo use two differen t m,doels fo rincom,e and expenses as the nature of the training data is fundermentally different. 
 class BasicModel(nn.Module):
-    def __init__(self, input_size=6, hidden_size=32):
+    def __init__(self, input_size=7, hidden_size=32):
         super().__init__()
         self.network = nn.Sequential(
             nn.Linear(input_size, hidden_size),
@@ -37,7 +37,7 @@ def save_model(model, path):
     torch.save(model.state_dict(), path)
 
 
-def train_model(model, X, y, save_path, epochs=300, lr=0.001):
+def train_model(model, X, y, save_path, epochs=600, lr=0.001): #epochs=300, lr=0.001 , 15 training clicks pri=accuracy": 64.43848833441734"actual_next_amount": "expense_prediction": -38.663093000650406,"income_prediction": 2453.169286251068
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     loss_fn = nn.MSELoss()
 
@@ -60,8 +60,8 @@ def predict(model, input_values):
         if x.dim() == 1:
             x = x.unsqueeze(0)
 
-        if x.shape[1] != 6:
-            raise ValueError("features must be a list of 6 numbers")
+        if x.shape[1] != 7:
+            raise ValueError("features must be a list of 7 numbers")
 
         out = model(x)
         return out.squeeze(1).tolist()
@@ -80,14 +80,15 @@ def build_features(rows, amounts, i):
     avg_last_3 = (
         amounts[i - 1] + amounts[i - 2] + amounts[i - 3]
     ) / 3.0 / SCALE_AMOUNT
-
+    avg_last_7 = sum(amounts[i-7:i]) / 7 / SCALE_AMOUNT if i >= 7 else avg_last_3
     return [
         month,
         day,
         day_of_week,
         current_amount,
         previous_amount,
-        avg_last_3
+        avg_last_3,
+        avg_last_7
     ]
 
 
