@@ -254,7 +254,6 @@ def make_graph():
     print(chart_type, timeframe, metric, timeRange)
     return jsonify({"labels": labels, "values": values, "chart": chart_type, "timeframe": timeframe})
 
-
 @appp.route("/import", methods=["POST"])
 def import_csv():
     file = request.files.get("file")
@@ -264,32 +263,56 @@ def import_csv():
 
     import csv
 
-    stream = file.stream.read().decode("utf-8-sig").splitlines()
-    reader = csv.DictReader(stream)
-
-    print("CSV headers:", reader.fieldnames)
-
-    for row in reader:
-        print("ROW:", row)
-
-        name = (row.get("Name") or "").strip()
-        date = (row.get("Date") or "").strip()
-
+    def clean_amount(value):
+        if value is None:
+            return 0.0
+        value = str(value).strip().replace("$", "").replace(",", "")
+        if value == "":
+            return 0.0
         try:
-            amount = float((row.get("Amount") or 0))
+            return float(value)
         except ValueError:
-            amount = 0
+            return 0.0
 
-        ttype = (row.get("Type") or "").strip()
-        category = (row.get("Category") or "").strip()
-        description = (row.get("Description") or "").strip()
+    try:
+        stream = file.stream.read().decode("utf-8-sig").splitlines()
+        reader = csv.DictReader(stream)
 
-        if date == "":
-            print("Skipping row because date is missing:", row)
-            continue
+        if not reader.fieldnames:
+            print("CSV appears to be empty or missing headers.")
+            return redirect(url_for("house"))
 
-        add_transaction(name, date, amount, ttype, category, description)
-        retrain_models()
+        print("CSV headers:", reader.fieldnames)
+
+        imported_count = 0
+        skipped_count = 0
+
+        for row in reader:
+            print("ROW:", row)
+
+            name = (row.get("Name") or "").strip()
+            date = (row.get("Date") or "").strip()
+            amount = clean_amount(row.get("Amount"))
+            ttype = (row.get("Type") or "").strip()
+            category = (row.get("Category") or "").strip()
+            description = (row.get("Description") or "").strip()
+
+            if not date:
+                print("Skipping row because date is missing:", row)
+                skipped_count += 1
+                continue
+
+            add_transaction(name, date, amount, ttype, category, description)
+            imported_count += 1
+
+        if imported_count > 0:
+            retrain_models()
+
+        print(f"Import complete. Imported: {imported_count}, Skipped: {skipped_count}")
+
+    except Exception as e:
+        print("Error importing CSV:", e)
+
     return redirect(url_for("house"))
 if(__name__ == '__main__'):
     init_db()
