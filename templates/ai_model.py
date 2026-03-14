@@ -7,7 +7,7 @@ from database import get_connection
 
 SCALE_AMOUNT = 600.0 # codee has been refactored tyo use two differen t m,doels fo rincom,e and expenses as the nature of the training data is fundermentally different. 
 class BasicModel(nn.Module):
-    def __init__(self, input_size=7, hidden_size=32):
+    def __init__(self, input_size=8, hidden_size=32):
         super().__init__()
         self.network = nn.Sequential(
             nn.Linear(input_size, hidden_size),
@@ -27,10 +27,11 @@ expense_model = BasicModel()
 
 def load_model(model, path):
     try:
-        model.load_state_dict(torch.load(path, map_location="cpu"))
+        state_dict = torch.load(path, map_location="cpu")
+        model.load_state_dict(state_dict)
         model.eval()
-    except FileNotFoundError:
-        print(f"No saved model found at {path}. Using fresh model.")
+    except (FileNotFoundError, RuntimeError):
+        print(f"Saved model missing or incompatible at {path}. Using fresh model.")
 
 
 def save_model(model, path):
@@ -74,6 +75,7 @@ def build_features(rows, amounts, i):
     month = dt.month / 12.0
     day = dt.day / 31.0
     day_of_week = dt.weekday() / 6.0
+    is_weekend = 1.0 if dt.weekday() >= 5 else 0.0
 
     current_amount = float(rows[i][1]) / SCALE_AMOUNT
     previous_amount = float(rows[i - 1][1]) / SCALE_AMOUNT
@@ -85,6 +87,7 @@ def build_features(rows, amounts, i):
         month,
         day,
         day_of_week,
+        is_weekend,
         current_amount,
         previous_amount,
         avg_last_3,
@@ -122,7 +125,6 @@ def make_expense_training_tensors():
         return None, None
 
     return torch.tensor(X, dtype=torch.float32), torch.tensor(y, dtype=torch.float32)
-
 
 def make_income_training_tensors():
     conn = get_connection()

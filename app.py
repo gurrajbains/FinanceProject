@@ -279,7 +279,6 @@ def import_csv():
         reader = csv.DictReader(stream)
 
         if not reader.fieldnames:
-            print("CSV appears to be empty or missing headers.")
             return redirect(url_for("house"))
 
         print("CSV headers:", reader.fieldnames)
@@ -298,7 +297,7 @@ def import_csv():
             description = (row.get("Description") or "").strip()
 
             if not date:
-                print("Skipping row because date is missing:", row)
+                
                 skipped_count += 1
                 continue
 
@@ -308,8 +307,7 @@ def import_csv():
         if imported_count > 0:
             retrain_models()
 
-        print(f"Import complete. Imported: {imported_count}, Skipped: {skipped_count}")
-
+       
     except Exception as e:
         print("Error importing CSV:", e)
 
