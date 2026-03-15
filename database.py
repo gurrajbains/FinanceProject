@@ -146,49 +146,45 @@ def make_training_tensors():
 def get_summary(metric, timeframe, timeRange=None):
     conn = get_connection()
     cursor = conn.cursor()
-    timeRange = timeRange.strip() if timeRange else None
 
-    if metric == "spend_rate":
+    # Parse timeRange
+    start_range = end_range = None
+    if timeRange:
+        try:
+            start_range, end_range = [x.strip() for x in timeRange.split("to")]
+        except ValueError:
+            start_range = end_range = None
+
+    # Helper for time range
+    range_clause = ""
+    params = []
+    if start_range and end_range:
+        range_clause = "AND date BETWEEN ? AND ?"
+        params = [start_range + "-01", end_range + "-31"]
+
+    if metric in ["income", "expense"]:
+        ttype = metric
         if timeframe == "Monthly":
-            cursor.execute("SELECT strftime('%Y-%m', date), SUM(CASE WHEN ttype='income' THEN amount ELSE 0 END) - SUM(CASE WHEN ttype='expense' THEN -amount ELSE 0 END) FROM finance GROUP BY strftime('%Y-%m', date) ORDER BY strftime('%Y-%m', date);")
+            cursor.execute(f"SELECT strftime('%Y-%m', date) AS period, SUM(amount) FROM finance WHERE ttype=? {range_clause} GROUP BY period ORDER BY period;", [ttype] + params)
         elif timeframe == "Yearly":
-            cursor.execute("SELECT strftime('%Y', date), SUM(CASE WHEN ttype='income' THEN amount ELSE 0 END) - SUM(CASE WHEN ttype='expense' THEN -amount ELSE 0 END) FROM finance GROUP BY strftime('%Y', date) ORDER BY strftime('%Y', date);")
+            cursor.execute(f"SELECT strftime('%Y', date) AS period, SUM(amount) FROM finance WHERE ttype=? {range_clause} GROUP BY period ORDER BY period;", [ttype] + params)
         elif timeframe == "Quarterly":
-            cursor.execute("SELECT strftime('%Y', date) || '-Q' || ((CAST(strftime('%m', date) AS INTEGER) - 1) / 3 + 1), SUM(CASE WHEN ttype='income' THEN amount ELSE 0 END) - SUM(CASE WHEN ttype='expense' THEN -amount ELSE 0 END) FROM finance GROUP BY strftime('%Y', date) || '-Q' || ((CAST(strftime('%m', date) AS INTEGER) - 1) / 3 + 1) ORDER BY strftime('%Y', date), ((CAST(strftime('%m', date) AS INTEGER) - 1) / 3 + 1);")
+            cursor.execute(f"SELECT strftime('%Y', date) || '-Q' || ((CAST(strftime('%m', date) AS INTEGER)-1)/3 +1) AS period, SUM(amount) FROM finance WHERE ttype=? {range_clause} GROUP BY period ORDER BY period;", [ttype] + params)
 
-    elif metric == "earn_rate":
+    elif metric in ["earn_rate", "spend_rate"]:
+        factor = 1 if metric == "spend_rate" else 0
         if timeframe == "Monthly":
-            cursor.execute("SELECT strftime('%Y-%m', date), SUM(CASE WHEN ttype='income' THEN amount ELSE 0 END) FROM finance GROUP BY strftime('%Y-%m', date) ORDER BY strftime('%Y-%m', date);")
+            cursor.execute(f"SELECT strftime('%Y-%m', date) AS period, SUM(CASE WHEN ttype='income' THEN amount ELSE 0 END) + SUM(CASE WHEN ttype='expense' THEN amount ELSE 0 END)*{factor} FROM finance WHERE 1=1 {range_clause} GROUP BY period ORDER BY period;", params)
         elif timeframe == "Yearly":
-            cursor.execute("SELECT strftime('%Y', date), SUM(CASE WHEN ttype='income' THEN amount ELSE 0 END) FROM finance GROUP BY strftime('%Y', date) ORDER BY strftime('%Y', date);")
+            cursor.execute(f"SELECT strftime('%Y', date) AS period, SUM(CASE WHEN ttype='income' THEN amount ELSE 0 END) + SUM(CASE WHEN ttype='expense' THEN amount ELSE 0 END)*{factor} FROM finance WHERE 1=1 {range_clause} GROUP BY period ORDER BY period;", params)
         elif timeframe == "Quarterly":
-            cursor.execute("SELECT strftime('%Y', date) || '-Q' || ((CAST(strftime('%m', date) AS INTEGER) - 1) / 3 + 1), SUM(CASE WHEN ttype='income' THEN amount ELSE 0 END) FROM finance GROUP BY strftime('%Y', date) || '-Q' || ((CAST(strftime('%m', date) AS INTEGER) - 1) / 3 + 1) ORDER BY strftime('%Y', date), ((CAST(strftime('%m', date) AS INTEGER) - 1) / 3 + 1);")
-    if metric == "income":
-        if timeframe == "Monthly":
-            cursor.execute("""
-                SELECT strftime('%Y-%m', date), SUM(amount) FROM finance WHERE ttype='income' GROUP BY strftime('%Y-%m', date)ORDER BY strftime('%Y-%m', date); """)
-        elif timeframe == "Yearly":
-            cursor.execute("""
-                SELECT strftime('%Y', date), SUM(amount)FROM finance WHERE ttype='income'GROUP BY strftime('%Y', date) ORDER BY strftime('%Y', date);""")
+            cursor.execute(f"SELECT strftime('%Y', date) || '-Q' || ((CAST(strftime('%m', date) AS INTEGER)-1)/3 +1) AS period, SUM(CASE WHEN ttype='income' THEN amount ELSE 0 END) + SUM(CASE WHEN ttype='expense' THEN amount ELSE 0 END)*{factor} FROM finance WHERE 1=1 {range_clause} GROUP BY period ORDER BY period;", params)
 
-        elif timeframe == "Quarterly": cursor.execute("SELECT strftime('%Y', date) || '-Q' || ((cast(strftime('%m', date) as integer) - 1) / 3 + 1) AS year_quarter, SUM(amount) AS total FROM finance WHERE ttype = 'income' GROUP BY year_quarter ORDER BY year_quarter;")
-    if metric == "expense":
-        if timeframe == "Monthly":
-            cursor.execute("""
-                SELECT strftime('%Y-%m', date), SUM(amount) FROM finance WHERE ttype='expense' GROUP BY strftime('%Y-%m', date)ORDER BY strftime('%Y-%m', date); """)
-        elif timeframe == "Yearly":
-            cursor.execute(""" SELECT strftime('%Y', date), SUM(amount)FROM finance WHERE ttype='expense'GROUP BY strftime('%Y', date) ORDER BY strftime('%Y', date);""")
-
-        elif timeframe == "Quarterly": cursor.execute("SELECT strftime('%Y', date) || '-Q' || ((cast(strftime('%m', date) as integer) - 1) / 3 + 1) AS year_quarter, SUM(amount) AS total FROM finance WHERE ttype = 'expense' GROUP BY year_quarter ORDER BY year_quarter;")
+    else:
+        conn.close()
+        return []
 
     summary = cursor.fetchall()
-    for rows in summary[:]:  # Create a copy of the list to avoid modifying it during iteration
-        if timeRange:
-                    start, end = timeRange.split("to")
-                    start = start.strip()
-                    end = end.strip()
-                    if rows[0] < start or rows[0] > end:
-                        summary.remove(rows)
     conn.close()
     return summary
 def get_transactions_by_type(ttype):

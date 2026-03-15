@@ -244,14 +244,17 @@ def reset_search():
 def make_graph():
     chart_type = request.args.get("graphic", "line")
     timeframe = request.args.get("timeFrame", "Monthly")
-    print(chart_type, timeframe)
-    metric = request.args.get("metric","income")
-    timeRange = request.args.get("timeRange","")
-   
+    metric = request.args.get("metric", "income")
+
+    start_range = request.args.get("startRange", "")
+    end_range = request.args.get("endRange", "")
+
+    timeRange = f"{start_range}-01 to {end_range}-31" if start_range and end_range else None
     rows = get_summary(metric, timeframe, timeRange)
+
     labels = [item[0] for item in rows]
     values = [item[1] for item in rows]
-    print(chart_type, timeframe, metric, timeRange)
+    print(chart_type, timeframe, metric, start_range, end_range)
     return jsonify({"labels": labels, "values": values, "chart": chart_type, "timeframe": timeframe})
 
 @appp.route("/import", methods=["POST"])

@@ -195,6 +195,9 @@ background-color: #847171;}
     border: 1px solid rgba(0,0,0,0.25);
 
   }
+  .graphic-settings input {
+    width: 75px;
+  }
   </style>
 </head>
 <body style="overflow-x: hidden;">
@@ -338,58 +341,91 @@ fileInput.addEventListener("change", () => {
     
     <div class="canvasWrapper">
      <div class ="canvas"><canvas id="graphic-Canvas"></canvas></div>
-      <div class = "graphic-settings"> 
-          <select id="graphic-1" style="width:55px;" onchange="fetchDataAndRenderChart(this)" required> <!-- Create a dropdown such that one the clcik of the drop down the options shown are actually just the images hard to due since we need to sync the dropdown and css -->
-              <option value="line" selected>Line</option>
-              <option value="bar">Bar</option>
-              <option value="pie">Pie</option>
-              <option value="doughnut">Doughnut</option>
-              <option value="radar">Radar</option>
-              <option value="polarArea">Polar Area</option>
-</select>
-          <form style = "display:flex;" action="/api/make_graph" method="GET"onsubmit="fetchDataAndRenderChart(document.getElementById('graphic-1')); return false;">
-              <select style="width: 55px;" name="timeFrame" required>  
-                <option value="Monthly" selected>Monthly</option>
-                <option value="Quarterly">Quarterly</option>
-                <option value="Yearly">Yearly</option>
-              </select>
-              <select  style="width: 75px; display: flex;" name ="metric" required>  
-                <option value="income" selected>Income</option>
-                <option value="expense">Expense</option>
-                <option value="earn rate">Earn Rate</option>
-                <option value="spend_rate">Spend Rate</option>
-              </select>
-                <input type="text" name="timeRange1" placeholder="YYYY-MM to YYYY-MM" maxlength="20" pattern="^(19|20|21)\d{2}-(0[1-9]|1[0-2]) to (19|20)\d{2}-(0[1-9]|1[0-2])$" title="Please enter a time range in the format YYYY-MM to YYYY-MM">
-              <button type="icon-btn"><img src="{{ url_for('static', filename='icons/update.png') }}" alt="Update" style = "width: 16px; height: 18px;"></button>
-            </form>
-    </div>
+      <div class="graphic-settings">
+
+  <select id="graphic-1" onchange="fetchDataAndRenderChart(this)" required>
+    <option value="line" selected>Line</option>
+    <option value="bar">Bar</option>
+    <option value="pie">Pie</option>
+    <option value="doughnut">Doughnut</option>
+    <option value="radar">Radar</option>
+    <option value="polarArea">Polar Area</option>
+  </select>
+
+  <form action="/api/make_graph"
+        method="GET"
+        onsubmit="fetchDataAndRenderChart(document.getElementById('graphic-1')); return false;"
+        style="display:flex; gap:6px; align-items:center;">
+
+    <select name="timeFrame" required>
+      <option value="Monthly" selected>Monthly</option>
+      <option value="Quarterly">Quarterly</option>
+      <option value="Yearly">Yearly</option>
+    </select>
+
+    <select name="metric" required>
+      <option value="income" selected>Income</option>
+      <option value="expense">Expense</option>
+      <option value="earn_rate">Earn Rate</option>
+      <option value="spend_rate">Spend Rate</option>
+    </select>
+
+
+    <input type="month" name="startRange">
+    <span>-</span>
+    <input type="month" name="endRange">
+
+    <button type="submit" class="icon-btn">
+      <img src="{{ url_for('static', filename='icons/update.png') }}" 
+           alt="Update"
+           style="width:16px; height:18px;">
+    </button>
+
+  </form>
+
+</div>
 <div class ="secCanvas"><canvas id="graphic-Canvas-2"></canvas></div>
-    <div class = "graphic-settings"> 
-          <select id="graphic-2" style="width:55px;" onchange="fetchDataAndRenderChart2(this)" required>
-              <option value="line" selected>Line</option>
-              <option value="bar">Bar</option>
-              <option value="pie">Pie</option>
-              <option value="doughnut">Doughnut</option>
-              <option value="radar">Radar</option>
-              <option value="polarArea">Polar Area</option>
+    <div class="graphic-settings">
+
+  <select id="graphic-2" onchange="fetchDataAndRenderChart(this)" required>
+    <option value="line" selected>Line</option>
+    <option value="bar">Bar</option>
+    <option value="pie">Pie</option>
+    <option value="doughnut">Doughnut</option>
+    <option value="radar">Radar</option>
+    <option value="polarArea">Polar Area</option>
+  </select>
+
+  <form action="/api/make_graph"
+        method="GET"
+        onsubmit="fetchDataAndRenderChart(document.getElementById('graphic-2')); return false;"
+        style="display:flex; gap:6px; align-items:center;">
+
+  <select name="timeFrame" required>
+  <option value="Monthly" selected>Monthly</option>
+  <option value="Quarterly">Quarterly</option>
+  <option value="Yearly">Yearly</option>
 </select>
-          <form  style = "display:flex;" action="/api/make_graph" method="GET"
-      onsubmit="fetchDataAndRenderChart2(document.getElementById('graphic-2')); return false;">
-              <select style="width: 55px;" name="timeFrame2" required>  
-                <option value="Monthly" selected  >Monthly</option>
-                <option value="Quarterly">Quarterly</option>
-                <option value="Yearly">Yearly</option>
-              </select>
-              <select  style="width: 75px; display: flex;" name ="metric2" required>  
-                <option value="income" selected>Income</option>
-                <option value="expense">Expense</option>
-                <option value="earn_rate">Earn Rate</option>
-                <option value="spend_rate">Spend Rate</option>
-              </select>
-              <input type="text" name="timeRange2" placeholder="YYYY-MM to YYYY-MM" maxlength="20" pattern="^(19|20)\d{2}-(0[1-9]|1[0-2]) to (19|20|21)\d{2}-(0[1-9]|1[0-2])$" title="Please enter a time range in the format YYYY-MM to YYYY-MM">
-              <button type="icon-btn"><img src="{{ url_for('static', filename='icons/update.png') }}" alt="Update" style = "width: 16px; height: 16px;"></button>
-            </form>
-    </div>
+
+<select name="metric" required>
+  <option value="income" selected>Income</option>
+  <option value="expense">Expense</option>
+  <option value="earn_rate">Earn Rate</option>
+  <option value="spend_rate">Spend Rate</option>
+  </select>
+
+<input type="month" name="startRange">
+<span>-</span>
+<input type="month" name="endRange">
+    <button type="submit" class="icon-btn">
+      <img src="{{ url_for('static', filename='icons/update.png') }}" 
+           alt="Update"
+           style="width:16px; height:18px;">
+    </button>
+
+  </form>
+
+</div>
 </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
@@ -487,17 +523,19 @@ async function fetchDataAndRenderChart(graphic) {
 
   graphic = graphic || document.getElementById("graphic-1");
 
-  const timeRange = document.querySelector("input[name='timeRange1']").value;
+   const startRange = document.querySelector("input[name='startRange']").value;
+  const endRange = document.querySelector("input[name='endRange']").value;
   const metric = document.querySelector("select[name='metric']").value;
   const timeframe = document.querySelector("select[name='timeFrame']").value;
 
-  const response = await fetch(
+ const timeRange = startRange && endRange ? `${startRange}-01 to ${endRange}-31` : "";
+
+const response = await fetch(
     "/api/make_graph?graphic=" + (graphic.value || "line") +
-    "&timeRange=" + timeRange +
+    "&timeRange=" + encodeURIComponent(timeRange) +
     "&metric=" + metric +
     "&timeFrame=" + timeframe
-  );
-
+);
   const data = await response.json();
 
   renderChart({
@@ -512,18 +550,18 @@ async function fetchDataAndRenderChart(graphic) {
 }
 
 async function fetchDataAndRenderChart2(graphic2) {
-
   graphic2 = graphic2 || document.getElementById("graphic-2");
 
-  const timeRange = document.querySelector("input[name='timeRange2']").value;
-  const metric = document.querySelector("select[name='metric2']").value;
-  const timeframe = document.querySelector("select[name='timeFrame2']").value;
+  const form = graphic2.closest(".graphic-settings").querySelector("form");
+  const startRange = form.querySelector("input[name='startRange']").value;
+  const endRange = form.querySelector("input[name='endRange']").value;
+  const metric = form.querySelector("select[name='metric']").value;
+  const timeframe = form.querySelector("select[name='timeFrame']").value;
+
+  const timeRange = startRange && endRange ? `${startRange}-01 to ${endRange}-31` : "";
 
   const response = await fetch(
-    "/api/make_graph?graphic=" + (graphic2.value || "line") +
-    "&timeRange=" + timeRange +
-    "&metric=" + metric +
-    "&timeFrame=" + timeframe
+    `/api/make_graph?graphic=${encodeURIComponent(graphic2.value)}&timeRange=${encodeURIComponent(timeRange)}&metric=${encodeURIComponent(metric)}&timeFrame=${encodeURIComponent(timeframe)}`
   );
 
   const data = await response.json();
