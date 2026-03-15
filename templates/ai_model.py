@@ -1,3 +1,5 @@
+from xml.parsers.expat import model
+
 import torch
 import torch.nn as nn
 from datetime import datetime
@@ -39,19 +41,28 @@ def save_model(model, path):
 
 
 def train_model(model, X, y, save_path, epochs=600, lr=0.001): #epochs=300, lr=0.001 , 15 training clicks pri=accuracy": 64.43848833441734"actual_next_amount": "expense_prediction": -38.663093000650406,"income_prediction": 2453.169286251068
-    optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+    
+    
+    perm = torch.randperm(X.size(0))
+    X = X[perm]
+    y = y[perm]
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=0.0005)
     loss_fn = nn.MSELoss()
 
     model.train()
-    for _ in range(epochs):
+
+    for epoch in range(epochs):
         optimizer.zero_grad()
         preds = model(X)
         loss = loss_fn(preds, y)
+
         loss.backward()
         optimizer.step()
 
-    save_model(model, save_path)
+        if epoch % 100 == 0:
+            print("Epoch", epoch, "Loss:", loss.item())
 
+    save_model(model, save_path)
 
 def predict(model, input_values):
     model.eval()
