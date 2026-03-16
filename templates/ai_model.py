@@ -105,6 +105,42 @@ def build_features(rows, amounts, i):
         quarter, diff_prev, cumsum
     ]
 
+def categorize_transaction(description):
+    desc = description.lower()
+
+    rules = {
+        "groceries": ["walmart", "target", "costco", "kroger"],
+        "gas": ["shell", "chevron", "exxon", "76"],
+        "food": ["mcdonald", "starbucks", "chipotle", "doordash"],
+        "shopping": ["amazon", "ebay", "best buy"],
+        "transport": ["uber", "lyft"],
+        "income": ["deposit", "payroll", "salary", "paycheck"]
+    }
+
+    for category, keywords in rules.items():
+        for word in keywords:
+            if word in desc:
+                return category
+
+    return "other"
+def encode_category(category):
+    categories = [
+        "groceries",
+        "gas",
+        "food",
+        "shopping",
+        "transport",
+        "income",
+        "other"
+    ]
+
+    encoding = [0] * len(categories)
+
+    if category in categories:
+        encoding[categories.index(category)] = 1
+
+    return encoding
+
 
 def make_expense_training_tensors():
     conn = get_connection()
