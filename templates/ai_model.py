@@ -9,7 +9,7 @@ from database import get_connection
 
 SCALE_AMOUNT = 600.0 # codee has been refactored tyo use two differen t m,doels fo rincom,e and expenses as the nature of the training data is fundermentally different. 
 class BasicModel(nn.Module):
-    def __init__(self, input_size=8, hidden_size=32):
+    def __init__(self, input_size=19, hidden_size=32):
         super().__init__()
         self.network = nn.Sequential(
             nn.Linear(input_size, hidden_size),
@@ -72,8 +72,8 @@ def predict(model, input_values):
         if x.dim() == 1:
             x = x.unsqueeze(0)
 
-        if x.shape[1] != 7:
-            raise ValueError("features must be a list of 7 numbers")
+        if x.shape[1] != 19:
+            raise ValueError("features must be a list of 19 numbers")
 
         out = model(x)
         return out.squeeze(1).tolist()
@@ -113,30 +113,32 @@ def make_expense_training_tensors():
     cursor.execute("SELECT date, amount FROM finance ORDER BY date;")
     rows = cursor.fetchall()
     conn.close()
-
     if len(rows) < 8:
         return None, None
 
-    X = []
-    y = []
     amounts = [float(row[1]) for row in rows]
 
-    for i in range(3, len(rows) - 1):
-        next_amount_raw = float(rows[i + 1][1])
+    X = []
+    y = []
 
-        # Only train on expenses
-        if next_amount_raw >= 0:
+    for i in range(3, len(rows) - 1):
+
+        next_amount = float(rows[i+1][1])
+
+        if next_amount >= 0:
             continue
 
         features = build_features(rows, amounts, i)
+
         X.append(features)
-        y.append([next_amount_raw / SCALE_AMOUNT])
+        y.append([next_amount / SCALE_AMOUNT])
 
     if not X:
         return None, None
-
-    return torch.tensor(X, dtype=torch.float32), torch.tensor(y, dtype=torch.float32)
-
+    return (
+        torch.tensor(X, dtype=torch.float32),
+        torch.tensor(y, dtype=torch.float32)
+    )
 def make_income_training_tensors():
     conn = get_connection()
     cursor = conn.cursor()
@@ -148,22 +150,24 @@ def make_income_training_tensors():
     if len(rows) < 8:
         return None, None
 
+    amounts = [float(row[1]) for row in rows]
     X = []
     y = []
-    amounts = [float(row[1]) for row in rows]
 
     for i in range(3, len(rows) - 1):
-        next_amount_raw = float(rows[i + 1][1])
-
-        # Only train on income
-        if next_amount_raw <= 0:
+        next_amount = float(rows[i+1][1])
+        if next_amount <= 0:
             continue
 
         features = build_features(rows, amounts, i)
+
         X.append(features)
-        y.append([next_amount_raw / SCALE_AMOUNT])
+        y.append([next_amount / SCALE_AMOUNT])
 
     if not X:
         return None, None
 
-    return torch.tensor(X, dtype=torch.float32), torch.tensor(y, dtype=torch.float32)
+    return (
+        torch.tensor(X, dtype=torch.float32),
+        torch.tensor(y, dtype=torch.float32)
+    )
