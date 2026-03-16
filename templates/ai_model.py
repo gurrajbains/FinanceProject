@@ -80,29 +80,29 @@ def predict(model, input_values):
 
 
 def build_features(rows, amounts, i):
-    date_str = rows[i][0]
-    dt = datetime.strptime(date_str, "%Y-%m-%d")
-
+    dt = datetime.strptime(rows[i][0], "%Y-%m-%d")
     month = dt.month / 12.0
     day = dt.day / 31.0
     day_of_week = dt.weekday() / 6.0
     is_weekend = 1.0 if dt.weekday() >= 5 else 0.0
-
-    current_amount = float(rows[i][1]) / SCALE_AMOUNT
-    previous_amount = float(rows[i - 1][1]) / SCALE_AMOUNT
-    avg_last_3 = (
-        amounts[i - 1] + amounts[i - 2] + amounts[i - 3]
-    ) / 3.0 / SCALE_AMOUNT
+    current_amount = amounts[i] / SCALE_AMOUNT
+    previous_amount = amounts[i-1] / SCALE_AMOUNT
+    avg_last_3 = sum(amounts[i-3:i]) / 3 / SCALE_AMOUNT
     avg_last_7 = sum(amounts[i-7:i]) / 7 / SCALE_AMOUNT if i >= 7 else avg_last_3
+    lag2 = amounts[i-2] / SCALE_AMOUNT
+    lag3 = amounts[i-3] / SCALE_AMOUNT
+    rolling_std3 = torch.std(torch.tensor(amounts[i-3:i])) / SCALE_AMOUNT
+    is_start_month = 1.0 if dt.day <= 3 else 0.0
+    is_end_month = 1.0 if dt.day >= 28 else 0.0
+    quarter = (dt.month - 1) // 3 / 3.0
+    diff_prev = (amounts[i] - amounts[i-1]) / SCALE_AMOUNT
+    cumsum = sum(amounts[:i]) / SCALE_AMOUNT
+    
     return [
-        month,
-        day,
-        day_of_week,
-        is_weekend,
-        current_amount,
-        previous_amount,
-        avg_last_3,
-        avg_last_7
+        month, day, day_of_week, is_weekend,
+        current_amount, previous_amount, avg_last_3, avg_last_7,
+        lag2, lag3, rolling_std3, is_start_month, is_end_month,
+        quarter, diff_prev, cumsum
     ]
 
 
