@@ -13,11 +13,14 @@ from templates.ai_model import (
     expense_model,
     income_model
 )
-
+Features = 26
 appp = Flask(__name__)
 
 load_model(expense_model, "expense_model.pt")
 load_model(income_model, "income_model.pt")
+FEATURE_COUNT = 26
+
+
 def retrain_models(): #helper fucntion such that 
     X_exp, y_exp = make_expense_training_tensors()
     if X_exp is not None and y_exp is not None and X_exp.shape[0] >= 5:
@@ -26,7 +29,7 @@ def retrain_models(): #helper fucntion such that
     X_inc, y_inc = make_income_training_tensors()
     if X_inc is not None and y_inc is not None and X_inc.shape[0] >= 5:
         train_model(income_model, X_inc, y_inc, "income_model.pt", epochs=300, lr=0.001)
-
+        
 @appp.route("/api/trainExpenses", methods=["POST"])
 def api_trainExpenses():
     X, y = make_expense_training_tensors()
@@ -37,34 +40,32 @@ def api_trainExpenses():
     train_model(expense_model, X, y, "expense_model.pt", epochs=300, lr=0.001)
     return jsonify({"status": "expense model trained", "rows_used": int(X.shape[0])})
 
-
 @appp.route("/api/trainIncomes", methods=["POST"])
 def api_trainIncomes():
     X, y = make_income_training_tensors()
-
     if X is None or y is None or X.shape[0] < 5:
         return jsonify({"error": "Not enough income data to train."}), 400
-
     train_model(income_model, X, y, "income_model.pt", epochs=300, lr=0.001)
     return jsonify({"status": "income model trained", "rows_used": int(X.shape[0])})
+
 
 @appp.route("/api/ai_comments", methods=["GET"])
 def api_ai_comments():
     conn = get_connection()
     cursor = conn.cursor()
-
     cursor.execute("SELECT date, amount FROM finance ORDER BY date DESC LIMIT 4")
     rows = cursor.fetchall()
     conn.close()
-
     if len(rows) < 4: # determiens how many rowsd we need
         return jsonify({"error": "Not enough data"}), 400
 
-    rows = rows[::-1] 
-    amounts = [float(r[1]) for r in rows] # grabs the amounts in the r in rows and then makes a list of thouse in amoutns  a
-    features = [build_features(rows, amounts, 3)] #features are thge last 4 transactions 
+    rows = rows[::-1]
+
+    amounts = [float(r[1]) for r in rows] # grabs the amounts in the r in rows and then makes a list of thouse in amoutns a
+    features = [build_features(rows, amounts, 3)] #features are thge last 4 transactions
+
     expense_prediction = predict(expense_model, features)[0] * SCALE_AMOUNT
-    income_prediction = predict(income_model, features)[0] * SCALE_AMOUNT    # send the data to income model and then scale it back up to the real amount
+    income_prediction = predict(income_model, features)[0] * SCALE_AMOUNT
 
     comments = []
     if (abs(expense_prediction) > income_prediction):
@@ -74,39 +75,51 @@ def api_ai_comments():
 
     return jsonify({"comments": comments})
 
+
 @appp.route("/api/prediction_accuracy", methods=["GET"])
 def api_prediction_accuracy():
+
     conn = get_connection()
     cursor = conn.cursor()
+
     cursor.execute("SELECT date, amount FROM finance ORDER BY date DESC LIMIT 5")
     rows = cursor.fetchall()
     conn.close()
-    if len(rows) < 5: # use less than 5 as the preidction we used for output is based off the last 4 thus we need at least 5 to have a real next amount to compare it to or the correect comparison
 
+    if len(rows) < 5: # use less than 5 as the preidction we used for output is based off the last 4 thus we need at least 5 to have a real next amount to compare it to
         return jsonify({"error": "Not enough data"}), 400
     rows = rows[::-1]
     amounts = [float(r[1]) for r in rows]
+
     features = [build_features(rows, amounts, 3)]
+
     expense_prediction = predict(expense_model, features)[0] * SCALE_AMOUNT
     income_prediction = predict(income_model, features)[0] * SCALE_AMOUNT
+
     actual_next_amount = amounts[-1]
+
     if actual_next_amount < 0:
         error = abs(expense_prediction - actual_next_amount)
-        accuracy = max(0, 100 - (error / abs(actual_next_amount)) * 100) #might implemnet perccent error 
+        accuracy = max(0, 100 - (error / abs(actual_next_amount)) * 100)
     else:
         error = abs(income_prediction - actual_next_amount)
         accuracy = max(0, 100 - (error / abs(actual_next_amount)) * 100)
-        print("Expense Prediction:", expense_prediction)
-        print("Income Prediction:", income_prediction)
-        print("Actual Next Amount:", actual_next_amount)
-        print("Prediction Accuracy:", accuracy)
-        
-    return jsonify({"expense_prediction": expense_prediction,"income_prediction": income_prediction,"actual_next_amount": actual_next_amount,"accuracy": accuracy})
+    print("Expense Prediction:", expense_prediction)
+    print("Income Prediction:", income_prediction)
+    print("Actual Next Amount:", actual_next_amount)
+    print("Prediction Accuracy:", accuracy)
+
+    return jsonify({
+        "expense_prediction": expense_prediction,
+        "income_prediction": income_prediction,
+        "actual_next_amount": actual_next_amount,
+        "accuracy": accuracy
+    })
 
 
 @appp.route("/api/predict_next_expense", methods=["GET"])
 def predict_next_expense():
-    
+
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -120,7 +133,6 @@ def predict_next_expense():
     rows = rows[::-1]
     amounts = [float(r[1]) for r in rows]
     features = [build_features(rows, amounts, 3)]
-
     prediction = predict(expense_model, features)
     prediction = [p * SCALE_AMOUNT for p in prediction]
 
@@ -129,7 +141,7 @@ def predict_next_expense():
 
 @appp.route("/api/predict_next_income", methods=["GET"])
 def predict_next_income():
-   
+
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -142,8 +154,8 @@ def predict_next_income():
 
     rows = rows[::-1]
     amounts = [float(r[1]) for r in rows]
-    features = [build_features(rows, amounts, 3)]
 
+    features = [build_features(rows, amounts, 3)]
     prediction = predict(income_model, features)
     prediction = [p * SCALE_AMOUNT for p in prediction]
 
@@ -158,12 +170,12 @@ def api_predictIncomes():
     if not features:
         return jsonify({"error": "Missing features"}), 400
 
-    if len(features[0]) != 6:
-        return jsonify({"error": "Input must contain 6 values"}), 400
-
+    if len(features[0]) != FEATURE_COUNT:
+        return jsonify({"error": f"Input must contain {FEATURE_COUNT} values"}), 400
+    
     prediction = predict(income_model, features)
-    prediction = [p * SCALE_AMOUNT for p in prediction]
 
+    prediction = [p * SCALE_AMOUNT for p in prediction]
     return jsonify({"prediction": prediction})
 @appp.route('/')
 def house():
