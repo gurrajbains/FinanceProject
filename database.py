@@ -7,7 +7,7 @@ import torch
 from datetime import datetime
 
 DB_NAME = "finance.db"
-
+valid_categories = [" fast food", "rent", "salary", "entertainment", "transportation", "healthcare", "zelle", "technology", "car bills", "Utilities bills", "other", "miscellaneous", "groceries", "subscriptions", "insurance", "education", "travel", "gifts", "donations", "personal care", "clothing", "savings", "investments"]
 
 def get_connection():
 
@@ -43,11 +43,12 @@ def return_HTML_table(rows):
 
 def add_transaction(name, date, amount, ttype, category, description=""):
     converted_date = split_date(date)
-
-
     if not converted_date:
-        print("Skipping invalid date:", date)
+        print("Skipping invalid date:", date)       
         return
+    category = category.strip().lower()
+    if category not in valid_categories:
+        category = "other"
 
     if ttype == "expense" and amount > 0:
         amount = -amount
