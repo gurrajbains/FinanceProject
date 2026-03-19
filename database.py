@@ -39,7 +39,32 @@ def return_HTML_table(rows):
     Return DATA to html   """
     rows = get_all_transactions()
     return render_template("index.html", rows=rows)
-
+def categorize_transaction(description):
+    desc = description.lower().strip()
+    rules = {
+        "groceries": ["walmart","target","costco","kroger","safeway","trader joe","whole foods","foodmaxx"],
+        "gas": ["shell","chevron","exxon","76","arco","valero","gas"],
+        "food": ["mcdonald","starbucks","chipotle","doordash","ubereats","grubhub","restaurant","cafe","pizza"],
+        "shopping": ["amazon","ebay","best buy","walmart online","target online","nike","apple","store"],
+        "transport": ["uber","lyft","bus","train","bart","metro"],
+        "income": ["deposit","payroll","salary","paycheck","zelle","venmo","refund","bonus"]
+    }
+    for category, keywords in rules.items():
+        for word in keywords:
+            if word in desc:
+                return category
+    
+    scores = {key:0 for key in rules.keys()}
+    words = desc.split()
+    for w in words:
+        for category, keywords in rules.items():
+            for k in keywords:
+                if w in k or k in w:
+                    scores[category] += 1
+    best_category = max(scores, key=scores.get)
+    if scores[best_category] > 0:
+        return best_category
+    return "other"
 
 def add_transaction(name, date, amount, ttype, category, description=""):
     converted_date = split_date(date)
@@ -48,7 +73,10 @@ def add_transaction(name, date, amount, ttype, category, description=""):
         return
     category = category.strip().lower()
     if category not in valid_categories:
-        category = "other"
+        if(description):
+            category = categorize_transaction(description)
+        else:
+            category = "other"
 
     if ttype == "expense" and amount > 0:
         amount = -amount
