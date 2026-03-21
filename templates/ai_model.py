@@ -140,8 +140,58 @@ def encode_category(category):
         encoding[categories.index(category)] = 1
 
     return encoding
-
-
+def make_category_training_tensors():
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT description, category FROM finance WHERE description IS NOT NULL")
+    rows = cursor.fetchall()
+    conn.close()
+    if len(rows) < 10:
+        return None, None
+    X = []
+    y = []
+    for desc, cat in rows:
+        features = text_to_features(desc)
+        label = encode_category(cat)
+        X.append(features)
+        y.append(label)
+    X = torch.tensor(X, dtype=torch.float32)
+    y = torch.tensor(y, dtype=torch.long)
+    return X, y
+def text_to_features(text):
+    text = text.lower()
+    features = [
+        len(text),
+        sum(c.isdigit() for c in text),
+        sum(c.isalpha() for c in text),
+        int("uber" in text),
+        int("amazon" in text),
+        int("walmart" in text),
+        int("gas" in text),
+        int("food" in text),
+        int("pay" in text),
+        int("deposit" in text)
+    ]
+    return features
+def train_category_model():
+    X, y = make_category_training_tensors()
+    if X is None:
+        return
+    train_model(category_model, X, y, "category_model.pt", epochs=200, lr=0.001)
+def predict_category(description):
+    features = [text_to_features(description)]
+    pred = predict(category_model, features)
+    index = int(pred[0])
+    reverse_map = {
+        0:"groceries",
+        1:"gas",
+        2:"food",
+        3:"shopping",
+        4:"transport",
+        5:"income",
+        6:"other"
+    }
+    return reverse_map.get(index, "other")
 def make_expense_training_tensors():
     conn = get_connection()
     cursor = conn.cursor()
