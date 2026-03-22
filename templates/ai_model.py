@@ -25,6 +25,7 @@ class BasicModel(nn.Module):
 # Separate models
 income_model = BasicModel()
 expense_model = BasicModel()
+category_model = BasicModel(input_size=10, hidden_size=16) 
 
 
 def load_model(model, path):
@@ -106,22 +107,31 @@ def build_features(rows, amounts, i):
     ]
 
 def categorize_transaction(description):
-    desc = description.lower()
-
+    if not description:
+        return "other"
+    desc = description.lower().strip()
     rules = {
-        "groceries": ["walmart", "target", "costco", "kroger"],
-        "gas": ["shell", "chevron", "exxon", "76"],
-        "food": ["mcdonald", "starbucks", "chipotle", "doordash"],
-        "shopping": ["amazon", "ebay", "best buy"],
-        "transport": ["uber", "lyft"],
-        "income": ["deposit", "payroll", "salary", "paycheck"]
+        "groceries": ["walmart","target","costco","kroger","safeway","trader joe","whole foods","foodmaxx","raleys","save mart"],
+        "gas": ["shell","chevron","exxon","76","arco","valero","gas","fuel"],
+        "food": ["mcdonald","starbucks","chipotle","doordash","ubereats","grubhub","restaurant","cafe","pizza","taco","burger"],
+        "shopping": ["amazon","ebay","best buy","nike","apple","store","mall","online"],
+        "transport": ["uber","lyft","bus","train","bart","metro","taxi"],
+        "income": ["deposit","payroll","salary","paycheck","zelle","venmo","refund","bonus","direct dep"]
     }
-
     for category, keywords in rules.items():
         for word in keywords:
             if word in desc:
                 return category
-
+    scores = {key:0 for key in rules.keys()}
+    words = desc.split()
+    for w in words:
+        for category, keywords in rules.items():
+            for k in keywords:
+                if w in k or k in w:
+                    scores[category] += 1
+    best_category = max(scores, key=scores.get)
+    if scores[best_category] > 0:
+        return best_category
     return "other"
 def encode_category(category):
     categories = [
