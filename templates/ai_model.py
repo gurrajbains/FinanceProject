@@ -70,9 +70,16 @@ FEATURE_COUNT = 26
 def predict(model, features):
     if len(features[0]) != FEATURE_COUNT:
         raise ValueError(f"features must be a list of {FEATURE_COUNT} numbers")
+
     X = torch.tensor(features, dtype=torch.float32)
+
     with torch.no_grad():
-        return float(model(X).item())
+        output = model(X).item()
+
+    if output != output:  # NaN check
+        return 0.0
+
+    return float(output)
 
 def build_features(rows, amounts, i):
     dt = datetime.strptime(rows[i][0], "%Y-%m-%d")
@@ -224,7 +231,7 @@ def train_category_model():
 def predict_category(description):
     features = [text_to_features(description)]
     pred = predict(category_model, features)
-    index = int(pred[0])
+    index = int(round(pred))
     reverse_map = {
         0:"groceries",
         1:"gas",

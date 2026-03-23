@@ -63,9 +63,8 @@ def api_ai_comments():
 
     amounts = [float(r[1]) for r in rows] # grabs the amounts in the r in rows and then makes a list of thouse in amoutns a
     features = [build_features(rows, amounts, 3)] #features are thge last 4 transactions
-
-    expense_prediction = predict(expense_model, features)[0] * SCALE_AMOUNT
-    income_prediction = predict(income_model, features)[0] * SCALE_AMOUNT
+    expense_prediction = predict(expense_model, features) * SCALE_AMOUNT
+    income_prediction = predict(income_model, features) * SCALE_AMOUNT
 
     comments = []
     if (abs(expense_prediction) > income_prediction):
@@ -170,11 +169,10 @@ def api_predictIncomes():
 
     if len(features[0]) != FEATURE_COUNT:
         return jsonify({"error": f"Input must contain {FEATURE_COUNT} values"}), 400
-    
     prediction = predict(income_model, features)
+    prediction = prediction * SCALE_AMOUNT
 
-    prediction = [p * SCALE_AMOUNT for p in prediction]
-    return jsonify({"prediction":  float(prediction)})
+    return jsonify({"prediction": prediction})
 @appp.route('/')
 def house():
     rows = get_all_transactions()
@@ -250,22 +248,31 @@ def sort():
 @appp.route("/reset_Search", methods=["POST"])
 def reset_search():
     return redirect(url_for("house"))
-@appp.route("/api/make_graph", methods=["GET"])
+@appp.route("/api/make_graph")
 def make_graph():
-    chart_type = request.args.get("graphic", "line")
+    graphic = request.args.get("graphic", "line")
+    metric = request.args.get("metric", "income")   # ✅ FIXED
     timeframe = request.args.get("timeFrame", "Monthly")
-    metric = request.args.get("metric", "income")
 
-    start_range = request.args.get("startRange", "")
-    end_range = request.args.get("endRange", "")
+    # ✅ Proper timeRange handling
+    timeRange = request.args.get("timeRange")
 
-    timeRange = f"{start_range}-01 to {end_range}-31" if start_range and end_range else None
+    if not timeRange or timeRange.strip() == "":
+        timeRange = None
+
+    print("GRAPH DEBUG ->", graphic, timeframe, metric, timeRange)
+
     rows = get_summary(metric, timeframe, timeRange)
 
-    labels = [item[0] for item in rows]
-    values = [item[1] for item in rows]
-    print(chart_type, timeframe, metric, start_range, end_range)
-    return jsonify({"labels": labels, "values": values, "chart": chart_type, "timeframe": timeframe})
+    labels = [r[0] for r in rows]
+    values = [float(r[1]) for r in rows]
+
+    return jsonify({
+        "labels": labels,
+        "values": values,
+        "chart": graphic,
+        "timeframe": timeframe
+    })
 
 @appp.route("/import", methods=["POST"])
 def import_csv():

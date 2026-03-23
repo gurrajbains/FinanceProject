@@ -176,7 +176,6 @@ def get_summary(metric, timeframe, timeRange=None):
     conn = get_connection()
     cursor = conn.cursor()
 
-    # Parse timeRange
     start_range = end_range = None
     if timeRange:
         try:
@@ -184,12 +183,11 @@ def get_summary(metric, timeframe, timeRange=None):
         except ValueError:
             start_range = end_range = None
 
-    # Helper for time range
     range_clause = ""
     params = []
     if start_range and end_range:
         range_clause = "AND date BETWEEN ? AND ?"
-        params = [start_range + "-01", end_range + "-31"]
+        params = [start_range, end_range]
 
     if metric in ["income", "expense"]:
         ttype = metric
@@ -215,7 +213,11 @@ def get_summary(metric, timeframe, timeRange=None):
 
     summary = cursor.fetchall()
     conn.close()
-    return summary
+
+
+    cleaned = [(row[0], row[1] if row[1] is not None else 0) for row in summary]
+
+    return cleaned
 def get_transactions_by_type(ttype):
     conn = get_connection()
     cursor = conn.cursor()

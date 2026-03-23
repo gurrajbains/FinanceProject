@@ -624,7 +624,7 @@ document.getElementById("ai-predict-expense-btn").addEventListener("click", asyn
 
     if (data.prediction) {
 
-      const value = Number(data.prediction[0]).toFixed(2);
+    const value = Number(data.prediction).toFixed(2);
 
       document.getElementById("ai-result").textContent =
         "Next expense prediction: $" + value;
@@ -658,8 +658,7 @@ document.getElementById("ai-predict-income-btn").addEventListener("click", async
 
     if (data.prediction) {
 
-      const value = Number(data.prediction[0]).toFixed(2);
-
+      const value = Number(data.prediction).toFixed(2);
       document.getElementById("ai-result").textContent =
         "Next income prediction: $" + value;
 
