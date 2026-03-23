@@ -134,8 +134,7 @@ def predict_next_expense():
     amounts = [float(r[1]) for r in rows]
     features = [build_features(rows, amounts, 3)]
     prediction = predict(expense_model, features)
-    prediction = [p * SCALE_AMOUNT for p in prediction]
-
+    prediction = prediction * SCALE_AMOUNT
     return jsonify({"prediction": prediction})
 
 
@@ -157,8 +156,7 @@ def predict_next_income():
 
     features = [build_features(rows, amounts, 3)]
     prediction = predict(income_model, features)
-    prediction = [p * SCALE_AMOUNT for p in prediction]
-
+    prediction = prediction * SCALE_AMOUNT
     return jsonify({"prediction": prediction})
 
 
@@ -176,7 +174,7 @@ def api_predictIncomes():
     prediction = predict(income_model, features)
 
     prediction = [p * SCALE_AMOUNT for p in prediction]
-    return jsonify({"prediction": prediction})
+    return jsonify({"prediction":  float(prediction)})
 @appp.route('/')
 def house():
     rows = get_all_transactions()
