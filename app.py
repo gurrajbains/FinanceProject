@@ -251,29 +251,25 @@ def reset_search():
 @appp.route("/api/make_graph")
 def make_graph():
     graphic = request.args.get("graphic", "line")
-    metric = request.args.get("metric", "income")   # ✅ FIXED
+    metric = request.args.get("metric", "income")
     timeframe = request.args.get("timeFrame", "Monthly")
-
-    # ✅ Proper timeRange handling
     timeRange = request.args.get("timeRange")
-
     if not timeRange or timeRange.strip() == "":
         timeRange = None
-
-    print("GRAPH DEBUG ->", graphic, timeframe, metric, timeRange)
-
     rows = get_summary(metric, timeframe, timeRange)
-
     labels = [r[0] for r in rows]
     values = [float(r[1]) for r in rows]
-
     return jsonify({
         "labels": labels,
         "values": values,
         "chart": graphic,
         "timeframe": timeframe
     })
-
+@appp.route("/api/insights")
+def insights():
+    from database import get_insights
+    insights = get_insights()
+    return jsonify({"insights": insights})
 @appp.route("/import", methods=["POST"])
 def import_csv():
     file = request.files.get("file")

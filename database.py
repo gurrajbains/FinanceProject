@@ -218,6 +218,65 @@ def get_summary(metric, timeframe, timeRange=None):
     cleaned = [(row[0], row[1] if row[1] is not None else 0) for row in summary]
 
     return cleaned
+def get_insights():
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    insights = []
+
+
+    cursor.execute("""
+        SELECT strftime('%Y-%m', date) as month, SUM(amount)
+        FROM finance
+        WHERE ttype='expense'
+        GROUP BY month
+        ORDER BY month DESC
+        LIMIT 2
+    """)
+    rows = cursor.fetchall() 
+    #omapre the last two months & then we print into insights and if - or pos different message 
+    if len(rows) == 2:
+        current, previous = rows[0][1], rows[1][1]
+        if previous > 0:
+            change = ((current - previous) / previous) * 100
+            if change > 0:
+                insights.append(f"Spending increased by {change:.1f}% compared to last month")
+            else:
+                insights.append(f"Spending decreased by {abs(change):.1f}% compared to last month")
+
+  
+    cursor.execute("""
+        SELECT category, SUM(amount) as total
+        FROM finance
+        WHERE ttype='expense'
+        GROUP BY category
+        ORDER BY total DESC
+        LIMIT 1
+    """)
+    row = cursor.fetchone()
+    if row:
+        insights.append(f"Top spending category: {row[0]}")
+
+    
+    cursor.execute("""
+        SELECT strftime('%Y-%m', date) as month, SUM(amount)
+        FROM finance
+        WHERE ttype='income'
+        GROUP BY month
+        ORDER BY month DESC
+        LIMIT 2
+    """)
+    rows = cursor.fetchall()
+
+    if len(rows) == 2:
+        current, previous = rows[0][1], rows[1][1]
+        if current > previous:
+            insights.append("Your income is increasing")
+        elif current < previous:
+            insights.append("Your income decreased recently")
+
+    conn.close()
+    return insights
 def get_transactions_by_type(ttype):
     conn = get_connection()
     cursor = conn.cursor()

@@ -746,7 +746,18 @@ document.getElementById("ai-train-income-btn").addEventListener("click", async (
   }
 
 });
+fetch("/api/insights")
+  .then(res => res.json())
+  .then(data => {
+    const container = document.getElementById("insights");
+    container.innerHTML = "";
 
+    data.insights.forEach(text => {
+      const p = document.createElement("p");
+      p.textContent = "• " + text;
+      container.appendChild(p);
+    });
+  });
 </script>
 </body>
 </html>
