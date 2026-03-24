@@ -182,19 +182,11 @@ background-color: #847171;}
   button {
   
     border-radius: 12px;
-    border: 1px solid rgba(0,0,0,0.25);
+    border: 1px solid rgba(255, 0, 0, 0.25);
     padding: 6px 12px;
-    cursor: pointer;  background-color: #0d0b0b;
+    cursor: pointer;  background-color: #e31717;
   }
 }
-  #ai-result {
-    margin-top: 8px;
-    background: rgba(44, 20, 20, 0.95);
-    border-radius: 12px;
-    padding: 10px;
-    border: 1px solid rgba(0,0,0,0.25);
-
-  }
   .graphic-settings input {
     width: 75px;
   }
@@ -334,7 +326,25 @@ fileInput.addEventListener("change", () => {
       </div>
       </div>
         </div>    
-
+<div id="ai-card" class="card" style="margin-top: 1rem; padding: 1rem; border: 1px solid #ccc; border-radius: 8px; background-color: #f9f9f9;">
+  <h2>AI Predictions</h2>
+  
+  <div class="ai-buttons" style="margin-bottom: 1rem;">
+    <button id="ai-predict-expense-btn" type="button" style="margin-right: 0.5rem;">
+      Predict Next Expense
+    </button>
+    <button id="ai-predict-income-btn" type="button" style="margin-right: 0.5rem;">
+      Predict Next Income
+    </button>
+    <button id="ai-train-expense-btn" type="button">
+      Train Expense Model
+    </button>
+  </div>
+  
+  <p class="placeholder-text">
+    Your AI-generated insights will appear here.
+  </p>
+</div>
     </div>
     
 
@@ -578,39 +588,10 @@ async function fetchDataAndRenderChart2(graphic2) {
 }
 fetchDataAndRenderChart();
 fetchDataAndRenderChart2();
-
-
 </script>
-<div class="ai-card">
-
-  <h3>AI Predictions</h3>
-
-  <button id="ai-predict-expense-btn" type="button">
-    Predict Next Expense
-  </button>
-
-  <button id="ai-predict-income-btn" type="button">
-    Predict Next Income
-  </button>
-
-  <button id="ai-train-expense-btn" type="button">
-    Train Expense Model
-  </button>
-
-  <button id="ai-train-income-btn" type="button">
-    Train Income Model
-  </button>
-
-  <div id="ai-result" style="margin-top:10px;">
-    Prediction:
-  </div>
-   <div id="ai-comments" style="margin-top:10px;">
-    Comments:
-  </div>
-  
-</div>
 
 <script>
+
 
 // Predict expense
 document.getElementById("ai-predict-expense-btn").addEventListener("click", async () => {

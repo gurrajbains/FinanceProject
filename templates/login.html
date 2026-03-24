@@ -1,0 +1,180 @@
+<div class="ai-card">
+
+  <h3>AI Predictions</h3>
+
+  <button id="ai-predict-expense-btn" type="button">
+    Predict Next Expense
+  </button>
+
+  <button id="ai-predict-income-btn" type="button">
+    Predict Next Income
+  </button>
+
+  <button id="ai-train-expense-btn" type="button">
+    Train Expense Model
+  </button>
+
+  <button id="ai-train-income-btn" type="button">
+    Train Income Model
+  </button>
+
+  <div id="ai-result" style="margin-top:10px;">
+    Prediction:
+  </div>
+   <div id="ai-comments" style="margin-top:10px;">
+    Comments:
+  </div>
+  
+</div>
+
+<script>
+
+// Predict expense
+document.getElementById("ai-predict-expense-btn").addEventListener("click", async () => {
+
+  document.getElementById("ai-result").textContent = "Predicting expense...";
+
+  try {
+
+    const res = await fetch("/api/predict_next_expense");
+    const data = await res.json();
+
+    if (data.prediction) {
+
+    const value = Number(data.prediction).toFixed(2);
+
+      document.getElementById("ai-result").textContent =
+        "Next expense prediction: $" + value;
+
+    } else {
+
+      document.getElementById("ai-result").textContent =
+        "Prediction error: " + (data.error ?? "Unknown error");
+
+    }
+
+  } catch (err) {
+
+    document.getElementById("ai-result").textContent =
+      "Server error while predicting expense.";
+
+  }
+
+});
+
+
+// Predict income
+document.getElementById("ai-predict-income-btn").addEventListener("click", async () => {
+
+  document.getElementById("ai-result").textContent = "Predicting income...";
+
+  try {
+
+    const res = await fetch("/api/predict_next_income");
+    const data = await res.json();
+
+    if (data.prediction) {
+
+      const value = Number(data.prediction).toFixed(2);
+      document.getElementById("ai-result").textContent =
+        "Next income prediction: $" + value;
+
+    } else {
+
+      document.getElementById("ai-result").textContent =
+        "Prediction error: " + (data.error ?? "Unknown error");
+
+    }
+
+  } catch (err) {
+
+    document.getElementById("ai-result").textContent =
+      "Server error while predicting income.";
+
+  }
+
+});
+
+
+// Train expense model
+document.getElementById("ai-train-expense-btn").addEventListener("click", async () => {
+
+  document.getElementById("ai-result").textContent = "Training expense model...";
+
+  try {
+
+    const res = await fetch("/api/trainExpenses", {
+      method: "POST"
+    });
+
+    const data = await res.json();
+
+    document.getElementById("ai-result").textContent =
+      "Expense model: " + (data.status ?? data.error);
+
+  } catch {
+
+    document.getElementById("ai-result").textContent =
+      "Expense training failed.";
+
+  }
+
+});
+document.getElementById("ai-comments").addEventListener("click", async () => {
+
+  document.getElementById("ai-result").textContent = "Generating comments...";
+
+  try {
+
+    const res = await fetch("/api/ai_comments", {
+      method: "GET"
+    });
+   
+      const data = await res.json();
+      document.getElementById("ai-comments").textContent =
+        "Comments: " + (data.comments ?? data.error);
+  } catch {
+    document.getElementById("ai-comments").textContent =
+      "Failed to generate comments.";
+  }});
+
+
+// Train income model
+document.getElementById("ai-train-income-btn").addEventListener("click", async () => {
+
+  document.getElementById("ai-result").textContent = "Training income model...";
+
+  try {
+
+    const res = await fetch("/api/trainIncomes", {
+      method: "POST"
+    });
+
+    const data = await res.json();
+
+    document.getElementById("ai-result").textContent =
+      "Income model: " + (data.status ?? data.error);
+
+  } catch {
+
+    document.getElementById("ai-result").textContent =
+      "Income training failed.";
+
+  }
+
+});
+fetch("/api/insights")
+  .then(res => res.json())
+  .then(data => {
+    const container = document.getElementById("insights");
+    container.innerHTML = "";
+
+    data.insights.forEach(text => {
+      const p = document.createElement("p");
+      p.textContent = "• " + text;
+      container.appendChild(p);
+    });
+  });
+</script>
+</body>
+</html>
