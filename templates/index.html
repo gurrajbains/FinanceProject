@@ -326,24 +326,38 @@ fileInput.addEventListener("change", () => {
       </div>
       </div>
         </div>    
-<div id="ai-card" class="card" style="margin-top: 1rem; padding: 1rem; border: 1px solid #ccc; border-radius: 8px; background-color: #f9f9f9;">
-  <h2>AI Predictions</h2>
+<div id="ai-card" class="card" style="margin-top: 16px; padding: 1.25rem; border: 1px solid #ddd; border-radius: 10px; background-color: #fafafa;">
   
-  <div class="ai-buttons" style="margin-bottom: 1rem;">
-    <button id="ai-predict-expense-btn" type="button" style="margin-right: 0.5rem;">
-      Predict Next Expense
-    </button>
-    <button id="ai-predict-income-btn" type="button" style="margin-right: 0.5rem;">
-      Predict Next Income
-    </button>
-    <button id="ai-train-expense-btn" type="button">
-      Train Expense Model
-    </button>
+  <h2 style="margin-bottom: 12px;">AI Insights</h2>
+  <div class="ai-buttons" style="margin-bottom: 16px; display: flex; gap: 10px; flex-wrap: wrap;">
+    <button id="ai-predict-expense-btn">Predict Expense</button>
+    <button id="ai-predict-income-btn">Predict Income</button>
+    <button id="ai-train-expense-btn">Train Model</button>
+    <button id="ai-comments">Generate Comments</button>
   </div>
-  
-  <p class="placeholder-text">
-    Your AI-generated insights will appear here.
-  </p>
+
+  <div style="margin-bottom: 12px;">
+    <strong>Predictions:</strong>
+    <p id="ai-prediction-output" style="margin: 4px 0; color: #333;">
+      No predictions yet.
+    </p>
+  </div>
+
+  <div style="margin-bottom: 12px;">
+    <strong>Model Status:</strong>
+    <p id="ai-train-output" style="margin: 4px 0; color: #333;">
+      Not trained yet.
+    </p>
+  </div>
+
+
+  <div>
+    <strong>AI Comments:</strong>
+    <p id="ai-comments-output" style="margin: 4px 0; font-style: italic; color: #555;">
+      No comments generated.
+    </p>
+  </div>
+
 </div>
     </div>
     
@@ -591,141 +605,95 @@ fetchDataAndRenderChart2();
 </script>
 
 <script>
-
-
 // Predict expense
 document.getElementById("ai-predict-expense-btn").addEventListener("click", async () => {
-
-  document.getElementById("ai-result").textContent = "Predicting expense...";
+  const output = document.getElementById("ai-prediction-output");
+  output.textContent = "Predicting expense...";
 
   try {
-
     const res = await fetch("/api/predict_next_expense");
     const data = await res.json();
 
     if (data.prediction) {
-
-    const value = Number(data.prediction).toFixed(2);
-
-      document.getElementById("ai-result").textContent =
-        "Next expense prediction: $" + value;
-
+      const value = Number(data.prediction).toFixed(2);
+      output.textContent = "Next expense prediction: $" + value;
     } else {
-
-      document.getElementById("ai-result").textContent =
-        "Prediction error: " + (data.error ?? "Unknown error");
-
+      output.textContent = "Prediction error: " + (data.error ?? "Unknown error");
     }
-
   } catch (err) {
-
-    document.getElementById("ai-result").textContent =
-      "Server error while predicting expense.";
-
+    output.textContent = "Server error while predicting expense.";
   }
-
 });
-
 
 // Predict income
 document.getElementById("ai-predict-income-btn").addEventListener("click", async () => {
-
-  document.getElementById("ai-result").textContent = "Predicting income...";
+  const output = document.getElementById("ai-prediction-output");
+  output.textContent = "Predicting income...";
 
   try {
-
     const res = await fetch("/api/predict_next_income");
     const data = await res.json();
 
     if (data.prediction) {
-
       const value = Number(data.prediction).toFixed(2);
-      document.getElementById("ai-result").textContent =
-        "Next income prediction: $" + value;
-
+      output.textContent = "Next income prediction: $" + value;
     } else {
-
-      document.getElementById("ai-result").textContent =
-        "Prediction error: " + (data.error ?? "Unknown error");
-
+      output.textContent = "Prediction error: " + (data.error ?? "Unknown error");
     }
-
   } catch (err) {
-
-    document.getElementById("ai-result").textContent =
-      "Server error while predicting income.";
-
+    output.textContent = "Server error while predicting income.";
   }
-
 });
-
 
 // Train expense model
 document.getElementById("ai-train-expense-btn").addEventListener("click", async () => {
-
-  document.getElementById("ai-result").textContent = "Training expense model...";
+  const output = document.getElementById("ai-train-output");
+  output.textContent = "Training expense model...";
 
   try {
-
-    const res = await fetch("/api/trainExpenses", {
-      method: "POST"
-    });
-
+    const res = await fetch("/api/trainExpenses", { method: "POST" });
     const data = await res.json();
-
-    document.getElementById("ai-result").textContent =
-      "Expense model: " + (data.status ?? data.error);
-
+    output.textContent = "Expense model: " + (data.status ?? data.error);
   } catch {
-
-    document.getElementById("ai-result").textContent =
-      "Expense training failed.";
-
+    output.textContent = "Expense training failed.";
   }
-
 });
+
+
+//Generate suggestions
+// Generate suggestions on the same button as comments
 document.getElementById("ai-comments").addEventListener("click", async () => {
-
-  document.getElementById("ai-result").textContent = "Generating comments...";
-
-  try {
-
-    const res = await fetch("/api/ai_comments", {
-      method: "GET"
-    });
-   
-      const data = await res.json();
-      document.getElementById("ai-comments").textContent =
-        "Comments: " + (data.comments ?? data.error);
-  } catch {
-    document.getElementById("ai-comments").textContent =
-      "Failed to generate comments.";
-  }});
-
-
-// Train income model
-document.getElementById("ai-train-income-btn").addEventListener("click", async () => {
-
-  document.getElementById("ai-result").textContent = "Training income model...";
+  const outputEl = document.getElementById("ai-comments-output");
+  outputEl.textContent = "Generating suggestions...";
 
   try {
-
-    const res = await fetch("/api/trainIncomes", {
-      method: "POST"
-    });
-
+    const res = await fetch("/api/ai_suggestions");
     const data = await res.json();
-
-    document.getElementById("ai-result").textContent =
-      "Income model: " + (data.status ?? data.error);
-
+    if (data.comments && data.comments.length > 0) {
+      outputEl.innerHTML = data.comments.map(c => "• " + c).join("<br>");
+    } else {
+      outputEl.textContent = "No suggestions available right now.";
+    }
   } catch {
-
-    document.getElementById("ai-result").textContent =
-      "Income training failed.";
-
+    outputEl.textContent = "Failed to generate suggestions.";
   }
+});
+// Generate comments
+document.getElementById("ai-comments").addEventListener("click", async () => {
+  const outputEl = document.getElementById("ai-comments-output");
+  outputEl.textContent = "Generating suggestions...";
 
+  try {
+    const res = await fetch("/api/ai_suggestions");
+    const data = await res.json();
+    if (data.comments && data.comments.length > 0) {
+      outputEl.innerHTML = data.comments.map(c => "• " + c).join("<br>");
+    } else {
+      outputEl.textContent = "No suggestions available right now.";
+    }
+  } catch {
+    outputEl.textContent = "Failed to generate suggestions.";
+  }
 });
 fetch("/api/insights")
   .then(res => res.json())

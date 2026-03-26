@@ -1,5 +1,5 @@
 from pyexpat import features
-
+                                                                     
 from flask import Flask, jsonify, render_template, request, redirect, send_file, url_for
 from database import get_connection, init_db, add_transaction, get_all_transactions, delete_all_transactions, export_to_csv, get_summary, search_transactions, sort_transactions
 from templates.ai_model import (
@@ -8,7 +8,7 @@ from templates.ai_model import (
     load_model,
     make_expense_training_tensors,
     make_income_training_tensors,
-    predict,
+    predict,    
     train_model,
     expense_model,
     income_model
@@ -328,6 +328,46 @@ def import_csv():
         print("Error importing CSV:", e)
 
     return redirect(url_for("house"))
+
+
+@appp.route("/api/ai_suggestions", methods=["GET"])
+def ai_suggestions():
+    rows = get_all_transactions() 
+    suggestions = []
+
+
+    expenses = [r for r in rows if r[4] == 'expense']  
+
+        
+    income = sum(float(r[3]) for r in rows if r[4] == 'income')  
+       
+    total_expense = abs(sum(float(r[3]) for r in expenses))
+
+
+    category_totals = {}
+    for r in expenses:
+        cat = r[5]  
+        category_totals[cat] = abs(category_totals.get(cat, 0) + float(r[3]))
+
+    for cat, total in category_totals.items():
+        if income > 0 and total > income * 0.2:
+            suggestions.append(
+                f"You spent ${total:.2f} on {cat}, which is high relative to your income."
+            )
+
+    
+    if income > 0 and total_expense > income:
+        suggestions.append(
+            f"Total expenses (${total_expense:.2f}) exceed income (${income:.2f}). Consider reducing expenses in high categories."
+        )
+
+    if category_totals:
+        top_cat, top_amount = max(category_totals.items(), key=lambda x: x[1])
+        suggestions.append(
+            f"Your largest expense is {top_cat} (${top_amount:.2f}). You could try reducing this category to save money."
+        )
+
+    return jsonify({"comments": suggestions})
 if(__name__ == '__main__'):
     init_db()
     appp.run(debug=True) #v \Scripts\activate venv  to activate virtual environment
