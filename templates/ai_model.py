@@ -7,25 +7,31 @@ from flask import Flask, jsonify
 from database import get_connection 
 
 
-SCALE_AMOUNT = 600.0 # codee has been refactored tyo use two differen t m,doels fo rincom,e and expenses as the nature of the training data is fundermentally different. 
-class BasicModel(nn.Module):
-    def __init__(self, input_size=26, hidden_size=32):
+SCALE_AMOUNT = 600.0 # code has been refactored to use two different models for income and expenses as the nature of the training data is fundamentally different. 
+class ImprovedModel(nn.Module):
+    def __init__(self, input_size=26, hidden_size=64, dropout=0.2):
         super().__init__()
         self.network = nn.Sequential(
             nn.Linear(input_size, hidden_size),
-            nn.ReLU(),
+            nn.BatchNorm1d(hidden_size),   
+            nn.LeakyReLU(0.01),            
+            nn.Dropout(dropout),           
             nn.Linear(hidden_size, hidden_size),
-            nn.ReLU(),
-            nn.Linear(hidden_size, 1),
+            nn.BatchNorm1d(hidden_size),
+            nn.LeakyReLU(0.01),
+            nn.Dropout(dropout),
+            nn.Linear(hidden_size, hidden_size // 2),
+            nn.LeakyReLU(0.01),
+            nn.Linear(hidden_size // 2, 1)
         )
 
     def forward(self, x):
         return self.network(x)
 
 # Separate models
-income_model = BasicModel()
-expense_model = BasicModel()
-category_model = BasicModel(input_size=10, hidden_size=16) 
+income_model = BasicModel2()
+expense_model = BasicModel2()
+category_model = BasicModel2(input_size=10, hidden_size=16) 
 
 
 def load_model(model, path):
@@ -174,6 +180,7 @@ def categorize_transaction(description):
     if scores[best_category] > 0:
         return best_category
     return "other"
+
 CATEGORY_MAP = {
         "groceries":0,
         "gas":1,
@@ -183,6 +190,7 @@ CATEGORY_MAP = {
         "income":5,
         "other":6
 }
+
 def encode_category(category):
     if not category:
         return CATEGORY_MAP["other"]
@@ -190,6 +198,7 @@ def encode_category(category):
     if category not in CATEGORY_MAP:
         CATEGORY_MAP[category] = len(CATEGORY_MAP)
     return CATEGORY_MAP[category]
+
 def make_category_training_tensors():
     conn = get_connection()
     cursor = conn.cursor()
@@ -208,6 +217,7 @@ def make_category_training_tensors():
     X = torch.tensor(X, dtype=torch.float32)
     y = torch.tensor(y, dtype=torch.long)
     return X, y
+
 def text_to_features(text):
     text = text.lower()
     features = [
@@ -223,11 +233,13 @@ def text_to_features(text):
         int("deposit" in text)
     ]
     return features
+
 def train_category_model():
     X, y = make_category_training_tensors()
     if X is None:
         return
     train_model(category_model, X, y, "category_model.pt", epochs=200, lr=0.001)
+
 def predict_category(description):
     features = [text_to_features(description)]
     pred = predict(category_model, features)
@@ -242,27 +254,27 @@ def predict_category(description):
         6:"other"
     }
     return reverse_map.get(index, "other")
+
 def make_expense_training_tensors():
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT date, amount FROM finance ORDER BY date;")
+    cursor.execute("SELECT date, amount, category FROM finance ORDER BY date;")
     rows = cursor.fetchall()
     conn.close()
     if len(rows) < 8:
         return None, None
 
-    amounts = [float(row[1]) for row in rows]
+    rows = [r for r in rows if float(r[1]) < 0]
+
+    amounts = [abs(float(row[1])) for row in rows]
 
     X = []
     y = []
 
     for i in range(3, len(rows) - 1):
 
-        next_amount = float(rows[i+1][1])
-
-        if next_amount >= 0:
-            continue
+        next_amount = abs(float(rows[i+1][1]))
 
         features = build_features(rows, amounts, i)
 
@@ -275,25 +287,27 @@ def make_expense_training_tensors():
         torch.tensor(X, dtype=torch.float32),
         torch.tensor(y, dtype=torch.float32)
     )
+
 def make_income_training_tensors():
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute("SELECT date, amount FROM finance ORDER BY date;")
+    cursor.execute("SELECT date, amount, category FROM finance ORDER BY date;")
     rows = cursor.fetchall()
     conn.close()
 
     if len(rows) < 8:
         return None, None
 
-    amounts = [float(row[1]) for row in rows]
+    rows = [r for r in rows if float(r[1]) > 0]
+
+    amounts = [abs(float(row[1])) for row in rows]
+
     X = []
     y = []
 
     for i in range(3, len(rows) - 1):
-        next_amount = float(rows[i+1][1])
-        if next_amount <= 0:
-            continue
+        next_amount = abs(float(rows[i+1][1]))
 
         features = build_features(rows, amounts, i)
 

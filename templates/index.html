@@ -411,7 +411,7 @@ fileInput.addEventListener("change", () => {
 <div class ="secCanvas"><canvas id="graphic-Canvas-2"></canvas></div>
     <div class="graphic-settings">
 
-  <select id="graphic-2" onchange="fetchDataAndRenderChart(this)" required>
+  <select id="graphic-2" onchange="fetchDataAndRenderChart2(this)" required>
     <option value="line" selected>Line</option>
     <option value="bar">Bar</option>
     <option value="pie">Pie</option>
@@ -547,10 +547,12 @@ async function fetchDataAndRenderChart(graphic) {
 
   graphic = graphic || document.getElementById("graphic-1");
 
-   const startRange = document.querySelector("input[name='startRange']").value;
-  const endRange = document.querySelector("input[name='endRange']").value;
-  const metric = document.querySelector("select[name='metric']").value;
-  const timeframe = document.querySelector("select[name='timeFrame']").value;
+   const form = graphic.closest(".graphic-settings").querySelector("form");
+
+const startRange = form.querySelector("input[name='startRange']").value;
+const endRange = form.querySelector("input[name='endRange']").value;
+const metric = form.querySelector("select[name='metric']").value;
+const timeframe = form.querySelector("select[name='timeFrame']").value;
 
  const timeRange = startRange && endRange ? `${startRange}-01 to ${endRange}-31` : "";
 
