@@ -10,10 +10,9 @@ DB_NAME = "finance.db"
 valid_categories = [" fast food", "rent", "salary", "entertainment", "transportation", "healthcare", "zelle", "technology", "car bills", "Utilities bills", "other", "miscellaneous", "groceries", "subscriptions", "insurance", "education", "travel", "gifts", "donations", "personal care", "clothing", "savings", "investments"]
 
 def get_connection():
-
-   
-   return sqlite3.connect(DB_NAME)
-
+    conn = sqlite3.connect(DB_NAME)
+    conn.row_factory = sqlite3.Row
+    return conn
 
 def init_db():
     conn = get_connection()
@@ -183,41 +182,69 @@ def get_summary(metric, timeframe, timeRange=None):
         except ValueError:
             start_range = end_range = None
 
-    range_clause = ""
+    base_query = "FROM finance WHERE 1=1"
     params = []
+
     if start_range and end_range:
-        range_clause = "AND date BETWEEN ? AND ?"
-        params = [start_range, end_range]
+        base_query += " AND date BETWEEN ? AND ?"
+        params.extend([start_range, end_range])
 
     if metric in ["income", "expense"]:
-        ttype = metric
+        base_query += " AND ttype=?"
+        params = [metric] + params
+
         if timeframe == "Monthly":
-            cursor.execute(f"SELECT strftime('%Y-%m', date) AS period, SUM(amount) FROM finance WHERE ttype=? {range_clause} GROUP BY period ORDER BY period;", [ttype] + params)
+            query = "SELECT strftime('%Y-%m', date), SUM(amount) " + base_query + " GROUP BY 1 ORDER BY 1"
         elif timeframe == "Yearly":
-            cursor.execute(f"SELECT strftime('%Y', date) AS period, SUM(amount) FROM finance WHERE ttype=? {range_clause} GROUP BY period ORDER BY period;", [ttype] + params)
+            query = "SELECT strftime('%Y', date), SUM(amount) " + base_query + " GROUP BY 1 ORDER BY 1"
         elif timeframe == "Quarterly":
-            cursor.execute(f"SELECT strftime('%Y', date) || '-Q' || ((CAST(strftime('%m', date) AS INTEGER)-1)/3 +1) AS period, SUM(amount) FROM finance WHERE ttype=? {range_clause} GROUP BY period ORDER BY period;", [ttype] + params)
+            query = "SELECT strftime('%Y', date)||'-Q'||((CAST(strftime('%m',date) AS INTEGER)-1)/3+1), SUM(amount) " + base_query + " GROUP BY 1 ORDER BY 1"
+        else:
+            conn.close()
+            return []
+
+        cursor.execute(query, params)
 
     elif metric in ["earn_rate", "spend_rate"]:
         factor = 1 if metric == "spend_rate" else 0
+
         if timeframe == "Monthly":
-            cursor.execute(f"SELECT strftime('%Y-%m', date) AS period, SUM(CASE WHEN ttype='income' THEN amount ELSE 0 END) + SUM(CASE WHEN ttype='expense' THEN amount ELSE 0 END)*{factor} FROM finance WHERE 1=1 {range_clause} GROUP BY period ORDER BY period;", params)
+            query = f"""
+            SELECT strftime('%Y-%m', date),
+            SUM(CASE WHEN ttype='income' THEN amount ELSE 0 END) +
+            SUM(CASE WHEN ttype='expense' THEN amount ELSE 0 END)*{factor}
+            {base_query}
+            GROUP BY 1 ORDER BY 1
+            """
         elif timeframe == "Yearly":
-            cursor.execute(f"SELECT strftime('%Y', date) AS period, SUM(CASE WHEN ttype='income' THEN amount ELSE 0 END) + SUM(CASE WHEN ttype='expense' THEN amount ELSE 0 END)*{factor} FROM finance WHERE 1=1 {range_clause} GROUP BY period ORDER BY period;", params)
+            query = f"""
+            SELECT strftime('%Y', date),
+            SUM(CASE WHEN ttype='income' THEN amount ELSE 0 END) +
+            SUM(CASE WHEN ttype='expense' THEN amount ELSE 0 END)*{factor}
+            {base_query}
+            GROUP BY 1 ORDER BY 1
+            """
         elif timeframe == "Quarterly":
-            cursor.execute(f"SELECT strftime('%Y', date) || '-Q' || ((CAST(strftime('%m', date) AS INTEGER)-1)/3 +1) AS period, SUM(CASE WHEN ttype='income' THEN amount ELSE 0 END) + SUM(CASE WHEN ttype='expense' THEN amount ELSE 0 END)*{factor} FROM finance WHERE 1=1 {range_clause} GROUP BY period ORDER BY period;", params)
+            query = f"""
+            SELECT strftime('%Y', date)||'-Q'||((CAST(strftime('%m',date) AS INTEGER)-1)/3+1),
+            SUM(CASE WHEN ttype='income' THEN amount ELSE 0 END) +
+            SUM(CASE WHEN ttype='expense' THEN amount ELSE 0 END)*{factor}
+            {base_query}
+            GROUP BY 1 ORDER BY 1
+            """
+        else:
+            conn.close()
+            return []
+
+        cursor.execute(query, params)
 
     else:
         conn.close()
         return []
 
-    summary = cursor.fetchall()
+    rows = cursor.fetchall()
     conn.close()
-
-
-    cleaned = [(row[0], row[1] if row[1] is not None else 0) for row in summary]
-
-    return cleaned
+    return rows
 def get_insights():
     conn = get_connection()
     cursor = conn.cursor()
@@ -319,15 +346,15 @@ def search_transactions(q, ttype):
     return rows
 
 def sort_transactions(sort_by, ttype):
-    conn = get_connection() 
+    conn = get_connection()
     cursor = conn.cursor()
 
-    if sort_by == "date":
-        cursor.execute("SELECT id, name, date, amount, ttype, category, description FROM finance WHERE ttype=? ORDER BY date DESC", (ttype,))
-    elif sort_by == "amount":
-        cursor.execute("SELECT id, name, date, amount, ttype, category, description FROM finance WHERE ttype=? ORDER BY amount DESC", (ttype,))
-    else:
-        cursor.execute("SELECT id, name, date, amount, ttype, category, description FROM finance WHERE ttype=? ORDER BY id DESC", (ttype,))
+    valid_sort = {"date", "amount", "id"}
+    if sort_by not in valid_sort:
+        sort_by = "date"
+    query = f"""
+    SELECT id, name, date, amount, ttype, category, description FROM finance WHERE ttype=? ORDER BY {sort_by} DESC """
+    cursor.execute(query, (ttype,))
     rows = cursor.fetchall()
     conn.close()
     return rows
