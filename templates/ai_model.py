@@ -1,11 +1,9 @@
 from xml.parsers.expat import model
-
 import torch
 import torch.nn as nn
 from datetime import datetime
 from flask import Flask, jsonify
 from database import get_connection 
-
 
 SCALE_AMOUNT = 600.0 # code has been refactored to use two different models for income and expenses as the nature of the training data is fundamentally different. 
 class ImprovedModel(nn.Module):
@@ -13,25 +11,26 @@ class ImprovedModel(nn.Module):
         super().__init__()
         self.network = nn.Sequential(
             nn.Linear(input_size, hidden_size),
-            nn.BatchNorm1d(hidden_size),   
-            nn.LeakyReLU(0.01),            
-            nn.Dropout(dropout),           
+            nn.LayerNorm(hidden_size),
+            nn.LeakyReLU(0.01),
+            nn.Dropout(dropout),
             nn.Linear(hidden_size, hidden_size),
-            nn.BatchNorm1d(hidden_size),
+            nn.LayerNorm(hidden_size),
             nn.LeakyReLU(0.01),
             nn.Dropout(dropout),
             nn.Linear(hidden_size, hidden_size // 2),
             nn.LeakyReLU(0.01),
-            nn.Linear(hidden_size // 2, 1)
+            nn.Linear(hidden_size // 2, 1),
+            nn.ReLU()
         )
 
     def forward(self, x):
         return self.network(x)
 
 # Separate models
-income_model = BasicModel2()
-expense_model = BasicModel2()
-category_model = BasicModel2(input_size=10, hidden_size=16) 
+income_model = ImprovedModel()
+expense_model = ImprovedModel()
+category_model = ImprovedModel(input_size=10, hidden_size=16) 
 
 
 def load_model(model, path):
@@ -78,7 +77,7 @@ def predict(model, features):
         raise ValueError(f"features must be a list of {FEATURE_COUNT} numbers")
 
     X = torch.tensor(features, dtype=torch.float32)
-
+    model.eval()
     with torch.no_grad():
         output = model(X).item()
 

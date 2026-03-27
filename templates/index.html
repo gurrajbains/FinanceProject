@@ -2,457 +2,375 @@
 <html width="100%" height="100%">
 <head>
   <title>Finance Manager</title>
-
   <style>
+    * { box-sizing: border-box; }
 
-* { box-sizing: border-box; }
+    html, body { height: 100%; }
 
-html, body {
-  height: 100%;
-}
+    body {
+      margin: 0;
+      background-image: url("{{ url_for('static', filename='background.jpg') }}");
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      overflow-x: hidden;
+    }
 
-body {
-  margin: 0;
-  background-image: url("{{ url_for('static', filename='background.jpg') }}");
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  overflow-x: hidden;
-}
+    .content {
+      display: grid;
+      grid-template-columns: minmax(620px, 1fr) minmax(340px, 520px);
+      gap: 20px;
+      padding: 20px;
+      align-items: start;
+    }
 
+    .leftColumn, .canvasWrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      min-width: 0;
+    }
 
-.content {
-  display: grid;
-  grid-template-columns: minmax(620px, 1fr) minmax(340px, 520px);
-  gap: 20px;
-  padding: 20px;
-  align-items: start;
-}
+    @media (max-width: 1100px) {
+      .content { grid-template-columns: 1fr; }
+    }
 
-.leftColumn {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  min-width: 0;             
-}
+    .table-containment {
+      width: 100%;
+      background: rgba(255,255,255,0.9);
+      border-radius: 18px;
+      padding: 10px;
+      height: 585px;
+      overflow: auto;
+    }
 
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0;
+    }
 
-.canvasWrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  min-width: 0;
-}
+    thead th {
+      position: sticky;
+      top: 0;
+      background: rgb(105,104,104);
+      z-index: 2;
+      border-radius: 10px;
+      border: 1px solid rgba(0,0,0,0.25);
+    }
 
+    th, td {
+      padding: 10px;
+      text-align: center;
+      border: 1px solid rgba(0,0,0,0.25);
+    }
 
-@media (max-width: 1100px) {
-  .content {
-    grid-template-columns: 1fr;
-  }
-}
+    .toolbar {
+      width: 100%;
+      text-align: left;
+      background: rgba(231,231,231,0.9);
+      border-radius: 10px;
+      padding: 5px;
+      display: flex;
+      flex-direction: row;
+      gap: 5px;  
+    }
 
+    .add-form form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
 
-.table-containment {
-  width: 100%;
-  background: rgba(255,255,255,0.90);
-  border-radius: 18px;
-  padding: 10px;
-  height: 585px;
-  overflow: auto;
-}
+    .add-form input,
+    .add-form select,
+    .action-bar input,
+    .action-bar select {
+      height: 34px;
+      padding: 6px 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(0,0,0,0.25);
+      background: rgba(255,255,255,0.95);
+    }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 0;               
-}
+    button {
+      height: 34px;
+      padding: 6px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(0,0,0,0.25);
+      cursor: pointer;
+    }
 
-thead th {
-  position: sticky;
-  top: 0;
-  background: rgb(105, 104, 104);
-  z-index: 2;
-  border-radius: 10px;
-  border: 1px solid rgba(0,0,0,0.25);
-}
+    .action-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
 
-th, td {
-  padding: 10px;
-  text-align: center;
-  border: 1px solid rgba(0,0,0,0.25);
-}
+    .canvas,
+    .secCanvas {
+      width: 100%;
+      background: rgba(200,177,177,0.9);
+      border-radius: 18px;
+      padding: 10px;
+    }
 
-.toolbar {
-  width: 100%;
-  text-align: left;
-  background: rgba(231, 231, 231, 0.9);
-  border-radius: 10px;
-  padding: 5px;
-  display: flex;
-  flex-direction: row;
-  gap: 5px;  
-  
-}
+    .canvas { height: 290px; }
+    .secCanvas { height: 290px; }
 
+    .canvas canvas,
+    .secCanvas canvas {
+      width: 100%;
+      height: 100%;
+    }
 
-.add-form form {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  align-items: center;
-}
+    .graphic-settings {
+      width: 100%;
+      background-color: #e3d0d0;
+      border-radius: 18px;
+      padding: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      justify-content: center;
+      flex-direction: row;
+    }
 
+    .graphic-settings select,
+    .graphic-settings input {
+      height: 34px;
+      border-radius: 12px;
+      border: 1px solid rgba(0,0,0,0.25);
+      padding: 6px 10px;
+    }
 
-.add-form input,
-.add-form select,
-.action-bar input,
-.action-bar select {
-  height: 34px;
-  padding: 6px 10px;
-  border-radius: 12px;
-  border: 1px solid rgba(0,0,0,0.25);
-  background: rgba(255,255,255,0.95);
-}
+    .graphic-settings button:hover,
+    button:hover { background-color: #847171; }
 
+    .ai-card {
+      position: flex;
+    }
 
-button {
-  height: 34px;
-  padding: 6px 12px;
-  border-radius: 12px;
-  border: 1px solid rgba(0,0,0,0.25);
-  cursor: pointer;
-}
+    .ai-card button {
+      border-radius: 12px;
+      border: 1px solid rgba(255,0,0,0.25);
+      padding: 6px 12px;
+      cursor: pointer;
+      background-color: #e31717;
+    }
 
-.action-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  align-items: center;
-}
-
-
-.canvas,
-.secCanvas {
-  width: 100%;
-  background: rgba(200, 177, 177, 0.9);
-  border-radius: 18px;
-  padding: 10px;
-}
-
-
-.canvas { height: 290px; }
-.secCanvas { height: 290px; }
-
-
-.canvas canvas,
-.secCanvas canvas {
-  width: 100% ;
-  height: 100% ;
-}
-
-
-.graphic-settings {
-  width: 100%;
-  background-color: #e3d0d0;
-  border-radius: 18px;
-  padding: 8px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: center;
-  justify-content: center;
-  flex-direction: row;
-}
-
-.graphic-settings select,
-.graphic-settings input {
-  height: 34px;
-  border-radius: 12px;
-  border: 1px solid rgba(0,0,0,0.25);
-  padding: 6px 10px;
-}
-
-
-.graphic-settings button:hover,
-button:hover {
-background-color: #847171;}
-
-.ai-card {
-  position: flex;  
-  button {
-  
-    border-radius: 12px;
-    border: 1px solid rgba(255, 0, 0, 0.25);
-    padding: 6px 12px;
-    cursor: pointer;  background-color: #e31717;
-  }
-}
-  .graphic-settings input {
-    width: 75px;
-  }
+    .graphic-settings input { width: 75px; }
   </style>
 </head>
-<body style="overflow-x: hidden;">
+<body>
   <div class="content">
-    <div class = "leftColumn">
-    <div class="table-containment">
-  <form id="delete-form" action="/delete" method="POST">
-    <table rules = "rows">
-      <thead>
-        <tr>
-          <th>
-            <input type="checkbox" id="select-all"
-              onclick="document.querySelectorAll('input[name=delete_ids]').forEach(cb => cb.checked = this.checked);">
-          </th>
-          <th>Transaction ID</th>
-          <th>Date</th>
-          <th>Amount</th>
-          <th>Type</th>
-          <th>Source</th>
-          <th>Description</th>
-        </tr>
-      </thead>
+    <div class="leftColumn">
 
-      <tbody>
-        {% for row in rows %}
-        <tr>
-          <td><input type="checkbox" name="delete_ids" value="{{ row[0] }}"></td>
-          <td>{{ row[1] }}</td>
-          <td>{{ row[2].split('-')[1] }}-{{ row[2].split('-')[2] }}-{{ row[2].split('-')[0] }}</td>
-          <td>{{ row[3] }}</td>
-          <td>{{ row[4] }}</td>
-          <td>{{ row[5] }}</td>
-          <td>{{ row[6] }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </form>
-</div>
-
-    <div class="toolbar">
-      <div class="add-form">
-        <form action="/add" method="POST">
-          <input style = "width:100px;" type="name" name="name" placeholder="Name" required minlength="2" maxlength="50">
-          <input style = "width:110px;" type="text" name="date" placeholder="MM-DD-YYYY" required pattern="^(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])-\d{4}$" title="Please enter a date in the format MM-DD-YYYY">
-          <input style = "width:85px;"  type="number" name="amount" step="0.01" placeholder="Amount" required  number-only max = "100000000000" min = "0" title ="Please enter a valid amount">
-
-          <select style="width: 75px;" name="type" required>
-            <option value="">Type</option>
-            <option value="income">Income</option>
-            <option value="expense">Expense</option>
-          </select>
-
-          <input style = "width:80px;"  type="text" name="source" placeholder="Source" required text-only minlength="1" maxlength="50" title="Please enter a valid source">
-          <input  style = "width:115px;"  type="text" name="description" placeholder="Desc (optional)" maxlength="100">
-
-          <button type="icon-btn">
-            <img src="{{ url_for('static', filename='icons/add-icon.png') }}" alt="Add" style="width: 16px; height: 16px;">
-          </button>
+      <div class="table-containment">
+        <form id="delete-form" action="/delete" method="POST">
+          <table rules="rows">
+            <thead>
+              <tr>
+                <th>
+                  <input type="checkbox" id="select-all" onclick="document.querySelectorAll('input[name=delete_ids]').forEach(cb => cb.checked = this.checked);">
+                </th>
+                <th>Transaction ID</th>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Type</th>
+                <th>Source</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in rows %}
+              <tr>
+                <td><input type="checkbox" name="delete_ids" value="{{ row[0] }}"></td>
+                <td>{{ row[1] }}</td>
+                <td>{{ row[2].split('-')[1] }}-{{ row[2].split('-')[2] }}-{{ row[2].split('-')[0] }}</td>
+                <td>{{ row[3] }}</td>
+                <td>{{ row[4] }}</td>
+                <td>{{ row[5] }}</td>
+                <td>{{ row[6] }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
         </form>
       </div>
-    <div class ="action-bar">
-      <div class="action-buttons">
-          <button type="icon-btn" form="delete-form">
-            <img src="{{ url_for('static', filename='icons/tash-icon.png') }}" alt="Delete"style="width: 16px; height: 16px;">
-          </button>
-        <form action="/export" method="GET">
-          <button type="icon-btn">
-            <img src="{{ url_for('static', filename='icons/export.png') }}" alt="Export" style="width: 16px; height: 16px;">
-        </form>
 
-
-
-
-
-     <form id="importForm" action="/import" method="POST" enctype="multipart/form-data">
-  <input type="file" id="fileInput" name="file" accept=".csv" style="display:none">
-
-  <button type="button" id="importBtn">
-    <img src="{{ url_for('static', filename='icons/export.png') }}" style="width:16px;height:16px;">
-  </button>
-</form>
-
-<script>
-const fileInput = document.getElementById("fileInput");
-const importBtn = document.getElementById("importBtn");
-const importForm = document.getElementById("importForm");
-
-importBtn.addEventListener("click", () => {
-  fileInput.click();
-});
-
-fileInput.addEventListener("change", () => {
-  if (fileInput.files.length > 0) {
-    importForm.submit();
-  }
-});
-</script>
-</form>
-
-        
-        <form action ="/sort" method="POST">
-          <button type="icon-btn">
-            <img src="{{ url_for('static', filename='icons/filter.png') }}" alt="Sort" style="width: 16px; height: 16px;">
-          </button>
-          <select style="width: 75px;" name="sort_by" required >
-            <option value="">Select</option>
-            <option value="date">Date</option>
-            <option value="amount">Amount</option>
-          </select>
-          <select style="width: 75px;" name="type" required>
-            <option value="">Select</option>
-            <option value="income">Income</option>
-            <option value="expense">Expense</option>
-          </select>
-        </form>
-        <div class="searchbar">
-          <form action="/search" method="GET">
-            <input type="text" name="query" placeholder="Search.." maxlength="100">
+      <div class="toolbar">
+        <div class="add-form">
+          <form action="/add" method="POST">
+            <input style="width:100px;" type="name" name="name" placeholder="Name" required minlength="2" maxlength="50">
+            <input style="width:110px;" type="text" name="date" placeholder="MM-DD-YYYY" required pattern="^(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])-\d{4}$" title="Please enter a date in the format MM-DD-YYYY">
+            <input style="width:85px;" type="number" name="amount" step="0.01" placeholder="Amount" required number-only max="100000000000" min="0" title="Please enter a valid amount">
+            <select style="width: 75px;" name="type" required>
+              <option value="">Type</option>
+              <option value="income">Income</option>
+              <option value="expense">Expense</option>
+            </select>
+            <input style="width:80px;" type="text" name="source" placeholder="Source" required text-only minlength="1" maxlength="50" title="Please enter a valid source">
+            <input style="width:115px;" type="text" name="description" placeholder="Desc (optional)" maxlength="100">
             <button type="icon-btn">
-              <img src="{{ url_for('static', filename='icons/search-icon.png') }}" alt="Search" style="width: 16px; height: 16px;">
-              </button>
-        </form> 
-        
-</div><div class="reset">
-          <form action="/reset_Search" method="POST">
-            <button type="icon-btn">
-              <img src="{{ url_for('static', filename='icons/reset-icon.png') }}" alt="Reset" style="width: 16px; height: 17px;">
+              <img src="{{ url_for('static', filename='icons/add-icon.png') }}" alt="Add" style="width:16px;height:16px;">
             </button>
-            
-        </form>  
-          
-         </div>
+          </form>
+        </div>
+
+        <div class="action-bar">
+          <div class="action-buttons">
+            <button type="icon-btn" form="delete-form">
+              <img src="{{ url_for('static', filename='icons/tash-icon.png') }}" alt="Delete" style="width:16px;height:16px;">
+            </button>
+
+            <form action="/export" method="GET">
+              <button type="icon-btn">
+                <img src="{{ url_for('static', filename='icons/export.png') }}" alt="Export" style="width:16px;height:16px;">
+              </button>
+            </form>
+
+            <form id="importForm" action="/import" method="POST" enctype="multipart/form-data">
+              <input type="file" id="fileInput" name="file" accept=".csv" style="display:none">
+              <button type="button" id="importBtn">
+                <img src="{{ url_for('static', filename='icons/export.png') }}" style="width:16px;height:16px;">
+              </button>
+            </form>
+
+            <form action="/sort" method="POST">
+              <button type="icon-btn">
+                <img src="{{ url_for('static', filename='icons/filter.png') }}" alt="Sort" style="width:16px;height:16px;">
+              </button>
+              <select style="width:75px;" name="sort_by" required>
+                <option value="">Select</option>
+                <option value="date">Date</option>
+                <option value="amount">Amount</option>
+              </select>
+              <select style="width:75px;" name="type" required>
+                <option value="">Select</option>
+                <option value="income">Income</option>
+                <option value="expense">Expense</option>
+              </select>
+            </form>
+
+            <div class="searchbar">
+              <form action="/search" method="GET">
+                <input type="text" name="query" placeholder="Search.." maxlength="100">
+                <button type="icon-btn">
+                  <img src="{{ url_for('static', filename='icons/search-icon.png') }}" alt="Search" style="width:16px;height:16px;">
+                </button>
+              </form>
+            </div>
+
+            <div class="reset">
+              <form action="/reset_Search" method="POST">
+                <button type="icon-btn">
+                  <img src="{{ url_for('static', filename='icons/reset-icon.png') }}" alt="Reset" style="width:16px;height:17px;">
+                </button>
+              </form>
+            </div>
+
+          </div>
+        </div>
+
       </div>
+      <!-- Under Table -->
+
+      <div id="ai-card" class="card" style="margin-top:16px; padding:1.25rem; border:1px solid #ddd; border-radius:10px; background-color:#fafafa;">
+        <h2 style="margin-bottom:12px;">AI Insights</h2>
+        <div class="ai-buttons" style="margin-bottom:16px; display:flex; gap:10px; flex-wrap:wrap;">
+          <button id="ai-predict-expense-btn">Predict Expense</button>
+          <button id="ai-predict-income-btn">Predict Income</button>
+          <button id="ai-train-expense-btn">Train Model</button>
+          <button id="ai-comments">Generate Comments</button>
+        </div>
+        <div style="margin-bottom:12px;">
+          <strong>Predictions:</strong>
+          <p id="ai-prediction-output" style="margin:4px 0; color:#333;">No predictions yet.</p>
+        </div>
+        <div style="margin-bottom:12px;">
+          <strong>Model Status:</strong>
+          <p id="ai-train-output" style="margin:4px 0; color:#333;">Not trained yet.</p>
+        </div>
+        <div>
+          <strong>AI Comments:</strong>
+          <p id="ai-comments-output" style="margin:4px 0; font-style:italic; color:#555;">No comments generated.</p>
+        </div>
       </div>
-        </div>    
-<div id="ai-card" class="card" style="margin-top: 16px; padding: 1.25rem; border: 1px solid #ddd; border-radius: 10px; background-color: #fafafa;">
-  
-  <h2 style="margin-bottom: 12px;">AI Insights</h2>
-  <div class="ai-buttons" style="margin-bottom: 16px; display: flex; gap: 10px; flex-wrap: wrap;">
-    <button id="ai-predict-expense-btn">Predict Expense</button>
-    <button id="ai-predict-income-btn">Predict Income</button>
-    <button id="ai-train-expense-btn">Train Model</button>
-    <button id="ai-comments">Generate Comments</button>
-  </div>
 
-  <div style="margin-bottom: 12px;">
-    <strong>Predictions:</strong>
-    <p id="ai-prediction-output" style="margin: 4px 0; color: #333;">
-      No predictions yet.
-    </p>
-  </div>
+    </div> <!-- leftColumn -->
 
-  <div style="margin-bottom: 12px;">
-    <strong>Model Status:</strong>
-    <p id="ai-train-output" style="margin: 4px 0; color: #333;">
-      Not trained yet.
-    </p>
-  </div>
-
-
-  <div>
-    <strong>AI Comments:</strong>
-    <p id="ai-comments-output" style="margin: 4px 0; font-style: italic; color: #555;">
-      No comments generated.
-    </p>
-  </div>
-
-</div>
-    </div>
-    
-
-    
     <div class="canvasWrapper">
-     <div class ="canvas"><canvas id="graphic-Canvas"></canvas></div>
+      <div class="canvas"><canvas id="graphic-Canvas"></canvas></div>
       <div class="graphic-settings">
+        <select id="graphic-1" onchange="fetchDataAndRenderChart(this)" required>
+          <option value="line" selected>Line</option>
+          <option value="bar">Bar</option>
+          <option value="pie">Pie</option>
+          <option value="doughnut">Doughnut</option>
+          <option value="radar">Radar</option>
+          <option value="polarArea">Polar Area</option>
+        </select>
 
-  <select id="graphic-1" onchange="fetchDataAndRenderChart(this)" required>
-    <option value="line" selected>Line</option>
-    <option value="bar">Bar</option>
-    <option value="pie">Pie</option>
-    <option value="doughnut">Doughnut</option>
-    <option value="radar">Radar</option>
-    <option value="polarArea">Polar Area</option>
-  </select>
+        <form action="/api/make_graph" method="GET" onsubmit="fetchDataAndRenderChart(document.getElementById('graphic-1')); return false;" style="display:flex; gap:6px; align-items:center;">
+          <select name="timeFrame" required>
+            <option value="Monthly" selected>Monthly</option>
+            <option value="Quarterly">Quarterly</option>
+            <option value="Yearly">Yearly</option>
+          </select>
+          <select name="metric" required>
+            <option value="income" selected>Income</option>
+            <option value="expense">Expense</option>
+            <option value="earn_rate">Earn Rate</option>
+            <option value="spend_rate">Spend Rate</option>
+          </select>
+          <input type="month" name="startRange">
+          <span>-</span>
+          <input type="month" name="endRange">
+          <button type="submit" class="icon-btn">
+            <img src="{{ url_for('static', filename='icons/update.png') }}" alt="Update" style="width:16px;height:18px;">
+          </button>
+        </form>
+      </div>
 
-  <form action="/api/make_graph"
-        method="GET"
-        onsubmit="fetchDataAndRenderChart(document.getElementById('graphic-1')); return false;"
-        style="display:flex; gap:6px; align-items:center;">
+      <div class="secCanvas"><canvas id="graphic-Canvas-2"></canvas></div>
+      <div class="graphic-settings">
+        <select id="graphic-2" onchange="fetchDataAndRenderChart2(this)" required>
+          <option value="line" selected>Line</option>
+          <option value="bar">Bar</option>
+          <option value="pie">Pie</option>
+          <option value="doughnut">Doughnut</option>
+          <option value="radar">Radar</option>
+          <option value="polarArea">Polar Area</option>
+        </select>
 
-    <select name="timeFrame" required>
-      <option value="Monthly" selected>Monthly</option>
-      <option value="Quarterly">Quarterly</option>
-      <option value="Yearly">Yearly</option>
-    </select>
+        <form action="/api/make_graph" method="GET" onsubmit="fetchDataAndRenderChart(document.getElementById('graphic-2')); return false;" style="display:flex; gap:6px; align-items:center;">
+          <select name="timeFrame" required>
+            <option value="Monthly" selected>Monthly</option>
+            <option value="Quarterly">Quarterly</option>
+            <option value="Yearly">Yearly</option>
+          </select>
+          <select name="metric" required>
+            <option value="income" selected>Income</option>
+            <option value="expense">Expense</option>
+            <option value="earn_rate">Earn Rate</option>
+            <option value="spend_rate">Spend Rate</option>
+          </select>
+          <input type="month" name="startRange">
+          <span>-</span>
+          <input type="month" name="endRange">
+          <button type="submit" class="icon-btn">
+            <img src="{{ url_for('static', filename='icons/update.png') }}" alt="Update" style="width:16px;height:18px;">
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
 
-    <select name="metric" required>
-      <option value="income" selected>Income</option>
-      <option value="expense">Expense</option>
-      <option value="earn_rate">Earn Rate</option>
-      <option value="spend_rate">Spend Rate</option>
-    </select>
-
-
-    <input type="month" name="startRange">
-    <span>-</span>
-    <input type="month" name="endRange">
-
-    <button type="submit" class="icon-btn">
-      <img src="{{ url_for('static', filename='icons/update.png') }}" 
-           alt="Update"
-           style="width:16px; height:18px;">
-    </button>
-
-  </form>
-
-</div>
-<div class ="secCanvas"><canvas id="graphic-Canvas-2"></canvas></div>
-    <div class="graphic-settings">
-
-  <select id="graphic-2" onchange="fetchDataAndRenderChart2(this)" required>
-    <option value="line" selected>Line</option>
-    <option value="bar">Bar</option>
-    <option value="pie">Pie</option>
-    <option value="doughnut">Doughnut</option>
-    <option value="radar">Radar</option>
-    <option value="polarArea">Polar Area</option>
-  </select>
-
-  <form action="/api/make_graph"
-        method="GET"
-        onsubmit="fetchDataAndRenderChart(document.getElementById('graphic-2')); return false;"
-        style="display:flex; gap:6px; align-items:center;">
-
-  <select name="timeFrame" required>
-  <option value="Monthly" selected>Monthly</option>
-  <option value="Quarterly">Quarterly</option>
-  <option value="Yearly">Yearly</option>
-</select>
-
-<select name="metric" required>
-  <option value="income" selected>Income</option>
-  <option value="expense">Expense</option>
-  <option value="earn_rate">Earn Rate</option>
-  <option value="spend_rate">Spend Rate</option>
-  </select>
-
-<input type="month" name="startRange">
-<span>-</span>
-<input type="month" name="endRange">
-    <button type="submit" class="icon-btn">
-      <img src="{{ url_for('static', filename='icons/update.png') }}" 
-           alt="Update"
-           style="width:16px; height:18px;">
-    </button>
-
-  </form>
-
-</div>
-</div>
-</div>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
 function renderChart({
@@ -540,9 +458,6 @@ const canvasEl = document.getElementById(canvasId);
     }
   });
 }
-
-
-
 async function fetchDataAndRenderChart(graphic) {
 
   graphic = graphic || document.getElementById("graphic-1");

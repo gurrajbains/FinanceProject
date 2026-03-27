@@ -1,13 +1,12 @@
 # database.py
 import csv
 import sqlite3
-from turtle import st
 from flask import g, render_template
 import torch
 from datetime import datetime
 
 DB_NAME = "finance.db"
-valid_categories = [" fast food", "rent", "salary", "entertainment", "transportation", "healthcare", "zelle", "technology", "car bills", "Utilities bills", "other", "miscellaneous", "groceries", "subscriptions", "insurance", "education", "travel", "gifts", "donations", "personal care", "clothing", "savings", "investments"]
+valid_categories = [" fast food","rent","salary","entertainment","transportation","healthcare","zelle","technology","car bills","Utilities bills","other","miscellaneous","groceries","subscriptions","insurance","education","travel","gifts","donations","personal care","clothing","savings","investments"]
 
 def get_connection():
     conn = sqlite3.connect(DB_NAME)
@@ -35,9 +34,11 @@ def init_db():
 
 def return_HTML_table(rows):
     """
-    Return DATA to html   """
+    Return DATA to html   
+    """
     rows = get_all_transactions()
     return render_template("index.html", rows=rows)
+
 def categorize_transaction(description):
     desc = description.lower().strip()
     rules = {
@@ -106,19 +107,15 @@ def delete_transaction(transaction_id):
     cursor = conn.cursor()
     cursor.execute(" DELETE FROM finance WHERE id = ?", (transaction_id,))
     conn.commit()
-   
-    cursor.rowcount
-
     rowcount = cursor.rowcount
     conn.close()
     return rowcount
+
 def delete_all_transactions():
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("DELETE FROM finance;")
-   
     conn.commit()
-   
     deleted = cursor.rowcount
     conn.close()
     return deleted
@@ -127,7 +124,6 @@ def delete_all_transactions():
 def make_training_tensors():
     conn = get_connection()
     cursor = conn.cursor()
-
     cursor.execute("SELECT date, amount FROM finance ORDER BY date;")
     rows = cursor.fetchall()
     conn.close()
@@ -142,7 +138,10 @@ def make_training_tensors():
 
     for i in range(3, len(rows) - 1):
         date_str = rows[i][0]
-        dt = datetime.strptime(date_str, "%Y-%m-%d")
+        try:
+            dt = datetime.strptime(date_str, "%Y-%m-%d")
+        except:
+            continue
 
         month = dt.month / 12.0
         day = dt.day / 31.0
@@ -151,26 +150,17 @@ def make_training_tensors():
         current_amount = float(rows[i][1]) / 3000.0
         previous_amount = float(rows[i - 1][1]) / 3000.0
 
-        avg_last_3 = (
-            amounts[i - 1] + amounts[i - 2] + amounts[i - 3]
-        ) / 3.0 / 3000.0
-
+        avg_last_3 = (amounts[i - 1] + amounts[i - 2] + amounts[i - 3]) / 3.0 / 3000.0
         next_amount = float(rows[i + 1][1]) / 3000.0
 
-        X.append([
-            month,
-            day,
-            day_of_week,
-            current_amount,
-            previous_amount,
-            avg_last_3
-        ])
+        X.append([month, day, day_of_week, current_amount, previous_amount, avg_last_3])
         y.append([next_amount])
 
     X = torch.tensor(X, dtype=torch.float32)
     y = torch.tensor(y, dtype=torch.float32)
 
     return X, y
+
 def get_summary(metric, timeframe, timeRange=None):
     conn = get_connection()
     cursor = conn.cursor()
@@ -207,7 +197,6 @@ def get_summary(metric, timeframe, timeRange=None):
 
     elif metric in ["earn_rate", "spend_rate"]:
         factor = 1 if metric == "spend_rate" else 0
-
         if timeframe == "Monthly":
             query = f"""
             SELECT strftime('%Y-%m', date),
@@ -237,7 +226,6 @@ def get_summary(metric, timeframe, timeRange=None):
             return []
 
         cursor.execute(query, params)
-
     else:
         conn.close()
         return []
@@ -245,12 +233,12 @@ def get_summary(metric, timeframe, timeRange=None):
     rows = cursor.fetchall()
     conn.close()
     return rows
+
 def get_insights():
     conn = get_connection()
     cursor = conn.cursor()
 
     insights = []
-
 
     cursor.execute("""
         SELECT strftime('%Y-%m', date) as month, SUM(amount)
@@ -261,7 +249,7 @@ def get_insights():
         LIMIT 2
     """)
     rows = cursor.fetchall() 
-    #omapre the last two months & then we print into insights and if - or pos different message 
+    #compare the last two months & then we print into insights and if - or pos different message 
     if len(rows) == 2:
         current, previous = rows[0][1], rows[1][1]
         if previous > 0:
@@ -304,6 +292,7 @@ def get_insights():
 
     conn.close()
     return insights
+
 def get_transactions_by_type(ttype):
     conn = get_connection()
     cursor = conn.cursor()
@@ -311,18 +300,17 @@ def get_transactions_by_type(ttype):
     rows = cursor.fetchall()
     conn.close()
     return rows
+
 def export_to_csv(rows):
-    #Need to clean up data , need to clean up ui, need to clean up how data is being dsipalted on the CLI, add abiility to give percentages based on income etc; tax rates ; etc ; total percentage of money used; revenue across a few months etc;
     """
     Export all transactions to a CSV file.
     """
-    with open('finance.csv', 'w', newline='') as csvfile:  #open file in write mode 
-        columns = ['ID','Name', 'Date', 'Amount', 'Type', 'Category', 'Description'] # define ccollumns  fo rthe csv files
-        writer = csv.writer(csvfile)#writer will be write into csv file
-        writer.writerow(columns) # write the header rows 
-        for row in rows: #go through every single row in rows and put the values intoo the corresponding header 
+    with open('finance.csv', 'w', newline='') as csvfile:  
+        columns = ['ID','Name', 'Date', 'Amount', 'Type', 'Category', 'Description'] 
+        writer = csv.writer(csvfile)
+        writer.writerow(columns)
+        for row in rows:
             writer.writerow(row)
-
 
 def search_transactions(q, ttype):
     conn = get_connection()
@@ -348,7 +336,6 @@ def search_transactions(q, ttype):
 def sort_transactions(sort_by, ttype):
     conn = get_connection()
     cursor = conn.cursor()
-
     valid_sort = {"date", "amount", "id"}
     if sort_by not in valid_sort:
         sort_by = "date"
@@ -362,29 +349,25 @@ def sort_transactions(sort_by, ttype):
 def return_by_month():
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT ttype, SUM (amount), date FROM finance GROUP BY date;")  # rows will look like (Ttype SUM(amount) date) want to update with new date
+    cursor.execute("SELECT ttype, SUM (amount), date FROM finance GROUP BY date;")
     rows = cursor.fetchall()
     conn.close()
-    return rows # ret
-
+    return rows
 
 def split_date(date_str):
     if not date_str:
         return None
-
     date_str = date_str.strip()
-
     formats = [
-        "%Y-%m-%d",  "%m/%d/%Y",  "%m/%d/%y",   "%m-%d-%Y",    "%m-%d-%y",  "%Y/%m/%d",  "%Y.%m.%d",   "%d-%m-%Y",    "%d/%m/%Y",    "%d.%m.%Y",
+        "%Y-%m-%d",  "%m/%d/%Y",  "%m/%d/%y",   "%m-%d-%Y",    "%m-%d-%y",  
+        "%Y/%m/%d",  "%Y.%m.%d",   "%d-%m-%Y",    "%d/%m/%Y",    "%d.%m.%Y",
     ]
-
     for fmt in formats:
         try:
             dt = datetime.strptime(date_str, fmt)
             return dt.strftime("%Y-%m-%d")
         except ValueError:
             continue
-
     print("Bad date format:", date_str)
     return None
 
@@ -392,35 +375,32 @@ def get_new_Graphic_data(timeFrame, data):
     conn = get_connection()
     cursor = conn.cursor()
     if timeFrame == "Monthly":
-        cursor.execute("SELECT ttype, SUM (amount), date FROM finance GROUP BY strftime('%Y-%m', date);")
+        cursor.execute("SELECT ttype, SUM(amount), strftime('%Y-%m', date) as period FROM finance GROUP BY ttype, period;")
     elif timeFrame == "Quarterly":
-        cursor.execute("SELECT ttype, SUM (amount), date FROM finance GROUP BY strftime('%Y-Q%q', date);")
+        cursor.execute("SELECT ttype, SUM(amount), strftime('%Y', date)||'-Q'||((CAST(strftime('%m',date) AS INTEGER)-1)/3+1) as period FROM finance GROUP BY ttype, period;")
     elif timeFrame == "Yearly":
-        cursor.execute("SELECT ttype, SUM (amount), date FROM finance GROUP BY strftime('%Y', date);")
+        cursor.execute("SELECT ttype, SUM(amount), strftime('%Y', date) as period FROM finance GROUP BY ttype, period;")
     rows = cursor.fetchall()
     conn.close()
     return rows
 
 def get_versus_data(data):
+    conn = get_connection()
+    cursor = conn.cursor()
     if data == "earn rate":
-        conn = get_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT date, SUM(amount) FROM finance WHERE ttype='income' GROUP BY strftime('%Y-%m', date);")
-        rows = cursor.fetchall()
-        conn.close()
+        cursor.execute("SELECT strftime('%Y-%m', date) as month, SUM(amount) FROM finance WHERE ttype='income' GROUP BY month ORDER BY month;")
     elif data == "spend_rate":
-        conn = get_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT date, SUM(amount) FROM finance WHERE ttype='expense' GROUP BY strftime('%Y-%m', date);")
-        rows = cursor.fetchall()
-        conn.close()
-        return rows
+        cursor.execute("SELECT strftime('%Y-%m', date) as month, SUM(amount) FROM finance WHERE ttype='expense' GROUP BY month ORDER BY month;")
+    rows = cursor.fetchall()
+    conn.close()
+    return rows
+
+
 def delete_transaction(transaction_id):
     conn= get_connection()
     cursor = conn.cursor()
     cursor.execute(" DELETE FROM finance WHERE id = ?", (transaction_id,))
     conn.commit()
-    cursor.rowcount
     rowcount = cursor.rowcount
     conn.close()
     return rowcount
