@@ -129,7 +129,7 @@
     .graphic-settings {
       width: 100%;
       background-color: #e3d0d0;
-      border-radius: 18px;
+      border-radius: 8px;
       padding: 8px;
       display: flex;
       flex-wrap: wrap;
@@ -141,10 +141,10 @@
 
     .graphic-settings select,
     .graphic-settings input {
-      height: 34px;
+      height: 24px;
       border-radius: 12px;
       border: 1px solid rgba(0,0,0,0.25);
-      padding: 6px 10px;
+      padding: 2px 2px;
     }
 
     .graphic-settings button:hover,
@@ -288,12 +288,10 @@
           <button id="ai-comments">Generate Comments</button>
         </div>
         <div style="margin-bottom:12px;">
-          <strong>Predictions:</strong>
+          <strong> Income Predictions:</strong>
           <p id="ai-prediction-output" style="margin:4px 0; color:#333;">No predictions yet.</p>
-        </div>
-        <div style="margin-bottom:12px;">
-          <strong>Model Status:</strong>
-          <p id="ai-train-output" style="margin:4px 0; color:#333;">Not trained yet.</p>
+          <strong>Expense Predictions:</strong>
+          <p id="ai-prediction-output-expense" style="margin:4px 0; color:#333;">No predictions yet.</p>
         </div>
         <div>
           <strong>AI Comments:</strong>
@@ -347,7 +345,7 @@
           <option value="polarArea">Polar Area</option>
         </select>
 
-        <form action="/api/make_graph" method="GET" onsubmit="fetchDataAndRenderChart(document.getElementById('graphic-2')); return false;" style="display:flex; gap:6px; align-items:center;">
+        <form action="/api/make_graph" method="GET" onsubmit="fetchDataAndRenderChart2(document.getElementById('graphic-2')); return false;" style="display:flex; gap:6px; align-items:center;">
           <select name="timeFrame" required>
             <option value="Monthly" selected>Monthly</option>
             <option value="Quarterly">Quarterly</option>
@@ -524,7 +522,7 @@ fetchDataAndRenderChart2();
 <script>
 // Predict expense
 document.getElementById("ai-predict-expense-btn").addEventListener("click", async () => {
-  const output = document.getElementById("ai-prediction-output");
+  const output = document.getElementById("ai-prediction-output-expense");
   output.textContent = "Predicting expense...";
 
   try {
@@ -624,6 +622,22 @@ fetch("/api/insights")
       container.appendChild(p);
     });
   });
+</script>
+<!-- Need to cleanup redundant code specifially training as users wouldnt be able to manualy train -->
+<script>
+const importBtn = document.getElementById("importBtn");
+const fileInput = document.getElementById("fileInput");
+const importForm = document.getElementById("importForm");
+
+importBtn.addEventListener("click", () => {
+  fileInput.click(); // Open file picker
+});
+
+fileInput.addEventListener("change", () => {
+  if (fileInput.files.length > 0) {
+    importForm.submit(); // Submit form once file is selected
+  }
+});
 </script>
 </body>
 </html>

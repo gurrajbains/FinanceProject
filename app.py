@@ -9,7 +9,7 @@ from templates.ai_model import (
     make_expense_training_tensors, make_income_training_tensors,
     predict, train_model, expense_model, income_model
 )
-
+addCount = 0
 FEATURE_COUNT = 26
 app = Flask(__name__)
 
@@ -170,7 +170,10 @@ def house():
 
 
 @app.route("/add", methods=["POST"])
-def add():
+def add():  
+    global addCount
+    
+   
     name = request.form["name"].strip()
     date = request.form["date"].strip()
     amount = float(request.form["amount"])
@@ -179,8 +182,10 @@ def add():
     description = request.form.get("description", "").strip()
 
     add_transaction(name, date, amount, ttype, category, description)
-    retrain_models()  # retrain after adding
-
+    addCount += 1
+    if addCount >= 8:
+        retrain_models()
+        addCount = 0
     return redirect(url_for("house"))
 
 
