@@ -201,57 +201,71 @@ def encode_category(category):
 def make_category_training_tensors():
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT description, category FROM finance WHERE description IS NOT NULL")
+    cursor.execute("SELECT description, category FROM finance WHERE description IS NOT NULL AND description != ''")
     rows = cursor.fetchall()
     conn.close()
-    if len(rows) < 10:
+    if len(rows) < 10:  
         return None, None
     X = []
     y = []
-    for desc, cat in rows:
-        features = text_to_features(desc)
-        label = encode_category(cat)
+    for description, category in rows:
+        features = text_to_features(description)
+        label = encode_category(category)
         X.append(features)
         y.append(label)
+
     X = torch.tensor(X, dtype=torch.float32)
     y = torch.tensor(y, dtype=torch.long)
     return X, y
-
+ALL_KEYWORDS = [
+    "walmart","target","costco","kroger","safeway","trader joe","whole foods",
+    "mcdonald","burger king","starbucks","chipotle","doordash","ubereats",
+    "uber","lyft","taxi","bus","train","metro","shell","chevron","exxon","gas",
+    "amazon","ebay","best buy","etsy","aliexpress","shopping",
+    "paypal","venmo","bill","payment","rent","utilities","subscription","pay",
+    "salary","deposit","paycheck","income","bonus","transfer"
+]
 def text_to_features(text):
     text = text.lower()
-    features = [
-        len(text),
-        sum(c.isdigit() for c in text),
-        sum(c.isalpha() for c in text),
-        int("uber" in text),
-        int("amazon" in text),
-        int("walmart" in text),
-        int("gas" in text),
-        int("food" in text),
-        int("pay" in text),
-        int("deposit" in text)
-    ]
+    features = [int(word in text) for word in ALL_KEYWORDS]
+    features.append(len(text))                    
+    features.append(sum(c.isdigit() for c in text))  
+    features.append(sum(c.isalpha() for c in text))  
+    
     return features
 
 def train_category_model():
+    feature_size = len(text_to_features("example text"))
+    category_model = ImprovedModel(input_size=feature_size, hidden_size=32)  
+
     X, y = make_category_training_tensors()
     if X is None:
-        return
-    train_model(category_model, X, y, "category_model.pt", epochs=200, lr=0.001)
+        print("Not enough data to train category model.")
+        return category_model
 
-def predict_category(description):
+    
+    train_model(category_model, X, y, "category_model.pt", epochs=200, lr=0.001)
+    print("Category model trained successfully.")
+    return category_model
+
+def predict_category(description, model=None):
+    if model is None:
+        model = ImprovedModel(input_size=len(text_to_features(description)), hidden_size=32)
+        try:
+            state_dict = torch.load("category_model.pt", map_location="cpu")
+            model.load_state_dict(state_dict)
+            model.eval()
+        except (FileNotFoundError, RuntimeError):
+            print("Saved category model missing or incompatible. Using fresh model.")
+            return "other"
+
     features = [text_to_features(description)]
-    pred = predict(category_model, features)
+    X = torch.tensor(features, dtype=torch.float32)
+    model.eval()
+    with torch.no_grad():
+        pred = model(X).item()
     index = int(round(pred))
-    reverse_map = {
-        0:"groceries",
-        1:"gas",
-        2:"food",
-        3:"shopping",
-        4:"transport",
-        5:"income",
-        6:"other"
-    }
+    reverse_map = {v:k for k,v in CATEGORY_MAP.items()}
     return reverse_map.get(index, "other")
 
 def make_expense_training_tensors():
