@@ -248,24 +248,11 @@ def train_category_model():
     print("Category model trained successfully.")
     return category_model
 
-def predict_category(description, model=None):
-    if model is None:
-        model = ImprovedModel(input_size=len(text_to_features(description)), hidden_size=32)
-        try:
-            state_dict = torch.load("category_model.pt", map_location="cpu")
-            model.load_state_dict(state_dict)
-            model.eval()
-        except (FileNotFoundError, RuntimeError):
-            print("Saved category model missing or incompatible. Using fresh model.")
-            return "other"
-
+def predict_category(description):
     features = [text_to_features(description)]
-    X = torch.tensor(features, dtype=torch.float32)
-    model.eval()
-    with torch.no_grad():
-        pred = model(X).item()
+    pred = predict(category_model, features)
     index = int(round(pred))
-    reverse_map = {v:k for k,v in CATEGORY_MAP.items()}
+    reverse_map = ALL_KEYWORDS + ["length", "digit_count", "alpha_count"]
     return reverse_map.get(index, "other")
 
 def make_expense_training_tensors():

@@ -9,7 +9,7 @@
 
     body {
       margin: 0;
-      background-image: url("{{ url_for('static', filename='background.jpg') }}");
+      background-color : #ffffff;
       background-size: cover;
       background-repeat: no-repeat;
       background-attachment: fixed;
@@ -40,7 +40,7 @@
       background: rgba(255,255,255,0.9);
       border-radius: 18px;
       padding: 10px;
-      height: 585px;
+      height:650px;
       overflow: auto;
     }
 
@@ -55,12 +55,18 @@
       top: 0;
       background: rgb(105,104,104);
       z-index: 2;
-      border-radius: 10px;
+      border-radius: 0px;
       border: 1px solid rgba(0,0,0,0.25);
     }
 
-    th, td {
-      padding: 10px;
+    th {
+      padding: 8px;
+      text-align: center;
+      text-align: center;
+      border: 1px solid rgba(0,0,0,0.25);
+    } td {
+      padding: 8px;
+      text-align: center;
       text-align: center;
       border: 1px solid rgba(0,0,0,0.25);
     }
@@ -68,12 +74,17 @@
     .toolbar {
       width: 100%;
       text-align: left;
-      background: rgba(231,231,231,0.9);
+      background: rgba(255, 255, 255, 0.9);
       border-radius: 10px;
       padding: 5px;
       display: flex;
       flex-direction: row;
       gap: 5px;  
+      button{
+        background-color: #ffffff;
+        height: 25px;
+        padding: 3px 6px;
+      }
     }
 
     .add-form form {
@@ -81,6 +92,14 @@
       flex-wrap: wrap;
       gap: 10px;
       align-items: center;
+      
+    }
+    .action-bar form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      
     }
 
     .add-form input,
@@ -112,7 +131,7 @@
     .canvas,
     .secCanvas {
       width: 100%;
-      background: rgba(200,177,177,0.9);
+      background: rgba(255, 253, 253, 0.9);
       border-radius: 18px;
       padding: 10px;
     }
@@ -128,7 +147,7 @@
 
     .graphic-settings {
       width: 100%;
-      background-color: #e3d0d0;
+      background-color: #ffffff;
       border-radius: 8px;
       padding: 8px;
       display: flex;
@@ -137,6 +156,7 @@
       align-items: center;
       justify-content: center;
       flex-direction: row;
+      
     }
 
     .graphic-settings select,
@@ -149,6 +169,18 @@
 
     .graphic-settings button:hover,
     button:hover { background-color: #847171; }
+    .graphic-settings button {
+      border-radius: 12px;
+      border: 1px solid rgba(0, 0, 0, 0.25);
+      padding: 3px 4px;
+      cursor: pointer;
+      width: 25px;
+      height: 25px;
+      background-color: #fffdfd;
+      align-items: center;
+  
+      justify-content: center;
+    }
 
     .ai-card {
       position: flex;
@@ -163,6 +195,8 @@
     }
 
     .graphic-settings input { width: 75px; }
+
+    
   </style>
 </head>
 <body>
