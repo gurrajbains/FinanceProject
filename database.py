@@ -32,13 +32,6 @@ def init_db():
     conn.close()
 
 
-def return_HTML_table(rows):
-    """
-    Return DATA to html   
-    """
-    rows = get_all_transactions()
-    return render_template("index.html", rows=rows)
-
 def categorize_transaction(description):
     desc = description.lower().strip()
     rules = {
@@ -102,14 +95,6 @@ def get_all_transactions():
     conn.close()
     return rows
 
-def delete_transaction(transaction_id):
-    conn= get_connection()
-    cursor = conn.cursor()
-    cursor.execute(" DELETE FROM finance WHERE id = ?", (transaction_id,))
-    conn.commit()
-    rowcount = cursor.rowcount
-    conn.close()
-    return rowcount
 
 def delete_all_transactions():
     conn = get_connection()
@@ -293,13 +278,6 @@ def get_insights():
     conn.close()
     return insights
 
-def get_transactions_by_type(ttype):
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT name, date, amount, ttype, category, description FROM finance WHERE ttype=? ORDER by date DESC, id DESC", (ttype,))
-    rows = cursor.fetchall()
-    conn.close()
-    return rows
 
 def export_to_csv(rows):
     """
@@ -346,13 +324,6 @@ def sort_transactions(sort_by, ttype):
     conn.close()
     return rows
 
-def return_by_month():
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT ttype, SUM (amount), date FROM finance GROUP BY date;")
-    rows = cursor.fetchall()
-    conn.close()
-    return rows
 
 def split_date(date_str):
     if not date_str:
@@ -371,29 +342,7 @@ def split_date(date_str):
     print("Bad date format:", date_str)
     return None
 
-def get_new_Graphic_data(timeFrame, data):
-    conn = get_connection()
-    cursor = conn.cursor()
-    if timeFrame == "Monthly":
-        cursor.execute("SELECT ttype, SUM(amount), strftime('%Y-%m', date) as period FROM finance GROUP BY ttype, period;")
-    elif timeFrame == "Quarterly":
-        cursor.execute("SELECT ttype, SUM(amount), strftime('%Y', date)||'-Q'||((CAST(strftime('%m',date) AS INTEGER)-1)/3+1) as period FROM finance GROUP BY ttype, period;")
-    elif timeFrame == "Yearly":
-        cursor.execute("SELECT ttype, SUM(amount), strftime('%Y', date) as period FROM finance GROUP BY ttype, period;")
-    rows = cursor.fetchall()
-    conn.close()
-    return rows
 
-def get_versus_data(data):
-    conn = get_connection()
-    cursor = conn.cursor()
-    if data == "earn rate":
-        cursor.execute("SELECT strftime('%Y-%m', date) as month, SUM(amount) FROM finance WHERE ttype='income' GROUP BY month ORDER BY month;")
-    elif data == "spend_rate":
-        cursor.execute("SELECT strftime('%Y-%m', date) as month, SUM(amount) FROM finance WHERE ttype='expense' GROUP BY month ORDER BY month;")
-    rows = cursor.fetchall()
-    conn.close()
-    return rows
 
 
 def delete_transaction(transaction_id):
