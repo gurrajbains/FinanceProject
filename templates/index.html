@@ -323,7 +323,7 @@
         <div class="ai-buttons" style="margin-bottom:16px; display:flex; gap:10px; flex-wrap:wrap;">
           <button id="ai-predict-expense-btn">Predict Expense</button>
           <button id="ai-predict-income-btn">Predict Income</button>
-          <button id="ai-train-expense-btn">Train Model</button>
+  
           <button id="ai-comments">Generate Comments</button>
         </div>
         <div style="margin-bottom:12px;">
@@ -599,19 +599,6 @@ document.getElementById("ai-predict-income-btn").addEventListener("click", async
   }
 });
 
-// Train expense model
-document.getElementById("ai-train-expense-btn").addEventListener("click", async () => {
-  const output = document.getElementById("ai-train-output");
-  output.textContent = "Training expense model...";
-
-  try {
-    const res = await fetch("/api/trainExpenses", { method: "POST" });
-    const data = await res.json();
-    output.textContent = "Expense model: " + (data.status ?? data.error);
-  } catch {
-    output.textContent = "Expense training failed.";
-  }
-});
 
 
 //Generate suggestions
@@ -632,23 +619,7 @@ document.getElementById("ai-comments").addEventListener("click", async () => {
     outputEl.textContent = "Failed to generate suggestions.";
   }
 });
-// Generate comments
-document.getElementById("ai-comments").addEventListener("click", async () => {
-  const outputEl = document.getElementById("ai-comments-output");
-  outputEl.textContent = "Generating suggestions...";
 
-  try {
-    const res = await fetch("/api/ai_suggestions");
-    const data = await res.json();
-    if (data.comments && data.comments.length > 0) {
-      outputEl.innerHTML = data.comments.map(c => "• " + c).join("<br>");
-    } else {
-      outputEl.textContent = "No suggestions available right now.";
-    }
-  } catch {
-    outputEl.textContent = "Failed to generate suggestions.";
-  }
-});
 fetch("/api/insights")
   .then(res => res.json())
   .then(data => {
