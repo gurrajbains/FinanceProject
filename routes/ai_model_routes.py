@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, request
+import torch
 from database import get_connection, get_all_transactions
 from templates.ai_model import (
     SCALE_AMOUNT, build_features,
@@ -141,3 +142,13 @@ def ai_suggestions():
         suggestions.append("Expenses exceed income.")
 
     return jsonify({"comments": suggestions})
+def evaluate_category_model(model, X, y):
+   
+    model.eval()
+    with torch.no_grad():
+        outputs = model(X)
+        preds = torch.round(outputs).long().squeeze()
+        correct = (preds == y).sum().item()
+        total = y.size(0)
+        accuracy = correct / total * 100
+    return accuracy
