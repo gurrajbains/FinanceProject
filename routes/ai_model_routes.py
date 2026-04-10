@@ -12,7 +12,7 @@ ai = Blueprint("ai", __name__)
 FEATURE_COUNT = 26
 
 
-# --- Helper ---
+
 def get_recent_features(n):
     conn = get_connection()
     cursor = conn.cursor()
@@ -30,7 +30,6 @@ def run_prediction(model, features):
     return predict(model, features) * SCALE_AMOUNT
 
 
-# --- Routes ---
 @ai.route("/api/trainExpenses", methods=["POST"])
 def train_expenses():
     X, y = make_expense_training_tensors()
