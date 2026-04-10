@@ -565,7 +565,7 @@ document.getElementById("ai-predict-expense-btn").addEventListener("click", asyn
   output.textContent = "Predicting expense...";
 
   try {
-    const res = await fetch("/api/predict_next_expense");
+    const res = await fetch("/api/predict_next/expense");
     const data = await res.json();
 
     if (data.prediction) {
@@ -585,7 +585,7 @@ document.getElementById("ai-predict-income-btn").addEventListener("click", async
   output.textContent = "Predicting income...";
 
   try {
-    const res = await fetch("/api/predict_next_income");
+    const res = await fetch("/api/predict_next/income");
     const data = await res.json();
 
     if (data.prediction) {

@@ -29,6 +29,15 @@ def get_recent_features(n):
 def run_prediction(model, features):
     return predict(model, features) * SCALE_AMOUNT
 
+@ai.route("/api/retrain_models", methods=["POST"])
+def retrain_models():
+    X_expense, y_expense = make_expense_training_tensors()
+    X_income, y_income = make_income_training_tensors()
+    if X_expense is not None and X_expense.shape[0] >= 5:
+        train_model(expense_model, X_expense, y_expense, "expense_model.pt", epochs=300, lr=0.001)
+    if X_income is not None and X_income.shape[0] >= 5:
+        train_model(income_model, X_income, y_income, "income_model.pt", epochs=300, lr=0.001)
+    return jsonify({"status": "models retrained"})
 
 @ai.route("/api/trainExpenses", methods=["POST"])
 def train_expenses():

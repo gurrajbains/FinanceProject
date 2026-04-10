@@ -3,7 +3,7 @@ from database import (
     add_transaction, delete_all_transactions,
     get_all_transactions, export_to_csv, get_connection
 )
-from routes.ai_model_routes import retrain_models
+from  routes.ai_model_routes import retrain_models
 
 transactions = Blueprint("sql", __name__)
 
