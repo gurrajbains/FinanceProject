@@ -357,16 +357,23 @@
             <option value="Monthly" selected>Monthly</option>
             <option value="Quarterly">Quarterly</option>
             <option value="Yearly">Yearly</option>
-          </select>
+            <!--  <option value="1M" selected>1M</option>
+            <option value="3M">3M</option>
+            <option value="6M">6M</option>
+            <option value="1Y">1Y</option>
+            <option value="YTD">YTD</option>
+            <option value="ALL">ALL</option> -->
+    </select>
+
           <select name="metric" required>
             <option value="income" selected>Income</option>
             <option value="expense">Expense</option>
             <option value="earn_rate">Earn Rate</option>
             <option value="spend_rate">Spend Rate</option>
           </select>
-          <input type="month" name="startRange">
+          <input type="month" name="startRange" style ="width:25px;">
           <span>-</span>
-          <input type="month" name="endRange">
+          <input type="month" name="endRange" style ="width:25px;">
           <button type="submit" class="icon-btn">
             <img src="{{ url_for('static', filename='icons/update.png') }}" alt="Update" style="width:16px;height:18px;">
           </button>
@@ -389,6 +396,12 @@
             <option value="Monthly" selected>Monthly</option>
             <option value="Quarterly">Quarterly</option>
             <option value="Yearly">Yearly</option>
+             <!--  <option value="1M" selected>1M</option>
+            <option value="3M">3M</option>
+            <option value="6M">6M</option>
+            <option value="1Y">1Y</option>
+            <option value="YTD">YTD</option>
+            <option value="ALL">ALL</option> -->
           </select>
           <select name="metric" required>
             <option value="income" selected>Income</option>
@@ -396,9 +409,9 @@
             <option value="earn_rate">Earn Rate</option>
             <option value="spend_rate">Spend Rate</option>
           </select>
-          <input type="month" name="startRange">
+          <input type="month" name="startRange" style ="width:25px;">
           <span>-</span>
-          <input type="month" name="endRange">
+          <input type="month" name="endRange" style ="width:25px;">
           <button type="submit" class="icon-btn">
             <img src="{{ url_for('static', filename='icons/update.png') }}" alt="Update" style="width:16px;height:18px;">
           </button>
@@ -620,7 +633,7 @@ document.getElementById("ai-comments").addEventListener("click", async () => {
   }
 });
 
-fetch("/api/insights")
+fetch("/api/ai_suggestions")
   .then(res => res.json())
   .then(data => {
     const container = document.getElementById("insights");
