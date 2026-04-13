@@ -615,7 +615,6 @@ document.getElementById("ai-predict-income-btn").addEventListener("click", async
 
 
 //Generate suggestions
-// Generate suggestions on the same button as comments
 document.getElementById("ai-comments").addEventListener("click", async () => {
   const outputEl = document.getElementById("ai-comments-output");
   outputEl.textContent = "Generating suggestions...";
@@ -623,28 +622,17 @@ document.getElementById("ai-comments").addEventListener("click", async () => {
   try {
     const res = await fetch("/api/ai_suggestions");
     const data = await res.json();
+
     if (data.comments && data.comments.length > 0) {
       outputEl.innerHTML = data.comments.map(c => "• " + c).join("<br>");
     } else {
       outputEl.textContent = "No suggestions available right now.";
     }
-  } catch {
+
+  } catch (err) {
     outputEl.textContent = "Failed to generate suggestions.";
   }
 });
-
-fetch("/api/ai_suggestions")
-  .then(res => res.json())
-  .then(data => {
-    const container = document.getElementById("insights");
-    container.innerHTML = "";
-
-    data.insights.forEach(text => {
-      const p = document.createElement("p");
-      p.textContent = "• " + text;
-      container.appendChild(p);
-    });
-  });
 </script>
 <!-- Need to cleanup redundant code specifially training as users wouldnt be able to manualy train -->
 <script>

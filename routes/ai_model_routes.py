@@ -113,7 +113,7 @@ def ai_suggestions():
     category_totals = {}
     for r in expenses:
         cat = r[5]
-        category_totals[cat] = abs(category_totals.get(cat, 0) + float(r[3]))
+        category_totals[cat] = category_totals.get(cat, 0) + abs(float(r[3]))
     suggestions = []
     for cat, total in category_totals.items():
         if income > 0 and total > income * 0.2:
