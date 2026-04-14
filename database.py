@@ -34,30 +34,35 @@ def init_db():
 
 def categorize_transaction(description):
     desc = description.lower().strip()
+
     rules = {
         "groceries": ["walmart","target","costco","kroger","safeway","trader joe","whole foods","foodmaxx"],
         "gas": ["shell","chevron","exxon","76","arco","valero","gas"],
         "food": ["mcdonald","starbucks","chipotle","doordash","ubereats","grubhub","restaurant","cafe","pizza"],
-        "shopping": ["amazon","ebay","best buy","walmart online","target online","nike","apple","store"],
+        "shopping": ["amazon","ebay","best buy","nike","apple"],
         "transport": ["uber","lyft","bus","train","bart","metro"],
         "income": ["deposit","payroll","salary","paycheck","zelle","venmo","refund","bonus"]
     }
+
     for category, keywords in rules.items():
         for word in keywords:
-            if word in desc:
+            if re.search(rf"\b{re.escape(word)}\b", desc):
                 return category
-    
-    scores = {key:0 for key in rules.keys()}
+
+    scores = {key: 0 for key in rules.keys()}
     words = desc.split()
+
     for w in words:
         for category, keywords in rules.items():
             for k in keywords:
-                if w in k or k in w:
+                if w == k:
+                    scores[category] += 2
+                elif w in k or k in w:
                     scores[category] += 1
+
     best_category = max(scores, key=scores.get)
-    if scores[best_category] > 0:
-        return best_category
-    return "other"
+
+    return best_category if scores[best_category] > 0 else "other"
 
 def add_transaction(name, date, amount, ttype, category, description=""):
     converted_date = split_date(date)
