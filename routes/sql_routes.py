@@ -3,7 +3,8 @@ from database import (
     add_transaction, delete_all_transactions,
     get_all_transactions, export_to_csv, get_connection
 )
-from  routes.ai_model_routes import retrain_models
+from routes.ai_model_routes import retrain_models
+import csv
 
 transactions = Blueprint("sql", __name__)
 
@@ -43,7 +44,10 @@ def delete():
     if ids:
         conn = get_connection()
         cursor = conn.cursor()
-        cursor.execute(f"DELETE FROM finance WHERE id IN ({','.join(['?']*len(ids))})", ids)
+        cursor.execute(
+            f"DELETE FROM finance WHERE id IN ({','.join(['?']*len(ids))})",
+            ids
+        )
         conn.commit()
         conn.close()
 
@@ -54,3 +58,53 @@ def delete():
 def export():
     export_to_csv(get_all_transactions())
     return send_file("finance.csv", as_attachment=True)
+
+# import is very simple minded and doesnt address larger issues with it also ui is trash righht now and needs to be cleaned up as well asn the toolbar bigigest issue right now 
+@transactions.route("/import", methods=["POST"])
+def import_csv():
+    file = request.files.get("file")
+    if not file or file.filename == "":
+        return redirect(url_for("main.house"))
+
+    import csv
+    def clean_amount(value):
+        if value is None:
+            return 0.0
+        value = str(value).strip().replace("$", "").replace(",", "")
+        if value == "":
+            return 0.0
+        try:
+            return float(value)
+        except ValueError:
+            return 0.0
+
+    try:
+        stream = (line.decode("utf-8-sig") for line in file.stream)
+        reader = csv.DictReader(stream)
+        if not reader.fieldnames:
+            return redirect(url_for("main.house"))
+
+        imported_count = 0
+        skipped_count = 0
+        for row in reader:
+            name = (row.get("Name") or "").strip()
+            date = (row.get("Date") or "").strip()
+            amount = clean_amount(row.get("Amount"))
+            ttype = (row.get("Type") or "").strip()
+            category = (row.get("Category") or "").strip()
+            description = (row.get("Description") or "").strip()
+
+            if not date:
+                skipped_count += 1
+                continue
+
+            add_transaction(name, date, amount, ttype, category, description)
+            imported_count += 1
+
+        if imported_count > 0:
+            retrain_models()
+
+    except Exception as e:
+        print("Error importing CSV:", e)
+
+    return redirect(url_for("main.house"))
