@@ -63,48 +63,92 @@ def export():
 @transactions.route("/import", methods=["POST"])
 def import_csv():
     file = request.files.get("file")
+
     if not file or file.filename == "":
         return redirect(url_for("main.house"))
 
-    import csv
+    VALID_TYPES = {"income", "expense"}
+
     def clean_amount(value):
         if value is None:
             return 0.0
-        value = str(value).strip().replace("$", "").replace(",", "")
-        if value == "":
-            return 0.0
+
+        value = str(value).replace("$", "").replace(",", "").strip()
+
         try:
             return float(value)
-        except ValueError:
+        except:
             return 0.0
+
+    imported = 0
+    skipped = 0
+    duplicates = 0
 
     try:
         stream = (line.decode("utf-8-sig") for line in file.stream)
         reader = csv.DictReader(stream)
+
         if not reader.fieldnames:
             return redirect(url_for("main.house"))
 
-        imported_count = 0
-        skipped_count = 0
-        for row in reader:
-            name = (row.get("Name") or "").strip()
-            date = (row.get("Date") or "").strip()
-            amount = clean_amount(row.get("Amount"))
-            ttype = (row.get("Type") or "").strip()
-            category = (row.get("Category") or "").strip()
-            description = (row.get("Description") or "").strip()
+        conn = get_connection()
+        cursor = conn.cursor()
 
-            if not date:
-                skipped_count += 1
+        existing = set()
+
+        cursor.execute("SELECT name, date, amount, type, source FROM finance")
+
+        for row in cursor.fetchall():
+            existing.add(tuple(row))
+
+        rows_to_insert = []
+
+        for row in reader:
+            try:
+                normalized = {k.strip().lower(): (v.strip() if v else "") for k, v in row.items()}
+
+                name = normalized.get("name", "")
+                date = normalized.get("date", "")
+                amount = clean_amount(normalized.get("amount"))
+                ttype = normalized.get("type", "").lower()
+                category = normalized.get("category", "")
+                description = normalized.get("description", "")
+
+                if not date or ttype not in VALID_TYPES:
+                    skipped += 1
+                    continue
+
+                transaction_key = (name, date, amount, ttype, category)
+
+                if transaction_key in existing:
+                    duplicates += 1
+                    continue
+
+                existing.add(transaction_key)
+
+                rows_to_insert.append((name, date, amount, ttype, category, description))
+
+            except:
+                skipped += 1
                 continue
 
-            add_transaction(name, date, amount, ttype, category, description)
-            imported_count += 1
+        if rows_to_insert:
+            cursor.executemany(
+                "INSERT INTO finance (name, date, amount, type, source, description) VALUES (?, ?, ?, ?, ?, ?)",
+                rows_to_insert
+            )
 
-        if imported_count > 0:
+            conn.commit()
+            imported = len(rows_to_insert)
+
+        conn.close()
+
+        if imported >= 10:
             retrain_models()
 
+        print(f"Imported: {imported} | Skipped: {skipped} | Duplicates: {duplicates}")
+
     except Exception as e:
-        print("Error importing CSV:", e)
+        print("CSV Import Error:", e)
 
     return redirect(url_for("main.house"))
